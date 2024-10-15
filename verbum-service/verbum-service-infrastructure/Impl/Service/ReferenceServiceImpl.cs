@@ -20,21 +20,30 @@ namespace verbum_service_infrastructure.Impl.Service
             this.mapper = mapper;
         }
 
-        public async Task AddRange(Guid orderId, List<string> fileURLs)
+        public async Task AddRange(Guid orderId, List<string> fileURLs, string tag)
         {
-            var references = fileURLs.Select(fileURL => new OrderReference
+            try
             {
-                OrderId = orderId,
-                ReferenceFileUrl = fileURL
-            });
-            context.OrderReferences.AddRange(references);
-            await context.SaveChangesAsync();
+                var references = fileURLs.Select(fileURL => new OrderReference
+                {
+                    OrderId = orderId,
+                    ReferenceFileUrl = fileURL,
+                    Tag = tag,
+                    IsDeleted = false
+                });
+                context.OrderReferences.AddRange(references);
+                await context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task UpdateReference(Guid orderId, List<string> fileURLs)
         {
             await context.OrderReferences.Where(c => c.OrderId == orderId).ExecuteDeleteAsync();
-            await AddRange(orderId, fileURLs);
+            await AddRange(orderId, fileURLs, "");
         }
     }
 }

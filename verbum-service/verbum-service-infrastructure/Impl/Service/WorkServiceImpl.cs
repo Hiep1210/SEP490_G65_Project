@@ -61,8 +61,24 @@ namespace verbum_service_infrastructure.Impl.Service
             Guid clientId = currentUser.Id;
             switch (currentUser.Role)
             {
+                case UserRole.TRANSLATE_MANAGER:
+                    orders = await context.Works
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Where(w => w.ServiceCode == "TL")
+                        .ToListAsync();
+                    break;
+                case UserRole.EDIT_MANAGER:
+                    orders = await context.Works.Where(w => w.ServiceCode == "ED").ToListAsync();
+                    break;
+                case UserRole.EVALUATE_MANAGER:
+                    orders = await context.Works.Where(w => w.ServiceCode == "EV").ToListAsync();
+                    break;
                 case UserRole.CLIENT:
-                    orders = await context.Works.ToListAsync();
+                    orders = await context.Works
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .ToListAsync();
                     break;
                 default:
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
