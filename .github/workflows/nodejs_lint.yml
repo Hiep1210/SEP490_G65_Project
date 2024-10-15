@@ -8,6 +8,10 @@ on:
     paths:
       - VERBUM_FE_SEP490/**
 
+defaults:
+  run:
+    working-directory: ./VERBUM_FE_SEP490
+
 jobs:
   run-linters:
     name: Run linters
