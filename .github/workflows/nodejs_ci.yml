@@ -5,11 +5,9 @@ name: NodeJs_CI
 
 on:
   push:
-    branches: '**'
     paths:
       - VERBUM_FE_SEP490/**
   pull_request:
-    branches: '**'
     paths:
       - VERBUM_FE_SEP490/**
 
