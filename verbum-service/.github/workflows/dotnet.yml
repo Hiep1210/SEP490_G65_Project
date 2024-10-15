@@ -5,7 +5,11 @@ name: .NET
 
 on:
   push:
+    paths:
+      - vervum-service/**
   pull_request:
+    paths:
+      - vervum-service/**
 
 jobs:
   build:
