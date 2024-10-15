@@ -28,7 +28,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<OrderResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<List<OrderResponse>> GetAllOrder()
+        public async Task<List<OrderDetailsResponse>> GetAllOrder()
         {
             return await orderService.GetAllOrder();
         }

@@ -146,7 +146,7 @@ namespace verbum_service_infrastructure.Impl.Service
             }
 
             var claims = authenticateResult.Principal.Claims;
-            string email = claims.FirstOrDefault(c => c.Type.EndsWith("email"))?.Value;
+            string email = claims.FirstOrDefault(c => c.Type.EndsWith("emailaddress"))?.Value;
             string name = claims.FirstOrDefault(c => c.Type.EndsWith("name"))?.Value;
 
             User oldUser = await context.Users.FirstOrDefaultAsync(u => u.Email == email);

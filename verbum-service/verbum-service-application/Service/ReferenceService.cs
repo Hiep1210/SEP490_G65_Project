@@ -2,7 +2,7 @@
 {
     public interface ReferenceService
     {
-        Task AddRange(Guid orderId, List<string> fileURLs);
+        Task AddRange(Guid orderId, List<string> fileURLs, string tag);
         Task UpdateReference(Guid orderId, List<string> fileURLs);
     }
 }

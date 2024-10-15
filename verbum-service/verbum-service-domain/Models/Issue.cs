@@ -14,7 +14,7 @@ public partial class Issue
     public DateTime? UpdatedAt { get; set; }
 
     /// <summary>
-    /// CANCEL, OPEN, RESOLVED, APPROVED
+    /// CANCEL, OPEN, RESOLVED, ACCEPTED
     /// </summary>
     public string? Status { get; set; }
 

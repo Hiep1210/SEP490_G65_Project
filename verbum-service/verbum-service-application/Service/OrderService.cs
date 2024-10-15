@@ -6,7 +6,7 @@ namespace verbum_service_application.Service
 {
     public interface OrderService
     {
-        Task<List<OrderResponse>> GetAllOrder();
+        Task<List<OrderDetailsResponse>> GetAllOrder();
         Task AddRangeMiddle(Guid orderId, List<string> languageIds);
         Task CreateOrder(Order info);
         Task UpdateOrder(OrderUpdate request);

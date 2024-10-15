@@ -29,16 +29,25 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task CreateOrder(Order info)
         {
-            info.ClientId = currentUser.Id;
-            context.Orders.Add(info);
-            await context.SaveChangesAsync();
+            try
+            {
+                info.ClientId = currentUser.Id;
+                context.Orders.Add(info);
+                await context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task AddRangeMiddle(Guid orderId, List<string> languageIds)
         {
-            var categories = context.Languages.Where(c => languageIds.Contains(c.LanguageId)).ToList();
+            try
+            {
+                var categories = context.Languages.Where(c => languageIds.Contains(c.LanguageId)).ToList();
 
-            var order = context.Orders.Find(orderId);
+                var order = context.Orders.Find(orderId);
                 if (order != null)
                 {
                     foreach (var category in categories)
@@ -47,28 +56,34 @@ namespace verbum_service_infrastructure.Impl.Service
                     }
                 }
 
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
 
 
-        public async Task<List<OrderResponse>> GetAllOrder()
+        public async Task<List<OrderDetailsResponse>> GetAllOrder()
         {
             List<Order> orders = new List<Order>();
             Guid clientId = currentUser.Id;
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    orders = await context.Orders
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
                 case UserRole.ADMIN: case UserRole.STAFF:
-                    orders = await context.Orders.ToListAsync();
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
+                        .ToListAsync();
                     break;
                 default:
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
             }
-            List<OrderResponse> list = mapper.Map<List<OrderResponse>>(orders);
+            List<OrderDetailsResponse> list = mapper.Map<List<OrderDetailsResponse>>(orders);
             return list;
         }
 

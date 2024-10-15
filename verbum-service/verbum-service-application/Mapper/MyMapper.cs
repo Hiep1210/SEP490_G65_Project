@@ -27,12 +27,20 @@ namespace verbum_service_application.Mapper
             CreateMap<Order, OrderResponse>().ReverseMap();
             CreateMap<Order, OrderDetailsResponse>()
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
-                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Select(t => t.ReferenceFileUrl).ToList()));
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES").Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "DELIVERABLES").Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
             CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
             CreateMap<UpdateLanguageSupportRequest, Language>()
                 .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.LanguageId.ToUpper())).ReverseMap();
-            CreateMap<Work, WorkResponse>().ReverseMap();
+            CreateMap<Work, WorkResponse>()
+                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Order.OrderName))
+                .ForMember(dest => dest.SourceLanguageId, opt => opt.MapFrom(src => src.Order.SourceLanguageId))
+                .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Order.OrderStatus))
+                .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.Order.TargetLanguages.Select(t => t.LanguageId).ToList()))
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "REFERENCES").Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<Work, WorkCreate>().ReverseMap();
             CreateMap<Work, WorkUpdate>().ReverseMap();
         }

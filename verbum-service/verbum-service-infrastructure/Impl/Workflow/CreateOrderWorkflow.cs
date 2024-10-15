@@ -48,7 +48,8 @@ namespace verbum_service_infrastructure.Impl.Workflow
             //await workService.AddRange(order.OrderId, request.DueDate, serviceCodes);
             //workIds = await workService.GetWorkIdsListByOrderId(order.OrderId);
             //await workService.AddRangeMiddle(workIds,request.OldCategoryIds);
-            await referenceService.AddRange(order.OrderId, request.ReferenceFileURLs);
+            await referenceService.AddRange(order.OrderId, request.TranslationFileURL, "TRANSLATION");
+            await referenceService.AddRange(order.OrderId, request.ReferenceFileURLs, "REFERENCES");
         }
     }
 }
