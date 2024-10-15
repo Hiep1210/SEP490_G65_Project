@@ -7,6 +7,8 @@
     <div class="hidden bg-muted lg:block">
       <div
         class="h-full flex items-center justify-center lg:text-7xl font-bold"
+
+        
       >
         <div>
           <p>The <span class="text-primary">Localization</span></p>
