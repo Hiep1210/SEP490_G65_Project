@@ -1,0 +1,59 @@
+﻿using Microsoft.EntityFrameworkCore;
+using verbum_service_application.Validation;
+using verbum_service_domain.Common.ErrorModel;
+using verbum_service_domain.DTO.Request;
+using verbum_service_domain.Utils;
+using verbum_service_infrastructure.DataContext;
+
+namespace verbum_service_infrastructure.Impl.Validation
+{
+    public class CreateOrderValidation : IValidation<OrderCreate>
+    {
+        private readonly verbumContext context;
+        public CreateOrderValidation(verbumContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task<List<string>> Validate(OrderCreate request)
+        {
+            List<string> alerts = new List<string>();
+            ValidateEmpty(request, alerts);
+            await ValidateExist(request, alerts);
+            return alerts;
+        }
+
+        private void ValidateEmpty(OrderCreate request, List<string> alerts)
+        {
+            if (ObjectUtils.IsEmpty(request.TargetLanguageIdList))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "TargetLanguage"));
+            }
+            if (ObjectUtils.IsEmpty(request.OrderName))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "OrderName"));
+            }
+            if (ObjectUtils.IsEmpty(request.SourceLanguageId))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "SourceLanguageId"));
+            }
+            if (request.HasTranslateService == false && request.HasEvaluateService == false && request.HasEditService == false)
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "You need to order at least 1 service"));
+            }
+        }
+
+        private async Task ValidateExist(OrderCreate request, List<string> alerts)
+        {
+            if (!await context.Languages.AnyAsync(c => c.LanguageId == request.SourceLanguageId))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "SourceLanguage"));
+            }
+            if (!request.TargetLanguageIdList.All(id => context.Languages.Any(c => c.LanguageId == id)))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "TargetLanguage"));
+            }
+        }
+
+    }
+}

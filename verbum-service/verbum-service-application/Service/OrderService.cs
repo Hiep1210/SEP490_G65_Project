@@ -1,0 +1,21 @@
+﻿using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
+using verbum_service_domain.Models;
+
+namespace verbum_service_application.Service
+{
+    public interface OrderService
+    {
+        Task<List<OrderResponse>> GetAllOrder();
+        Task AddRangeMiddle(Guid orderId, List<string> languageIds);
+        Task CreateOrder(Order info);
+        Task UpdateOrder(OrderUpdate request);
+        Task UpdateOrderTargetLanguage(OrderUpdate request);
+        Task CancelOrder (Guid id);
+        Task<OrderDetailsResponse> GetOrderDetails(Guid id);
+        Task AcceptOrDeclineOrder(Guid orderId, string orderStatus);
+        Task RecoverDeletedFiles(Guid orderId, string url);
+        Task DeleteOrderReferenceFile(Guid orderId, string url);
+        Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request);
+    }
+}

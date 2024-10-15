@@ -1,0 +1,40 @@
+﻿using AutoMapper;
+using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
+using verbum_service_domain.Models;
+
+namespace verbum_service_application.Mapper
+{
+    public class MyMapper : Profile
+    {
+        public MyMapper()
+        {
+            CreateMap<UserSignUp, User>().ReverseMap();
+            CreateMap<Category, CategoryInfoResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CategoryId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CategoryName));
+            CreateMap<Category, CategoryInfo>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CategoryName))
+                .ReverseMap();
+            CreateMap<Category, CategoryUpdate>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CategoryId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CategoryName))
+                .ReverseMap();
+            CreateMap<Issue, CreateIssueRequest>().ReverseMap();
+            CreateMap<Issue, UpdateIssueRequest>().ReverseMap();
+            CreateMap<Language, LanguageResponse>().ReverseMap();
+            CreateMap<Order, OrderCreate>().ReverseMap();
+            CreateMap<Order, OrderResponse>().ReverseMap();
+            CreateMap<Order, OrderDetailsResponse>()
+                .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Select(t => t.ReferenceFileUrl).ToList()));
+            CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
+            CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
+            CreateMap<UpdateLanguageSupportRequest, Language>()
+                .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.LanguageId.ToUpper())).ReverseMap();
+            CreateMap<Work, WorkResponse>().ReverseMap();
+            CreateMap<Work, WorkCreate>().ReverseMap();
+            CreateMap<Work, WorkUpdate>().ReverseMap();
+        }
+    }
+}

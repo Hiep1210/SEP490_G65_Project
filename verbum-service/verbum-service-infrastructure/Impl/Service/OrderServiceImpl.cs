@@ -1,0 +1,177 @@
+﻿using AutoMapper;
+using Lombok.NET;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq.Expressions;
+using verbum_service_application.Service;
+using verbum_service_domain.Common;
+using verbum_service_domain.Common.ErrorModel;
+using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
+using verbum_service_domain.Models;
+using verbum_service_domain.Utils;
+using verbum_service_infrastructure.DataContext;
+
+namespace verbum_service_infrastructure.Impl.Service
+{
+    [RequiredArgsConstructor]
+    public partial class OrderServiceImpl : OrderService
+    {
+        private readonly verbumContext context;
+        private readonly IMapper mapper;
+        private readonly CurrentUser currentUser;
+
+        public async Task CancelOrder(Guid id)
+        {
+            await context.Orders.Where(o => o.OrderId == id).ExecuteUpdateAsync(o =>
+                o.SetProperty(c => c.OrderStatus, OrderStatus.CANCELLED.ToString()));
+        }
+
+        public async Task CreateOrder(Order info)
+        {
+            info.ClientId = currentUser.Id;
+            context.Orders.Add(info);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task AddRangeMiddle(Guid orderId, List<string> languageIds)
+        {
+            var categories = context.Languages.Where(c => languageIds.Contains(c.LanguageId)).ToList();
+
+            var order = context.Orders.Find(orderId);
+                if (order != null)
+                {
+                    foreach (var category in categories)
+                    {
+                        order.TargetLanguages.Add(category);
+                    }
+                }
+
+            await context.SaveChangesAsync();
+        }
+
+
+        public async Task<List<OrderResponse>> GetAllOrder()
+        {
+            List<Order> orders = new List<Order>();
+            Guid clientId = currentUser.Id;
+            switch (currentUser.Role)
+            {
+                case UserRole.CLIENT:
+                    orders = await context.Orders
+                        .Where(x => x.ClientId == clientId)
+                        .ToListAsync();
+                    break;
+                case UserRole.ADMIN: case UserRole.STAFF:
+                    orders = await context.Orders.ToListAsync();
+                    break;
+                default:
+                    throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
+            }
+            List<OrderResponse> list = mapper.Map<List<OrderResponse>>(orders);
+            return list;
+        }
+
+        public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
+        {
+            Order orders = new Order();
+            orders = await context.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
+            if (ObjectUtils.IsEmpty(orders))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
+            }
+
+            await context.Entry(orders)
+                    .Collection(o => o.TargetLanguages)
+                    .LoadAsync();
+
+            await context.Entry(orders)
+                    .Collection(o => o.OrderReferences)
+                    .LoadAsync();
+
+            OrderDetailsResponse orderResponse = mapper.Map<OrderDetailsResponse>(orders);
+            return orderResponse;
+        }
+
+        public async Task UpdateOrder(OrderUpdate request)
+        {
+            int records = await context.Orders
+                .Where(x => x.OrderId == request.OrderId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
+                                        .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
+                                        .SetProperty(u => u.DueDate, request.DueDate)
+                                        .SetProperty(u => u.HasTranslateService, request.TrasnlateService)
+                                        .SetProperty(u => u.HasEditService, request.EditService)
+                                        .SetProperty(u => u.HasEvaluateService, request.EvaluateService));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task UpdateOrderTargetLanguage(OrderUpdate request)
+        {
+            var order = context.Orders
+                        .Include(o => o.TargetLanguages)
+                        .FirstOrDefault(o => o.OrderId == request.OrderId);
+
+            if (order != null)
+            {
+                order.TargetLanguages.Clear();
+                await context.SaveChangesAsync();
+            }
+            await AddRangeMiddle(request.OrderId, request.TargetLanguageIdList);
+        }
+
+        public async Task AcceptOrDeclineOrder(Guid orderId, string orderStatus)
+        {
+            if(!OrderStatus.ACCEPTED.ToString().Equals(orderStatus) && !OrderStatus.REJECTED.ToString().Equals(orderStatus))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
+            }
+            int records = await context.Orders
+                .Where(x => x.OrderId == orderId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, orderStatus));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task RecoverDeletedFiles(Guid orderId, string url)
+        {
+            int records = await context.OrderReferences
+                .Where(x => x.OrderId == orderId && x.ReferenceFileUrl == url)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.IsDeleted, false));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task DeleteOrderReferenceFile(Guid orderId, string url)
+        {
+            int records = await context.OrderReferences
+                .Where(x => x.OrderId == orderId && x.ReferenceFileUrl.Equals(url))
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.IsDeleted, true));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request)
+        {
+            foreach(UploadOrderFileRequest one in request)
+            {
+                if (!Enum.IsDefined(typeof(OrderFileTag), one.Tag))
+                {
+                    throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Tag"));
+                }
+            }
+            using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    context.OrderReferences.AddRange(mapper.Map<List<OrderReference>>(request));
+                    int records = await context.SaveChangesAsync();
+                    if (records != request.Count) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            } 
+        }
+    }
+}

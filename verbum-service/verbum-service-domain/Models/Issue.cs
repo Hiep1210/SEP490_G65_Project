@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace verbum_service_domain.Models;
+
+public partial class Issue
+{
+    public Guid IssueId { get; set; }
+
+    public string? IssueName { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// CANCEL, OPEN, RESOLVED, APPROVED
+    /// </summary>
+    public string? Status { get; set; }
+
+    public Guid? ClientId { get; set; }
+
+    public Guid? OrderId { get; set; }
+
+    public string? IssueDescription { get; set; }
+
+    public Guid? AssigneeId { get; set; }
+
+    public virtual User? Assignee { get; set; }
+
+    public virtual User? Client { get; set; }
+
+    public virtual ICollection<IssueAttachment> IssueAttachments { get; set; } = new List<IssueAttachment>();
+
+    public virtual Order? Order { get; set; }
+}
