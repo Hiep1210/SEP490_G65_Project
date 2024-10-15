@@ -54,5 +54,4 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/verbum-be:latest
-          context: ${{ github.workspace }}/verbum-service  # Specify the context of the Docker build
           file: ${{ github.workspace }}/verbum-service/Dockerfile  # Specify the Dockerfile location
