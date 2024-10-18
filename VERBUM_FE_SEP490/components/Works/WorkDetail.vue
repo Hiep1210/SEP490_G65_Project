@@ -49,23 +49,21 @@ const cancelEdit = () => {
 
 const categories = props.categories
 
-const getCategories = (newCategory: Category[] | Category) => {
-  if (Array.isArray(newCategory) && newCategory.length > 0) {
-    // If newCategory is an array, find all matching category names
+const getCategories = (newCategory: Category[] | Category): Category[] => {
+  console.log({newCategory})
+  if (Array.isArray(newCategory)) {
+    // If newCategory is an array, find all matching categories
     return newCategory
-      .map(cat => {
-        const category = categories.find(category => category.id === cat.id);
-        return category ? category.name : null; // Return the category name or null if not found
-      })
-      .filter(Boolean) // Filter out null values
-      .join(', '); // Join names into a single string
+      .map(cat => categories.find(category => category.id === cat.id)) // find matching categories
+      .filter(Boolean) as Category[]; // filter out undefined values and assert as Category[]
   } else if (newCategory) {
-    // If newCategory is a single category, find and return its name
+    // If newCategory is a single category, find and return it as an array
     const category = categories.find(category => category.id === newCategory.id);
-    return category ? category.name : 'No Category Selected'; // Return the category name or a message if not found
+    return category ? [category] : []; // return an array with the category or an empty array if not found
   } else {
-    return 'No Category Selected'; // Return a message if newCategory is empty
+    return []; 
   }
+  
 };
 </script>
 
@@ -154,19 +152,28 @@ const getCategories = (newCategory: Category[] | Category) => {
           <tr>
             <td class="px-3 pb-1 text-right font-medium">Category:</td>
             <td class="px-3 pb-1">
-              <select v-if="editMode" v-model="editableWork.newCategory" class="border rounded px-2">
-                <option v-for="category in categories" :key="category.id" :value="category.id">
+              <select
+                v-if="editMode"
+                v-model="editableWork.newCategory"
+                class="border rounded px-2"
+              >
+                <option
+                  v-for="category in categories"
+                  :key="category.id"
+                  :value="category"
+                >
                   {{ category.name }}
                 </option>
               </select>
-              <span v-else>
-                {{ Array.isArray(getCategories(editableWork.newCategory)) 
-                  ? (getCategories(editableWork.newCategory).length > 3 
-                      ? getCategories(editableWork.newCategory).slice(0, 3).concat(', ') + ', ...' 
-                      : getCategories(editableWork.newCategory).concat(', '))
-                  : getCategories(editableWork.newCategory) }}
-              
+            
+              <span v-else >
+                <span 
+                v-for="category in getCategories(editableWork.newCategory)"
+                :key="category.id"
+                :value="category"
+              > {{ category.name }}</span>
               </span>
+              
             </td>
           </tr>
         </tbody>
