@@ -1,5 +1,7 @@
+import type { Category } from "../Category/category";
+
 export interface Work {
-    workId: number;
+    workId: string;
     orderName: string;
     orderStatus: string;
     sourceLanguageId: string;
@@ -8,4 +10,5 @@ export interface Work {
     dueDate: string;
     files: string;
     translationFileUrls: string;
+    newCategory: Category[] | Category;
   }

@@ -30,6 +30,7 @@ const searchName = ref('');
 const selectedStatus = ref('');
 const sortKey = ref('');
 const sortDirection = ref<'asc' | 'desc' | 'none'>('none');
+const router = useRouter()
 
 // Sorting function
 const sortedData = computed(() => {
@@ -70,6 +71,12 @@ const updateSort = ({
   sortKey.value = key;
   sortDirection.value = direction;
 };
+
+// Function to redirect to work details
+const goToWorkDetails = (workId: string) => {
+  router.push({ name: 'workDetail-workId', params: { workId } });
+};
+
 </script>
 
 <template>
@@ -182,10 +189,11 @@ const updateSort = ({
           v-for="item in filteredWorksByName"
           :key="item.workId"
           class="cursor-pointer"
+          @click="goToWorkDetails(item.workId)"
         >
-          <TableCell><Checkbox id="" /></TableCell>
+          <TableCell @click.stop><Checkbox id="" /></TableCell>
           <TableCell>{{ item.workId }}</TableCell>
-          <TableCell>{{ item.orderName }}</TableCell>
+          <TableCell>{{ item.orderName  }}</TableCell>
           <TableCell>{{ item.sourceLanguageId }}</TableCell>
           <TableCell>
             {{ Array.isArray(item.targetLanguageId) 

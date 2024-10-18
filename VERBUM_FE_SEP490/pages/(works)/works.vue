@@ -3,6 +3,10 @@ import type { Work } from '~/components/Works/work';
 import WorksTable from '~/components/Works/WorksTable.vue';
 const token = useCookie('access_token');
 
+useSeoMeta({
+  title: 'Works',
+})
+
 const { data: availableData, error: availableError } = await useAsyncData(
   'availableData',
   () => $fetch('http://localhost:8000/api/lang')
@@ -23,7 +27,7 @@ if (error || availableError) {
     error
   )
 }
-console.log("",availableData)
+console.log("here",availableData)
 const allWorks: Work[] = data.value || [];
 
 
