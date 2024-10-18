@@ -1,7 +1,6 @@
 
 <script setup lang="ts">
-
- const {handleVisibilityChange, stopSilentRefresh} = useAuth()
+const {handleVisibilityChange, stopSilentRefresh} = useAuth()
 
 onMounted(() => {
     // Add event listener for visibility change
@@ -21,7 +20,7 @@ onMounted(() => {
 </script>
 <template>
   <div>
-    <NuxtLoadingIndicator color="green" :height="5" :throttle="0" />
+    <NuxtLoadingIndicator color="#0891B2" :height="5" :throttle="0"/>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
