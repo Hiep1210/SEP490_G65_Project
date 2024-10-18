@@ -7,12 +7,14 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ENV ASPNETCORE_ENVIRONMENT=Development
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["verbum-service-web-api/verbum-service-web-api.csproj","verbum-service-web-api/"]
-COPY ["verbum-service-infrastructure/verbum-service-infrastructure.csproj","verbum-service-infrastructure/"]
-COPY ["verbum-service-application/verbum-service-application.csproj","verbum-service-application/"]
-COPY ["verbum-service-domain/verbum-service-domain.csproj","verbum-service-domain/"]
+COPY ["verbum-service/verbum-service-web-api/verbum-service-web-api.csproj", "verbum-service-web-api/"]
+COPY ["verbum-service/verbum-service-infrastructure/verbum-service-infrastructure.csproj", "verbum-service-infrastructure/"]
+COPY ["verbum-service/verbum-service-application/verbum-service-application.csproj", "verbum-service-application/"]
+COPY ["verbum-service/verbum-service-domain/verbum-service-domain.csproj", "verbum-service-domain/"]
 RUN dotnet restore "verbum-service-web-api/verbum-service-web-api.csproj"
-COPY . .
+
+COPY verbum-service/. .
+
 WORKDIR /src/verbum-service-web-api
 RUN dotnet build "verbum-service-web-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
