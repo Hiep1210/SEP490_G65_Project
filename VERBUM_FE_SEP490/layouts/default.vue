@@ -8,11 +8,8 @@
       <div class="flex h-full max-h-screen flex-col gap-2">
         <div class="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
           <a href="/" class="flex items-center gap-2 font-semibold">
-            <NuxtImg src="../public/logo.png" width="40" />
+            <NuxtImg src="../public/logo.png" width="1000" />
           </a>
-          <div class="flex items-center gap-1 ml-auto">
-            VERBUM
-          </div>
         </div>
         <div class="flex-1">
           <LayoutNavbar />
