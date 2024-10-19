@@ -51,6 +51,7 @@ namespace VNH.Infrastructure
             services.AddScoped<LanguageService, LanguageServiceImpl>();
             services.AddScoped<OrderService, OrderServiceImpl>();
             services.AddScoped<WorkService, WorkServiceImpl>();
+            services.AddScoped<DiscountService, DiscountServiceImpl>();
 
             //workflow dependency
             services.AddScoped<CreateUserWorkflow>();
@@ -77,6 +78,7 @@ namespace VNH.Infrastructure
             services.AddScoped<UpdateOrderValidation>();
             services.AddScoped<CreateWorkValidation>();
             services.AddScoped<UpdateWorkValidation>();
+            services.AddScoped<SaveDiscountValidation>();
 
             services.AddHttpContextAccessor();
 
