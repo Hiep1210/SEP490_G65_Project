@@ -67,6 +67,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.DiscountId)
                 .ValueGeneratedNever()
                 .HasColumnName("discount_id");
+            entity.Property(e => e.DiscountName)
+                .HasColumnType("character varying")
+                .HasColumnName("discount_name");
             entity.Property(e => e.DiscountPercent).HasColumnName("discount_percent");
         });
 
@@ -92,7 +95,7 @@ public partial class verbumContext : DbContext
                 .HasColumnName("issue_name");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.Status)
-                .HasComment("CANCEL, OPEN, RESOLVED, APPROVED")
+                .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED")
                 .HasColumnType("character varying")
                 .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
