@@ -21,6 +21,7 @@ namespace verbum_service_infrastructure.Impl.Validation
         {
             List<string> errors = new List<string>();
             errors.AddRange(ValidateRequired(request));
+            errors.AddRange(ValidateDiscountPercent(request));
             if (ObjectUtils.IsNotEmpty(errors))
             {
                 return errors;
@@ -38,6 +39,15 @@ namespace verbum_service_infrastructure.Impl.Validation
             if(ObjectUtils.IsEmpty(request.DiscountName))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "discount name"));
+            }
+            return errors;
+        }
+        public List<string> ValidateDiscountPercent(DiscountDTO request)
+        {
+            List<string> errors = new List<string>();
+            if (request.DiscountPercent <= 0 && request.DiscountPercent >= 100)
+            {
+                errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "discount percentage"));
             }
             return errors;
         }
