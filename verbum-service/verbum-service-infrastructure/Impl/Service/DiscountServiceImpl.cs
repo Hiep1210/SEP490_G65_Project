@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using verbum_service_application.Service;
+using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
@@ -40,6 +41,11 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task DeleteDiscount(Guid discountId)
         {
+            Discount discount = await context.Discounts.Include(x => x.Orders).FirstOrDefaultAsync(x => x.DiscountId == discountId);
+            if (discount.Orders.Any(x => x.OrderStatus.IsActive()))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.CANNOT_DELETE, "discount"));
+            }
             if(await context.Discounts.Where(x => x.DiscountId == discountId).ExecuteDeleteAsync() < 1)
             {
                 throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
