@@ -38,7 +38,7 @@ describe('UserDropdown', () => {
     const expectItems = ['Settings', 'Support', 'Logout']
     const userDropdownOptions = wrapper.findAllComponents(DropdownMenuItem)
     userDropdownOptions.forEach((option) => {
-        expect(expectItems.includes(option.text()))
+      expect(expectItems.includes(option.text()))
     })
   })
 })
