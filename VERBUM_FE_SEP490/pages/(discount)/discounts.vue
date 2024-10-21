@@ -85,11 +85,9 @@ const closeDialog = () => {
 
 <template>
   <div>
-    <Button 
-    class="mr-16 my-3 float-right"
-    @click="isDialogOpen = true"
-    >Create Discount
-  </Button>
+    <Button class="mr-16 my-3 float-right" @click="isDialogOpen = true"
+      >Create Discount
+    </Button>
 
     <DiscountsTable :columns="columns" :data="data" />
 

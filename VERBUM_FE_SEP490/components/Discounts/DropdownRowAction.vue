@@ -6,6 +6,7 @@ import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue
 import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue';
 import UpdateDialog from './UpdateDialog.vue';
 import type { Discount } from '~/types/discount';
+const token = useCookie('access_token')
 
 const props = defineProps<{
   rowData: Discount;  // Receive row data as a prop
@@ -22,12 +23,28 @@ const closeDialog = () => {
   showDialog.value = false;
 };
 
-const deleteRow = () => {
-  emit('delete', props.rowData);  // Emit delete event with row data
+const deleteRow = async () => {
+  try {
+    await $fetch(`http://localhost:8000/api/discount?discountId=${props.rowData.discountId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
+    emit('delete', props.rowData); 
+
+    // Optionally, refresh the data after deletion
+    // await refreshDiscounts();
+  } catch (error) {
+    console.error('Failed to delete discount:', error);
+    alert('Failed to delete discount. Please try again.');
+  }
+};
+
+const handleUpdate = (updatedDiscount : Discount) => {
+  emit('update', updatedDiscount);  // Emit the updated discount
 };
 </script>
-
-
 <template>
   <div>
     <DropdownMenu>
@@ -53,7 +70,9 @@ const deleteRow = () => {
       :open="showDialog"
       :row-data="props.rowData"
       @close="closeDialog"
+      @update="handleUpdate" 
     />
   </div>
 </template>
+
 
