@@ -35,7 +35,6 @@ namespace verbum_service_application.Mapper
             CreateMap<UpdateLanguageSupportRequest, Language>()
                 .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.LanguageId.ToUpper())).ReverseMap();
             CreateMap<Work, WorkResponse>()
-                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Order.OrderName))
                 .ForMember(dest => dest.SourceLanguageId, opt => opt.MapFrom(src => src.Order.SourceLanguageId))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Order.OrderStatus))
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.Order.TargetLanguages.Select(t => t.LanguageId).ToList()))
