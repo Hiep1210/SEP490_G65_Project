@@ -8,6 +8,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           const headers = new Headers(options.headers)
           headers.set('Authorization', `Bearer ${access_token?.value}`)
           options.headers = headers
+          options.credentials = 'include'
         }
       },
       async onResponseError({ response }) {
