@@ -1,10 +1,10 @@
 import auth from '~/middlewares/auth';
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Login',
+  title: 'Login'
 })
 definePageMeta({
-  layout: 'auth',
+  layout: 'auth'
 })
 </script>
 

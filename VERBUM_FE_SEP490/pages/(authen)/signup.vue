@@ -3,7 +3,7 @@ useSeoMeta({
   title: 'Sign up'
 })
 definePageMeta({
-  layout: 'auth',
+  layout: 'auth'
 })
 </script>
 

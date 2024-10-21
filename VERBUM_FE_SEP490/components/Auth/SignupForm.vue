@@ -25,7 +25,6 @@ const form = useForm({
   validationSchema: toTypedSchema(schema)
 })
 
-
 const onSubmit = async (values: Record<string, string>) => {
   try {
     const body = {
@@ -53,37 +52,46 @@ const googleAuth = () => {
           Enter your email below to create your account
         </p>
       </div>
-      <AutoForm class="space-y-3" :form="form" :schema="schema" :field-config="{
-        name: {
-          inputProps: {
-            type: 'text',
-            placeholder: 'Enter your name'
+      <AutoForm
+        class="space-y-3"
+        :form="form"
+        :schema="schema"
+        :field-config="{
+          name: {
+            inputProps: {
+              type: 'text',
+              placeholder: 'Enter your name'
+            }
+          },
+          email: {
+            inputProps: {
+              type: 'email',
+              placeholder: 'email@example.com'
+            }
+          },
+          password: {
+            inputProps: {
+              type: 'password',
+              placeholder: 'Enter your password'
+            }
+          },
+          confirm: {
+            label: 'Confirm Password',
+            inputProps: {
+              type: 'password',
+              placeholder: 'Re-enter your password'
+            }
           }
-        },
-        email: {
-          inputProps: {
-            type: 'email',
-            placeholder: 'email@example.com'
-          }
-        },
-        password: {
-          inputProps: {
-            type: 'password',
-            placeholder: 'Enter your password'
-          }
-        },
-        confirm: {
-          label: 'Confirm Password',
-          inputProps: {
-            type: 'password',
-            placeholder: 'Re-enter your password'
-          }
-        }
-      }" @submit="onSubmit">
+        }"
+        @submit="onSubmit"
+      >
         <Button type="submit" class="w-full"> Sign up </Button>
       </AutoForm>
       <Button variant="outline" class="w-full" @click.prevent="googleAuth()">
-        <NuxtImg src="https://i.pinimg.com/originals/ca/2f/7d/ca2f7db280e9c773e341589a81c15082.png" width="20" />
+        <NuxtImg
+          src="https://i.pinimg.com/originals/ca/2f/7d/ca2f7db280e9c773e341589a81c15082.png"
+          width="20"
+        />
         <span class="px-3">Continue with Google</span>
       </Button>
       <div class="mt-4 text-center text-sm">
