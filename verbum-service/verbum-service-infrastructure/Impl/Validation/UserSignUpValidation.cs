@@ -26,7 +26,7 @@ namespace verbum_service_infrastructure.Impl.Validation
         }
         private void ValidateRole(string role, List<string> alerts)
         {
-            if (UserRole.ADMIN.Equals(role) || UserRole.STAFF.Equals(role))
+            if (!UserRole.CLIENT.Equals(role))
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Role " + role));
             }
