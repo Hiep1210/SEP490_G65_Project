@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { Calendar } from '@/components/ui/v-calendar'
 import { Check, ChevronDown, Calendar as CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
@@ -20,23 +20,11 @@ import {
 import { format } from 'date-fns'
 import { useFileDialog } from '@vueuse/core'
 import { ref as storageRef, getDownloadURL } from 'firebase/storage'
-
-
-const languages = [
-  { id: "EN", name: 'English' },
-  { id: "ES", name: 'Spanish' },
-  { id: "FR", name: 'French' },
-  { id: "GE", name: 'German' },
-  { id: "ZH", name: 'Chinese' },
-  { id: "JA", name: 'Japanese' },
-  { id: "AR", name: 'Arabic' },
-  { id: "RU", name: 'Russian' },
-  { id: "PT", name: 'Portuguese' },
-  { id: "HI", name: 'Hindi' }
-]
+import { useAPI } from '@/composables/useCustomFetch'
 
 const openTarget = ref(false)
 const selectedValues = ref<string[]>([])
+const languages = ref([])
 
 const selectedValuesString = computed(() => selectedValues.value.join(','))
 
@@ -75,6 +63,14 @@ const { files, open } = useFileDialog()
 watch(files, () => {
   if (files.value?.length) {
     uploadFiles()
+  }
+})
+
+// Fetch languages on component mount
+onMounted(async () => {
+  const { data, error } = await useAPI('/lang')
+  if (!error.value) {
+    languages.value = data.value || []
   }
 })
 
@@ -145,10 +141,10 @@ watch(files, () => {
             <SelectGroup>
               <SelectItem
                 v-for="language in languages"
-                :key="language.id"
-                :value="language.id.toString()"
+                :key="language.languageId"
+                :value="language.languageId"
               >
-                {{ language.name }}
+                {{ language.languageName }}
               </SelectItem>
             </SelectGroup>
           </SelectContent>
@@ -186,8 +182,8 @@ watch(files, () => {
                         .map(
                           (val) =>
                             languages.find(
-                              (language: any) => language.id === val
-                            )?.name
+                              (language: any) => language.languageId === val
+                            )?.languageName
                         )
                         .join(', ')
                     : 'Select target language...'
@@ -207,16 +203,16 @@ watch(files, () => {
                 <CommandGroup>
                   <CommandItem
                     v-for="language in languages"
-                    :key="language.id"
-                    :value="language.id"
-                    @select="toggleSelection(language.id)"
+                    :key="language.languageId"
+                    :value="language.languageId"
+                    @select="toggleSelection(language.languageId)"
                   >
-                    {{ language.name }}
+                    {{ language.languageName }}
                     <Check
                       :class="
                         cn(
                           'ml-auto h-4 w-4',
-                          selectedValues.includes(language.id)
+                          selectedValues.includes(language.languageId)
                             ? 'opacity-100'
                             : 'opacity-0'
                         )

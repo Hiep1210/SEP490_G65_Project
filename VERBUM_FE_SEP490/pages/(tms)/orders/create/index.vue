@@ -2,7 +2,7 @@
 import { Check, Circle, Dot } from 'lucide-vue-next'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import { h, ref } from 'vue'
+import { ref } from 'vue'
 import {
   Stepper,
   StepperDescription,
@@ -14,7 +14,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-
+import { useAPI } from '@/composables/useCustomFetch'
 
 const formSchema = [
   z.object({
@@ -26,14 +26,26 @@ const formSchema = [
   z.object({
     hasTranslateService: z.boolean().default(false),
     hasEditService: z.boolean().default(false),
-    hasEvaluateService: z.boolean().default(false),
+    hasEvaluateService: z.boolean().default(false)
   }),
   z.object({
     reference: z.string(),
-    referenceFileURLs: z.string(),
+    referenceFileURLs: z.string()
     // discountId: z.string()
   })
 ]
+
+interface FormValues {
+  sourceLanguageId: string
+  targetLanguageIdList: string
+  translationFileURL: string
+  dueDate: Date
+  hasTranslateService?: boolean
+  hasEditService?: boolean
+  hasEvaluateService?: boolean
+  reference?: string
+  referenceFileURLs: string
+}
 
 const stepIndex = ref(1)
 const steps = [
@@ -55,44 +67,46 @@ const steps = [
   }
 ]
 
-async function onSubmit(values: any) {
-  // Convert the targetLanguageIdList and referenceFileURLs to arrays
+async function onSubmit(values: FormValues) {
   const payload = {
-    orderName: 'Order Name',
     ...values,
     sourceLanguageId: values.sourceLanguageId,
-    targetLanguageIdList: values.targetLanguageIdList.split(',').map((id: string) => id.trim()),
-    translationFileURL: values.translationFileURL.split(',').map((id: string) => id.trim()),
+    targetLanguageIdList: values.targetLanguageIdList
+      .split(',')
+      .map((id: string) => id.trim()),
+    translationFileURL: values.translationFileURL
+      .split(',')
+      .map((id: string) => id.trim()),
     dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss"),
     hasTranslateService: values.hasTranslateService ?? false,
     hasEditService: values.hasEditService ?? false,
     hasEvaluateService: values.hasEvaluateService ?? false,
     reference: values.reference,
-    referenceFileURLs: values.referenceFileURLs.split(',').map((url: string) => url.trim()),
+    referenceFileURLs: values.referenceFileURLs
+      .split(',')
+      .map((url: string) => url.trim()),
     discountId: null
   }
 
   try {
     // Send the payload to the backend using a POST request
-    const { data, error } = await $fetch('http://localhost:8000/api/order/add', {
+    const { data, error } = await useAPI('/order/add', {
       method: 'POST',
-      body: payload, // Pass the payload as the body
+      body: JSON.stringify(payload),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTI2Y2ZiNzEtZDlmNC00ZDIxLWE4N2EtNDE5MWJkM2I3YzU5IiwiZW1haWwiOiJsYW1waHVuZzIxMy5waHVjQGdtYWlsLmNvbSIsIm5hbWUiOiJMw6JtIFBow7luZyIsInN0YXR1cyI6IkFDVElWRSIsInJvbGUiOiJDTElFTlQiLCJleHAiOjE3Mjg5NzgzNjAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAwIn0.uQpVard8EFH_4N6XNi90PLLKSJNkgcLgZYApm8dghe8'
-      },
+        'Content-Type': 'application/json'
+      }
     })
 
-    if (error) {
-      console.error('Error submitting form:', error)
+    if (error.value) {
+      console.error('Error submitting form:', error.value)
     } else {
-      console.log('Form submitted successfully:', data)
+      console.log('Form submitted successfully:', data.value)
     }
   } catch (err) {
     console.error('Request failed:', err)
   }
 }
-
 </script>
 
 <template>
@@ -149,10 +163,7 @@ async function onSubmit(values: any) {
                 ]"
                 :disabled="state !== 'completed' && !meta.valid"
               >
-                <Check
-                  v-if="state === 'completed'"
-                  class="size-5"
-                />
+                <Check v-if="state === 'completed'" class="size-5" />
                 <Circle v-if="state === 'active'" />
                 <Dot v-if="state === 'inactive'" />
               </Button>
@@ -209,11 +220,7 @@ async function onSubmit(values: any) {
               >
                 Next
               </Button>
-              <Button
-                v-if="stepIndex === 3"
-                size="sm"
-                type="submit"
-              >
+              <Button v-if="stepIndex === 3" size="sm" type="submit">
                 Submit
               </Button>
             </div>

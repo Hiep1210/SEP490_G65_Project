@@ -3,7 +3,6 @@ import { House, FolderOpen, FileWarning, Book, User } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
-
 const navbarItems = [
   { navName: 'Home', navLink: '/', navIcon: House },
   { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },

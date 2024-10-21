@@ -35,7 +35,6 @@ watch(files, () => {
 })
 </script>
 
-
 <template>
   <FormField v-slot="{ componentField }" name="reference">
     <FormItem>
@@ -59,10 +58,7 @@ watch(files, () => {
     <FormItem class="flex flex-col">
       <FormLabel>Reference Files</FormLabel>
       <FormControl>
-        <Button
-          type="button"
-          @click="open({ accept: '*', multiple: true })"
-        >
+        <Button type="button" @click="open({ accept: '*', multiple: true })">
           Upload Files
         </Button>
         <Input
@@ -71,7 +67,7 @@ watch(files, () => {
           :value="downloadUrlsString"
         />
       </FormControl>
-      <Card v-if="files?.length" :class="cn( $attrs.class ?? '')">
+      <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
         <CardHeader>
           <CardDescription>Uploaded files</CardDescription>
         </CardHeader>
