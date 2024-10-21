@@ -1,5 +1,5 @@
 export interface Order {
-    id: number
+    id: string
     name: string
     status: string
     createAt: string
