@@ -8,8 +8,9 @@ namespace verbum_service_domain.DTO.Response
 {
     public class DiscountResponse
     {
-        public decimal? DiscountPercent { get; set; }
+        public Guid DiscountId { get; set; }
+        public decimal DiscountPercent { get; set; }
 
-        public string? DiscountName { get; set; }
+        public string DiscountName { get; set; }
     }
 }
