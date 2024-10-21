@@ -42,8 +42,13 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<Work, WorkCreate>().ReverseMap();
             CreateMap<Work, WorkUpdate>().ReverseMap();
-            CreateMap<Discount, DiscountDTO>().ReverseMap(); 
+            CreateMap<Discount, DiscountDTO>().ReverseMap();
             CreateMap<Discount, DiscountResponse>().ReverseMap();
+            CreateMap<Issue, IssueResponse>()
+                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.Name))
+                .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(src => src.Assignee.Name))
+                .ForMember(dest => dest.IssueAttachments, opt => opt.MapFrom(src => src.IssueAttachments.Where(a => !a.IsDeleted)))
+                .ReverseMap();
         }
     }
 }

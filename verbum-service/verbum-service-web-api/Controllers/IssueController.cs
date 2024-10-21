@@ -5,6 +5,7 @@ using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_infrastructure.Impl.Workflow;
 
@@ -22,7 +23,7 @@ namespace verbum_service.Controllers
         private readonly UpdateIssueWorkflow updateIssueWorkflow;
         [HttpGet]
         [Roles(UserRole.MANAGER, UserRole.LINGUIST, UserRole.CLIENT)]
-        [ProducesResponseType(typeof(List<Issue>), 200)]
+        [ProducesResponseType(typeof(List<IssueResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]

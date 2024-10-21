@@ -7,6 +7,7 @@ using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_infrastructure.DataContext;
 
@@ -80,30 +81,29 @@ namespace verbum_service_infrastructure.Impl.Service
             }
         }
 
-        public async Task<List<Issue>> ViewAllIssue()
+        public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = new List<Issue>();
-            switch(currentUser.Role)
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.Client).ToListAsync();
+            switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    issues = await context.Issues
+                    issues = issues
                         .Where(x => x.ClientId == currentUser.Id)
-                        .ToListAsync();
+                        .ToList();
                     break;
                 case UserRole.LINGUIST:
-                    issues = await context.Issues
+                    issues = issues
                         .Where(x => x.AssigneeId == currentUser.Id)
-                        .ToListAsync();
+                        .ToList();
                     break;
                 case UserRole.TRANSLATE_MANAGER:
                 case UserRole.EDIT_MANAGER:
                 case UserRole.EVALUATE_MANAGER:
-                    issues = await context.Issues.ToListAsync();
                     break;
                 default:
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
             }
-            return issues;
+            return mapper.Map<List<IssueResponse>>(issues);
         }
     }
 }
