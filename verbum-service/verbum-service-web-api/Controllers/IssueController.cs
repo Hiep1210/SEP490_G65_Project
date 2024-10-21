@@ -5,6 +5,7 @@ using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_infrastructure.Impl.Workflow;
 
@@ -22,7 +23,7 @@ namespace verbum_service.Controllers
         private readonly UpdateIssueWorkflow updateIssueWorkflow;
         [HttpGet]
         [Roles(UserRole.MANAGER, UserRole.LINGUIST, UserRole.CLIENT)]
-        [ProducesResponseType(typeof(List<Issue>), 200)]
+        [ProducesResponseType(typeof(List<IssueResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -52,8 +53,19 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
+        [HttpGet("file")]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(typeof(List<UploadIssueAttachmentFiles>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAllIssueAttachments()
+        {
+            return ResponseFilter.OkOrNoContent(await issueService.GetAllIssueAttachments(), this);
+        }
+
         [HttpPost("file")]
-        [Roles(UserRole.CLIENT)]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -64,7 +76,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpDelete("file")]
-        [Roles(UserRole.MANAGER)]
+        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -74,7 +86,7 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpDelete("file-recover")]
+        [HttpPut("file-recover")]
         [Roles(UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

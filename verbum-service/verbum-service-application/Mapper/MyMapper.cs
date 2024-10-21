@@ -35,7 +35,6 @@ namespace verbum_service_application.Mapper
             CreateMap<UpdateLanguageSupportRequest, Language>()
                 .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.LanguageId.ToUpper())).ReverseMap();
             CreateMap<Work, WorkResponse>()
-                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Order.OrderName))
                 .ForMember(dest => dest.SourceLanguageId, opt => opt.MapFrom(src => src.Order.SourceLanguageId))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Order.OrderStatus))
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.Order.TargetLanguages.Select(t => t.LanguageId).ToList()))
@@ -43,6 +42,13 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<Work, WorkCreate>().ReverseMap();
             CreateMap<Work, WorkUpdate>().ReverseMap();
+            CreateMap<Discount, DiscountDTO>().ReverseMap();
+            CreateMap<Discount, DiscountResponse>().ReverseMap();
+            CreateMap<Issue, IssueResponse>()
+                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.Name))
+                .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(src => src.Assignee.Name))
+                .ForMember(dest => dest.IssueAttachments, opt => opt.MapFrom(src => src.IssueAttachments.Where(a => !a.IsDeleted)))
+                .ReverseMap();
         }
     }
 }

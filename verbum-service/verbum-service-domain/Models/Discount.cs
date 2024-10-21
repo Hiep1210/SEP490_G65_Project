@@ -9,5 +9,7 @@ public partial class Discount
 
     public decimal? DiscountPercent { get; set; }
 
+    public string? DiscountName { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

@@ -3,18 +3,13 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  ssr: true,
+  ssr: false,
   vite: {
     optimizeDeps: {
       exclude: ['vee-validate']
     },
     plugins: [nodePolyfills()]
   },
-  // nitro:{
-  //   prerender: {
-  //     routes: ['/', '/login', '/signup']
-  //   }
-  // },
   modules: [
     [
       '@pinia/nuxt',

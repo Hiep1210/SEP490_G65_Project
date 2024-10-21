@@ -17,6 +17,7 @@ namespace verbum_service_domain.Common.ErrorModel
         public const string EMAIL_NOT_VERIFIED = "Email is not verified";
         public const string EMAIL_EXPIRED = "The email verification email token might be expired. Please check your email again";
         public const string LOGIN_FAIL = "Login fail";
-        public const string UPDATE_RECORD_FAIL = "No record affected, check if entity exists";
+        public const string UPDATE_RECORD_FAIL = "No record affected";
+        public const string CANNOT_DELETE = "Cannot delete this {0}";
     }
 }
