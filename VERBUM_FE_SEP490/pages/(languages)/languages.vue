@@ -1,6 +1,15 @@
 <script setup>
-import DualListBox from '~/components/Languages/DualListBox.vue'
-import { useToast } from '~/components/ui/toast'
+import DualListBox from '~/components/Languages/DualListBox.vue';
+import { useToast } from '~/components/ui/toast';
+
+useSeoMeta({
+  title: 'Languages',
+})
+
+definePageMeta({
+    layout: 'default',
+})
+
 const { data: availableData, error: availableError } = await useAsyncData(
   'availableData',
   () => $fetch('http://localhost:8000/api/lang')
