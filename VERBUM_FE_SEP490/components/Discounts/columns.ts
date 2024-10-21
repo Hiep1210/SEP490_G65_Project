@@ -34,17 +34,9 @@ export const columns: ColumnDef<Discount>[] = [
     {
         accessorKey: 'action',
         header: '',
-        cell: ({ row }) => h(DropdownRowAction),
+        cell: ({ row }) =>
+            h(DropdownRowAction, {
+              rowData: row.original, // Pass the row data as a prop
+            }),
     }
 ];
-
-// Functions for handling the actions
-function onEdit(discount: Discount) {
-    // Edit logic here
-    console.log('Edit clicked', discount);
-}
-
-function onDelete(discount: Discount) {
-    // Delete logic here
-    console.log('Delete clicked', discount);
-}

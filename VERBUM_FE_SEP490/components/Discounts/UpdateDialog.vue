@@ -1,49 +1,63 @@
 <script lang="ts" setup>
-import { Button } from "@/components/ui/button"
+import { ref, watch, defineEmits } from 'vue';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Discount } from '~/types/discount';
+
+const props = defineProps<{
+  open: boolean;
+  rowData: Discount;  // Receive row data as a prop
+}>();
+
+const emit = defineEmits(['close']);
+const isOpen = ref(props.open);
+
+// Form field values
+const name = ref(props.rowData.discountName);
+const percent = ref(props.rowData.discountPercent);
+
+watch(() => props.open, (newVal) => {
+  isOpen.value = newVal;
+});
+
+const closeDialog = () => {
+  emit('close');  // Emit close event
+};
 </script>
 
+
 <template>
-  <Dialog>
-    <DialogTrigger as-child>
-      <p>Edit Profile</p>
-    </DialogTrigger>
+  <Dialog :open="isOpen" @click-outside="closeDialog" @close="closeDialog">
     <DialogContent class="sm:max-w-[425px]">
       <DialogHeader>
-        <DialogTitle>Edit profile</DialogTitle>
-        <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
-        </DialogDescription>
+        <DialogTitle>Edit Discount</DialogTitle>
+        <Button variant="ghost" class="absolute top-2 right-2" @click="closeDialog" />
       </DialogHeader>
+
       <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label html-for="name" class="text-right">
-            Name
-          </Label>
-          <Input id="name" value="Pedro" class="col-span-3" />
+          <Label for="name" class="text-right">Name</Label>
+          <Input id="name" v-model="name" class="col-span-3" />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label html-for="username" class="text-right">
-            Username
-          </Label>
-          <Input id="username" value="@pe" class="col-span-3" />
+          <Label for="percent" class="text-right">Percent</Label>
+          <Input id="percent" v-model="percent" class="col-span-3" />
         </div>
       </div>
+
       <DialogFooter>
-        <Button type="submit">Save changes</Button>
+        <Button @click="closeDialog">Cancel</Button>
+        <Button @click="closeDialog">Save changes</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
 
-<style></style>
