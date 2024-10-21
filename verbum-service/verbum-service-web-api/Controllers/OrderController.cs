@@ -86,6 +86,18 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
+        [HttpGet("file")]
+        [EnableQuery]
+        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
+        [ProducesResponseType(typeof(List<UploadOrderFileRequest>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAllOrderReferenceFiles()
+        {
+            return ResponseFilter.OkOrNoContent(await orderService.GetAllOrderRefrenceFiles(), this);
+        }
+
         [HttpPost("file")]
         [Roles(UserRole.MANAGER, UserRole.CLIENT)]
         [ProducesResponseType(typeof(string), 201)]

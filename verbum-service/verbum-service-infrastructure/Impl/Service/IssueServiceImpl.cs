@@ -38,6 +38,11 @@ namespace verbum_service_infrastructure.Impl.Service
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
+        public async Task<List<UploadIssueAttachmentFiles>> GetAllIssueAttachments()
+        {
+            return mapper.Map<List<UploadIssueAttachmentFiles>>(await context.IssueAttachments.Where(x => !x.IsDeleted).ToListAsync());
+        }
+
         public async Task RecoverDeletedFiles(Guid issueId, string attachmentUrl)
         {
             int records = await context.IssueAttachments

@@ -188,5 +188,10 @@ namespace verbum_service_infrastructure.Impl.Service
                 }
             } 
         }
+
+        public async Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles()
+        {
+            return mapper.Map<List<UploadOrderFileRequest>>(await context.OrderReferences.Where(x => !x.IsDeleted).ToListAsync());
+        }
     }
 }

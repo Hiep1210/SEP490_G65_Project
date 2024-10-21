@@ -52,8 +52,19 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
+        [HttpGet("file")]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(typeof(List<UploadIssueAttachmentFiles>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAllIssueAttachments()
+        {
+            return ResponseFilter.OkOrNoContent(await issueService.GetAllIssueAttachments(), this);
+        }
+
         [HttpPost("file")]
-        [Roles(UserRole.CLIENT)]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -64,7 +75,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpDelete("file")]
-        [Roles(UserRole.MANAGER)]
+        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
