@@ -85,7 +85,7 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpDelete("file-recover")]
+        [HttpPut("file-recover")]
         [Roles(UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

@@ -118,7 +118,7 @@ namespace verbum_service.Controllers
             await orderService.DeleteOrderReferenceFile(orderId, fileURl);
             return NoContent();
         }
-        [HttpDelete("file-recover")]
+        [HttpPut("file-recover")]
         [Roles(UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
