@@ -29,10 +29,6 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "TargetLanguage"));
             }
-            if (ObjectUtils.IsEmpty(request.OrderName))
-            {
-                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "OrderName"));
-            }
             if (ObjectUtils.IsEmpty(request.SourceLanguageId))
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "SourceLanguageId"));

@@ -2,7 +2,6 @@
 {
     public class OrderCreate
     {
-        public string OrderName { get; set; }
         public string SourceLanguageId { get; set; }
         public List<string> TargetLanguageIdList { get; set; }
         public bool HasTranslateService { get; set; }
