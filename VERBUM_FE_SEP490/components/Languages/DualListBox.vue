@@ -17,7 +17,7 @@ const props = defineProps({
     default: () => []
   }
 })
-defineEmits(['cancel', 'save']);
+defineEmits(['cancel', 'save'])
 
 // Available and selected items
 const availableItems = ref(props.availableItemsList)
@@ -32,10 +32,12 @@ const searchSelectedQuery = ref('')
 
 const filteredAvailableItems = computed(() => {
   return availableItems.value
-    .filter((item) =>
-      item.languageName
-        .toLowerCase()
-        .includes(searchAvailableQuery.value.toLowerCase()) && item.support != true
+    .filter(
+      (item) =>
+        item.languageName
+          .toLowerCase()
+          .includes(searchAvailableQuery.value.toLowerCase()) &&
+        item.support != true
     )
     .sort((a, b) => a.languageName.localeCompare(b.languageName))
 })
@@ -56,7 +58,7 @@ const toggleSelectItem = (item, list) => {
   if (list === 'available') {
     if (selectedAvailableItems.value.includes(item)) {
       selectedAvailableItems.value = selectedAvailableItems.value.filter(
-        (i) => i !== item 
+        (i) => i !== item
       )
     } else {
       selectedAvailableItems.value.push(item)
@@ -76,7 +78,7 @@ const toggleSelectItem = (item, list) => {
 const moveSelectedToSelectedList = () => {
   if (selectedAvailableItems.value.length) {
     selectedAvailableItems.value.forEach((item) => {
-      item.support = true 
+      item.support = true
     })
     selects.value.push(...selectedAvailableItems.value)
     selectedItems.value.push(...selectedAvailableItems.value)
@@ -91,7 +93,7 @@ const moveSelectedToSelectedList = () => {
 const moveSelectedToAvailableList = () => {
   if (selectedSelectedItems.value.length) {
     selectedSelectedItems.value.forEach((item) => {
-      item.support = false 
+      item.support = false
     })
     selects.value.push(...selectedSelectedItems.value)
     selectedItems.value = selectedItems.value.filter(
@@ -100,7 +102,6 @@ const moveSelectedToAvailableList = () => {
     selectedSelectedItems.value = []
   }
 }
-
 </script>
 
 <template>
@@ -117,7 +118,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search available..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      >
+      />
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li
@@ -134,7 +135,7 @@ const moveSelectedToAvailableList = () => {
           ]"
           @click="toggleSelectItem(item, 'available')"
         >
-            {{ item.languageName }}
+          {{ item.languageName }}
         </li>
       </ul>
     </div>
@@ -162,7 +163,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search selected..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      >
+      />
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li
