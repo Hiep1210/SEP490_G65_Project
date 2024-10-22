@@ -8,7 +8,22 @@ import {
   TableRow
 } from '@/components/ui/table'
 import mockIssues from '~/mock/issues'
+import date
+
 const issues = mockIssues
+
+const getBadgeClass = (status: string) => {
+  switch (status) {
+    case 'Open':
+      return 'bg-green-500 text-white'
+    case 'In Progress':
+      return 'bg-yellow-500 text-black'
+    case 'Closed':
+      return 'bg-gray-500 text-white'
+    default:
+      return 'bg-gray-300 text-black'
+  }
+}
 </script>
 
 <template>
@@ -29,11 +44,13 @@ const issues = mockIssues
         </TableCell>
         <TableCell>{{ issue.createdAt }}</TableCell>
         <TableCell>{{ issue.updatedAt }}</TableCell>
-        <TableCell>{{ issue.status }}</TableCell>
+        <TableCell>
+          <Badge :class="getBadgeClass(issue.status)">{{ issue.status }}</Badge>
+        </TableCell>
         <TableCell>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Button variant="default">View</Button>
+              <Button variant="default">View All Files</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem

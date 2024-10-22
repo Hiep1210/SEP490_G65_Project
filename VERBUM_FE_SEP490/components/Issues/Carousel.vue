@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { Card } from '@/components/ui/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter
+} from '@/components/ui/card'
 import {
   Carousel,
   CarouselContent,
@@ -7,7 +13,10 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-const items = Array.from({ length: 5 }, (_, i) => i + 1)
+import mockIssues from '~/mock/issues'
+import type { Issue } from '~/types/issues'
+
+const items: Issue[] = mockIssues
 </script>
 
 <template>
@@ -15,21 +24,16 @@ const items = Array.from({ length: 5 }, (_, i) => i + 1)
     <CarouselContent>
       <CarouselItem
         v-for="item in items"
-        :key="item"
+        :key="item.issueId"
         class="md:basis-1/2 lg:basis-1/3"
       >
         <Card>
           <CardHeader>
-            <CardTitle>ORDER00{{ item }}</CardTitle>
-            <CardDescription
-              >Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolorum
-              at nam sit alias eveniet adipisci qui nesciunt earum illo
-              perferendis pariatur fugit voluptatem eaque, possimus voluptatibus
-              excepturi? Non, doloremque obcaecati.</CardDescription
-            >
+            <CardTitle>{{ item.issueName }}</CardTitle>
+            <CardDescription>{{ item.issueDescription }}</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Badge>Status</Badge>
+            <Badge>{{ item.issueAttachments.length }} attachments</Badge>
           </CardFooter>
         </Card>
       </CarouselItem>
