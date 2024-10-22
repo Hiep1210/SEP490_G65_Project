@@ -37,6 +37,10 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "You need to order at least 1 service"));
             }
+            if (ObjectUtils.IsEmpty(request.TranslationFileURL))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "Translation File"));
+            }
         }
 
         private async Task ValidateExist(OrderCreate request, List<string> alerts)
