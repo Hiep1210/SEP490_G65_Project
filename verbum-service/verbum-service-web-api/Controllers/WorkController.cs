@@ -39,7 +39,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> AddWork([FromBody] WorkCreate work)
         {
-            createWorkWorkflow.process(work);
+            await createWorkWorkflow.process(work);
             return NoContent();
         }
 
@@ -50,7 +50,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> UpdateWork([FromBody] WorkUpdate work)
         {
-            updateWorkWorkflow.process(work);
+            await updateWorkWorkflow.process(work);
             return NoContent();
         }
 
