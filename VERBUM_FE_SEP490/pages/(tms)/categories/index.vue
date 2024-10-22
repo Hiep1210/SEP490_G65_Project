@@ -32,7 +32,7 @@ const editCategory = (category) => {
 
 const updateExistingCategory = async () => {
     if (!selectedCategory.value || !newCategoryName.value.trim()) return
-    await updateCategory(selectedCategory.value.id, { name: newCategoryName.value })
+    await updateCategory(selectedCategory.value.id, newCategoryName.value)
     selectedCategory.value = null
     newCategoryName.value = ''
     isEditing.value = false
@@ -56,11 +56,9 @@ watch(categories, newCategories => {
         <div class="container mx-auto space-y-4">
             <!-- Input form -->
             <div class="space-y-2 space-x-2">
-                <input
-                    v-model="newCategoryName" class="border p-2 rounded" type="text"
-                    placeholder="Enter category name" >
-                <Button
-c                   lass="bg-blue-500 text-white p-2 rounded"
+                <input v-model="newCategoryName" class="border p-2 rounded" type="text"
+                    placeholder="Enter category name">
+                <Button c lass="bg-blue-500 text-white p-2 rounded"
                     @click="isEditing ? updateExistingCategory() : addNewCategory()">
                     {{ isEditing ? 'Update Category' : 'Add Category' }}
                 </Button>
@@ -68,8 +66,7 @@ c                   lass="bg-blue-500 text-white p-2 rounded"
 
             <!-- Categories list -->
             <div class="space-y-2">
-                <div
-                    v-for="category in categories" :key="category.id"
+                <div v-for="category in categories" :key="category.id"
                     class="flex justify-between items-center border p-2 rounded">
                     <span class="font-semibold">{{ category.name }}</span>
                     <div class="space-x-2">
