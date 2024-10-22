@@ -41,7 +41,7 @@ const cancelSelectedOrders = () => {
 
 const toggleAllOrders = (checked: boolean) => {
   if (checked) {
-    selectedOrders.value = props.orders.map(order => order.id)
+    selectedOrders.value = props.orders.map(order => order.orderId)
   } else {
     selectedOrders.value = []
   }
@@ -51,6 +51,9 @@ const toDetails = (orderId: string) => {
   useRouter().push("/orders/details/" + orderId)
   console.log(orderId)
 }
+const toCreate = () => {
+  useRouter().push("/orders/create")
+}
 </script>
 
 <template>
@@ -58,6 +61,7 @@ const toDetails = (orderId: string) => {
     <div class="flex justify-between space-x-4 pb-4">
       <Input placeholder="Search orders" />
       <Button variant="outline" @click="cancelSelectedOrders">Cancel Orders</Button>
+      <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
     <div class="border rounded-lg overflow-hidden">
@@ -83,17 +87,17 @@ const toDetails = (orderId: string) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="order in props.orders" :key="order.id" @click="toDetails(order.id)">
+          <TableRow v-for="order in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
             <TableCell class="text-center">
               <Checkbox 
-                :value="order.id" :checked="selectedOrders.includes(order.id)"
-                @update:checked="toggleOrderSelection(order.id)" />
+                :value="order.orderId" :checked="selectedOrders.includes(order.orderId)"
+                @update:checked="toggleOrderSelection(order.orderId)" />
             </TableCell>
-            <TableCell class="font-medium">{{ order.id }}</TableCell>
-            <TableCell>{{ order.name }}</TableCell>
-            <TableCell>{{ order.status }}</TableCell>
+            <TableCell class="font-medium">{{ order.orderId }}</TableCell>
+            <TableCell>{{ order.orderName }}</TableCell>
+            <TableCell>{{ order.orderStatus }}</TableCell>
             <TableCell class="text-center">
-              {{ formatDate(order.createAt) }}
+              {{ formatDate(order.createdDate) }}
             </TableCell>
             <TableCell>
               <Button variant="ghost" size="sm">
