@@ -8,7 +8,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import mockIssues from '~/mock/issues'
-import date
+import { formatDistanceToNow } from 'date-fns'
 
 const issues = mockIssues
 
@@ -42,8 +42,16 @@ const getBadgeClass = (status: string) => {
         <TableCell class="font-medium">
           {{ issue.issueName }}
         </TableCell>
-        <TableCell>{{ issue.createdAt }}</TableCell>
-        <TableCell>{{ issue.updatedAt }}</TableCell>
+        <TableCell>
+          {{
+            formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })
+          }}
+        </TableCell>
+        <TableCell>
+          {{
+            formatDistanceToNow(new Date(issue.updatedAt), { addSuffix: true })
+          }}
+        </TableCell>
         <TableCell>
           <Badge :class="getBadgeClass(issue.status)">{{ issue.status }}</Badge>
         </TableCell>
