@@ -35,5 +35,49 @@ export const useCategories = () => {
     }
   }
 
-  return { categories, isLoading, getCategories }
+  const addCategory = async (category: Category) => {
+    try {
+      await useAPI('/category/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(category)
+      })
+    } catch (error) {
+      console.error('Error adding category:', error)
+    }
+  }
+  const deleteCategory = async (id: number) => {
+    try {
+      await useAPI(`/category/delete/`, {
+        method: 'DELETE',
+        body: JSON.stringify({ id }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+    } catch (error) {
+      console.error('Error deleting category:', error)
+    }
+  }
+  
+  const updateCategory = async (category: Category) => {
+    try {
+      await useAPI(`/category/update/`, {
+        method: 'PUT',
+        body: JSON.stringify(category),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      console.log(category)
+    } catch (error) {
+      console.error('Error updating category:', error)
+    }
+  }
+
+
+  return {
+    categories,
+    isLoading,
+    getCategories,
+    addCategory,
+    deleteCategory,
+    updateCategory
+  }
 }
