@@ -7,9 +7,15 @@ public partial class Rating
 {
     public Guid RatingId { get; set; }
 
-    public int? RatingStars { get; set; }
-
     public Guid? OrderId { get; set; }
 
-    public string? RatingDetail { get; set; }
+    public decimal? InTime { get; set; }
+
+    public decimal? Expectation { get; set; }
+
+    public decimal? IssueResolved { get; set; }
+
+    public string? MoreThought { get; set; }
+
+    public virtual Order? Order { get; set; }
 }
