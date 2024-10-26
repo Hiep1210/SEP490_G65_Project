@@ -19,7 +19,6 @@ namespace verbum_service_infrastructure.Impl.Workflow
     {
         private readonly CreateIssueValidation validation;
         private readonly IssueService issueService;
-        private Guid issue = new Guid();
         protected override async Task PreStep(CreateIssueRequest request)
         {
         }
@@ -38,12 +37,7 @@ namespace verbum_service_infrastructure.Impl.Workflow
 
         protected override async Task PostStep(CreateIssueRequest request)
         {
-            issue = await issueService.AddIssue(request);
-        }
-
-        public Guid GetResponse()
-        {
-            return issue;
+            await issueService.AddIssue(request);
         }
 
     }
