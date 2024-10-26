@@ -13,13 +13,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     async onResponseError({ response }) {
       if (response.status === 401) {
-        if (confirm('Your session has expired. Please login again.')) {
-          await nuxtApp.runWithContext(() => {
-            if (confirm('Your session has expired. Please login again.')) {
-              useAuth().logout()
-            }
-          })
-        }
+        await nuxtApp.runWithContext(() => {
+          if (confirm('Your session has expired. Please login again.')) {
+            useAuth().logout()
+          }
+        })
       }
     }
   })
