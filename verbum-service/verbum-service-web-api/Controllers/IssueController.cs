@@ -39,7 +39,7 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> AddIssue(CreateIssueRequest request)
         {
             await createIssueWorkflow.process(request);
-            return Created();
+            return Created(String.Empty, createIssueWorkflow.GetResponse());
         }
 
         [HttpPut]

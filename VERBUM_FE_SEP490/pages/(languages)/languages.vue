@@ -1,6 +1,15 @@
 <script setup>
 import DualListBox from '~/components/Languages/DualListBox.vue';
 import { useToast } from '~/components/ui/toast';
+
+useSeoMeta({
+  title: 'Languages',
+})
+
+definePageMeta({
+    layout: 'default',
+})
+
 const { data: availableData, error: availableError } = await useAsyncData(
   'availableData',
   () => $fetch('http://localhost:8000/api/lang')
@@ -17,12 +26,12 @@ if (availableError.value || selectedError.value) {
     availableError.value || selectedError.value
   )
 }
-const selects = [];
+const selects = []
 const availableItemsList = availableData.value || []
 const selectedItemsList = selectedData.value || []
 
 const handleSave = async () => {
-  const {toast} = useToast();
+  const { toast } = useToast()
   if (!selects || selects.length === 0) {
     return
   }
@@ -31,7 +40,6 @@ const handleSave = async () => {
     languageId: item.languageId,
     support: item.support
   }))
-
 
   try {
     await $fetch('http://localhost:8000/api/lang/support', {
@@ -42,7 +50,7 @@ const handleSave = async () => {
       }
     })
     toast({
-      title: "Update Successfully!! ",
+      title: 'Update Successfully!! '
     })
   } catch (error) {
     console.error('Error while updating data:', error)

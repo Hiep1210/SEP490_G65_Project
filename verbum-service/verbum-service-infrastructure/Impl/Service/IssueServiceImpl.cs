@@ -19,7 +19,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly verbumContext context;
         private readonly CurrentUser currentUser;
-        public async Task AddIssue(CreateIssueRequest request)
+        public async Task<Guid> AddIssue(CreateIssueRequest request)
         {
             Issue issue = mapper.Map<Issue>(request);
             issue.IssueId = Guid.NewGuid();
@@ -27,8 +27,9 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.UpdatedAt = DateTime.Now;
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
-            context.Issues.Add(issue);
+            Issue returnIssue = context.Issues.Add(issue).Entity;
             await context.SaveChangesAsync();
+            return returnIssue.IssueId;
         }
 
         public async Task DeleteIssueAttachmentFile(Guid issueId, string attachmentUrl)
