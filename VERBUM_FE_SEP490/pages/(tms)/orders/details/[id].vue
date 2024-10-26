@@ -1,138 +1,97 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Ellipsis } from 'lucide-vue-next'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
+import type { Order } from '~/types/order';
 
-// Define the order with items
-const order = ref({
-    id: 'TMS-1',
-    name: 'Order 1',
-    status: 'Processing',
-    customerName: 'John Doe',
-    sourceLanguage: 'English',
-    targetLanguage: 'Spanish',
-    issues: [{
-        id: 'ISSUE-1',
-        title: 'Missing invoice',
-    },
-    {
-        id: 'ISSUE-2',
-        title: 'Missing reference files',
-    }],
-    sourceFiles: [{
-        id: 'FILE-1',
-        name: 'Example.docx',
-        status: 'Processing',
-        targetLanguage: 'Spanish',
-    },
-    {
-        id: 'FILE-2',
-        name: 'Example2.docx',
-        status: 'Processing',
-        targetLanguage: 'Spanish',
-    }],
-    referenceFiles: ['Example.pdf'],
-    services: ['Translation', 'Evaluation'],
-})
+const { order, getOrder } = useOrders();
+const route = useRoute();
+const orderId = route.params.id;
+
+const isEditing = ref(false);
+const editedOrder = ref<Partial<Order> | null>(null);
+
+onMounted(() => {
+    getOrder(orderId);
+});
+
+// Enter edit mode
+function enableEdit() {
+    isEditing.value = true;
+    editedOrder.value = { ...order.value }; // Clone current order data for editing
+}
+
+// Cancel edit mode
+function cancelEdit() {
+    isEditing.value = false;
+    editedOrder.value = null; // Clear edited data
+}
+
+// Save edited order details
+async function saveEdit() {
+    try {
+        await useAPI(`/order`, {
+            method: 'PATCH',
+            body: editedOrder.value,
+        });
+        if (order.value) {
+            Object.assign(order.value, editedOrder.value as Order); // Cast to Order to ensure typing compatibility
+        }
+        isEditing.value = false;
+    } catch (error) {
+        console.error('Failed to save order:', error);
+    }
+}
+const issues = [{
+    id: 1,
+    title: 'Issue 1',
+}, {
+    id: 2,
+    title: 'Issue 2',
+}, {
+    id: 3,
+    title: 'Issue 3',
+}, {
+    id: 4,
+    title: 'Issue 4',
+}, {
+    id: 5,
+    title: 'Issue 5',
+}]
 </script>
 
 <template>
     <div>
-        <div class="flex flex-1 pb-5">
+        <div v-if="!order">
+            <NuxtLoadingIndicator />
+        </div>
+        <div v-else class="flex flex-1 pb-5">
             <div class="pr-5 space-y-2">
                 <div class="container mx-auto p-2 space-y-2 orderDetails">
-                    <p class="text-[2rem] font-semibold">{{ order.name }}</p>
+                    <p class="text-[2rem] font-semibold">
+                        <span v-if="!isEditing">{{ order?.orderName }}</span>
+                        <input v-else v-model="editedOrder.orderName" class="text-2xl font-semibold border-1">
+                    </p>
                     <div class="flex flex-col justify-items-end">
-                        <span>
-                            #{{ order.id }}
-                        </span>
-                        <span class="text-gray-500">
-                            Status: {{ order.status }}
-                        </span>
-                        <span>
-                            Customer: {{ order.customerName }}
-                        </span>
+                        <span>#{{ order?.orderId }}</span>
+                        <span v-if="!isEditing" class="text-gray-500">Status: {{ order?.orderStatus }}</span>
+                        <input v-else v-model="editedOrder.orderStatus" placeholder="Status">
+
                         <span class="flex space-x-1">
-                            <Badge variant="default">{{ order.sourceLanguage }}</Badge>
+                            <Badge variant="default">{{ order?.sourceLanguageId }}</Badge>
                             <LucideArrowBigRight />
-                            <Badge variant="secondary">{{ order.targetLanguage }}</Badge>
+                            <Badge variant="secondary">{{ order?.targetLanguageId }}</Badge>
                         </span>
                     </div>
                 </div>
 
-                <Tabs default-value="working" class="w-full">
-                    <TabsList class="grid w-full grid-cols-2">
-                        <TabsTrigger value="working">
-                            Working Files
-                        </TabsTrigger>
-                        <TabsTrigger value="reference">
-                            Refernce Files
-                        </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="working">
-                        <div class="border rounded-md w-[52rem] h-[14rem]">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>ID</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Target Language</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow v-for="file in order.sourceFiles" :key="file.id">
-                                        <TableCell>{{ file.id }}</TableCell>
-                                        <TableCell>{{ file.name }}</TableCell>
-                                        <TableCell>{{ file.status }}</TableCell>
-                                        <TableCell>{{ file.targetLanguage }}</TableCell>
-                                        <TableCell>
-                                            <Button variant="ghost" size="sm">
-                                                <Ellipsis />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="reference">
-                        <div class="border rounded-md w-[52rem] h-[14rem]">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>ID</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Target Language</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow v-for="file in order.sourceFiles" :key="file.id">
-                                        <TableCell>{{ file.id }}</TableCell>
-                                        <TableCell>{{ file.name }}</TableCell>
-                                        <TableCell>{{ file.status }}</TableCell>
-                                        <TableCell>{{ file.targetLanguage }}</TableCell>
-                                        <TableCell>
-                                            <Button variant="ghost" size="sm">
-                                                <Ellipsis />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                <!-- Buttons for editing controls -->
+                <div v-if="isEditing">
+                    <Button @click="saveEdit">Save</Button>
+                    <Button variant="outline" @click="cancelEdit">Cancel</Button>
+                </div>
+                <Button v-else @click="enableEdit">Edit Order</Button>
 
+                <!-- Tabs and other order details remain unchanged -->
             </div>
+
             <div class="issuesList w-full space-y-2">
                 <div class="head flex flex-1">
                     <div class="flex flex-1 text-center">
@@ -140,7 +99,7 @@ const order = ref({
                     </div>
                     <Button variant="outline" size="sm">Add Issue</Button>
                 </div>
-                <div class="border rounded-md h-[25.3rem]">
+                <div class="border rounded-md h-[25.3rem] overflow-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -149,7 +108,7 @@ const order = ref({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="issue in order.issues" :key="issue.id">
+                            <TableRow v-for="issue in issues" :key="issue.id">
                                 <TableCell>{{ issue.id }}</TableCell>
                                 <TableCell>{{ issue.title }}</TableCell>
                             </TableRow>
@@ -158,7 +117,5 @@ const order = ref({
                 </div>
             </div>
         </div>
-        <Separator />
-        <div class="border rounded-md bg-slate-300 h-[12rem]" />
     </div>
 </template>

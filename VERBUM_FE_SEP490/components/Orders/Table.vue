@@ -49,7 +49,6 @@ const toggleAllOrders = (checked: boolean) => {
 
 const toDetails = (orderId: string) => {
   useRouter().push("/orders/details/" + orderId)
-  console.log(orderId)
 }
 const toCreate = () => {
   useRouter().push("/orders/create")

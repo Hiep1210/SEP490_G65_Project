@@ -16,6 +16,7 @@ export const useOrders = () => {
         method: 'GET',
         credentials: 'include'
       })
+
       if (!ordersData?.value || ordersData.value.length === 0) {
         toast({
           title: 'No orders found',
@@ -26,17 +27,21 @@ export const useOrders = () => {
         orders.value = ordersData.value
       }
     } catch (error) {
-      console.error(error)
+      console.error('Failed to fetch orders:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch orders. Please try again later.'
+      })
     } finally {
       isLoading.value = false
     }
   }
 
-  const getOrder = async (id: string) => {
+  const getOrder = async (id: string | string[]) => {
     isLoading.value = true
     try {
-      const { data: orderData } = await useAPI<Order>(`/order/get/`, {
-        query: { id },
+      const { data: orderData } = await useAPI<Order>(`/order/get-details`, {
+        params: { id },
         method: 'GET',
         credentials: 'include'
       })
@@ -52,13 +57,15 @@ export const useOrders = () => {
         order.value = orderData.value
       }
     } catch (error) {
-      console.error(error)
+      console.error('Failed to fetch order details:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch order details. Please try again later.'
+      })
     } finally {
       isLoading.value = false
     }
   }
-
-
 
   return { isLoading, orders, order, getOrders, getOrder }
 }
