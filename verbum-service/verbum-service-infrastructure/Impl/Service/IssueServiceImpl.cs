@@ -19,7 +19,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly verbumContext context;
         private readonly CurrentUser currentUser;
-        public async Task<Guid> AddIssue(CreateIssueRequest request)
+        public async Task AddIssue(CreateIssueRequest request)
         {
             Issue issue = mapper.Map<Issue>(request);
             issue.IssueId = Guid.NewGuid();
@@ -27,9 +27,8 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.UpdatedAt = DateTime.Now;
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
-            Issue returnIssue = context.Issues.Add(issue).Entity;
+            context.Issues.Add(issue);
             await context.SaveChangesAsync();
-            return returnIssue.IssueId;
         }
 
         public async Task DeleteIssueAttachmentFile(Guid issueId, string attachmentUrl)
@@ -55,11 +54,14 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateIssue(UpdateIssueRequest request)
         {
-            int records = await context.Issues
-                .Where(x => x.IssueId == request.IssueId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.UpdatedAt, DateTime.Now)
-                                        .SetProperty(u => u.IssueName, request.IssueName)
-                                        .SetProperty(u => u.IssueDescription, request.IssueDescription));
+            Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
+            updateIssue.UpdatedAt = DateTime.Now;
+            updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
+            updateIssue.IssueName = request.IssueName;
+            updateIssue.IssueDescription = request.IssueDescription;
+            updateIssue.AssigneeId = request.AssigneeId;
+            context.Issues.Update(updateIssue);
+            int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 

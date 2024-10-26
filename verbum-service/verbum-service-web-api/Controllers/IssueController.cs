@@ -39,11 +39,11 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> AddIssue(CreateIssueRequest request)
         {
             await createIssueWorkflow.process(request);
-            return Created(String.Empty, createIssueWorkflow.GetResponse());
+            return StatusCode(201);
         }
 
         [HttpPut]
-        [Roles(UserRole.CLIENT)]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -53,41 +53,8 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpGet("file")]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
-        [ProducesResponseType(typeof(List<UploadIssueAttachmentFiles>), 200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAllIssueAttachments()
-        {
-            return ResponseFilter.OkOrNoContent(await issueService.GetAllIssueAttachments(), this);
-        }
-
-        [HttpPost("file")]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
-        [ProducesResponseType(typeof(string), 201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> UploadIssueAttachment(List<UploadIssueAttachmentFiles> attachmentFiles)
-        {
-            await issueService.UploadIssueAttachment(attachmentFiles);
-            return Created();
-        }
-
-        [HttpDelete("file")]
-        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteIssueAttachmentFile(Guid issueId, string fileURl)
-        {
-            await issueService.DeleteIssueAttachmentFile(issueId, fileURl);
-            return NoContent();
-        }
-
         [HttpPut("file-recover")]
-        [Roles(UserRole.MANAGER)]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]

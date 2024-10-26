@@ -32,6 +32,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "DELIVERABLES").Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
             CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
+            CreateMap<IssueAttachment, UpdateIssueAttachmentFile>().ReverseMap();
             CreateMap<UpdateLanguageSupportRequest, Language>()
                 .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.LanguageId.ToUpper())).ReverseMap();
             CreateMap<Work, WorkResponse>()
