@@ -51,7 +51,7 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> AddCategory([FromBody] CategoryInfo category)
         {
             await createCategoryWorkflow.process(category);
-            return NoContent();
+            return StatusCode(201);
         }
 
         [HttpPut("update")]

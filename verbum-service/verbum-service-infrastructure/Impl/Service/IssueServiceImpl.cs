@@ -54,11 +54,14 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateIssue(UpdateIssueRequest request)
         {
-            int records = await context.Issues
-                .Where(x => x.IssueId == request.IssueId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.UpdatedAt, DateTime.Now)
-                                        .SetProperty(u => u.IssueName, request.IssueName)
-                                        .SetProperty(u => u.IssueDescription, request.IssueDescription));
+            Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
+            updateIssue.UpdatedAt = DateTime.Now;
+            updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
+            updateIssue.IssueName = request.IssueName;
+            updateIssue.IssueDescription = request.IssueDescription;
+            updateIssue.AssigneeId = request.AssigneeId;
+            context.Issues.Update(updateIssue);
+            int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 

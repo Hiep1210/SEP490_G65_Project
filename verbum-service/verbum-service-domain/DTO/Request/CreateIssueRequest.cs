@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using verbum_service_domain.Models;
 
 namespace verbum_service_domain.DTO.Request
 {
@@ -12,5 +13,6 @@ namespace verbum_service_domain.DTO.Request
         public Guid? OrderId { get; set; }
 
         public string? IssueDescription { get; set; }
+        public List<UploadIssueAttachmentFiles>? IssueAttachments { get; set; } = new List<UploadIssueAttachmentFiles>();
     }
 }

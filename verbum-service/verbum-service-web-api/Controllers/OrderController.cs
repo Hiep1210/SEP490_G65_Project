@@ -119,7 +119,7 @@ namespace verbum_service.Controllers
             return NoContent();
         }
         [HttpPut("file-recover")]
-        [Roles(UserRole.MANAGER)]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
