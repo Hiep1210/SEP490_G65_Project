@@ -12,7 +12,7 @@ namespace verbum_service_application.Service
 {
     public interface IssueService
     {
-        Task AddIssue(CreateIssueRequest request);
+        Task<Guid> AddIssue(CreateIssueRequest request);
         Task<List<IssueResponse>> ViewAllIssue();
         Task UpdateIssue(UpdateIssueRequest request);
         Task UploadIssueAttachment(List<UploadIssueAttachmentFiles> attachmentFiles);

@@ -8,6 +8,7 @@ using verbum_service_application.Service;
 using verbum_service_application.Workflow;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.Models;
 using verbum_service_domain.Utils;
 using verbum_service_infrastructure.Impl.Validation;
 
@@ -18,6 +19,7 @@ namespace verbum_service_infrastructure.Impl.Workflow
     {
         private readonly CreateIssueValidation validation;
         private readonly IssueService issueService;
+        private Guid issue = new Guid();
         protected override async Task PreStep(CreateIssueRequest request)
         {
         }
@@ -36,7 +38,12 @@ namespace verbum_service_infrastructure.Impl.Workflow
 
         protected override async Task PostStep(CreateIssueRequest request)
         {
-            await issueService.AddIssue(request);
+            issue = await issueService.AddIssue(request);
+        }
+
+        public Guid GetResponse()
+        {
+            return issue;
         }
 
     }
