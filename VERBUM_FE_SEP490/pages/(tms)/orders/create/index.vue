@@ -29,8 +29,8 @@ const formSchema = [
     hasEvaluateService: z.boolean().default(false)
   }),
   z.object({
-    reference: z.string(),
-    referenceFileURLs: z.string()
+    reference: z.string().optional(),
+    referenceFileURLs: z.string().optional()
     // discountId: z.string()
   })
 ]
