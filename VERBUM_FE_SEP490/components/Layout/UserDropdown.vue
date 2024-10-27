@@ -8,6 +8,15 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { CircleUser } from 'lucide-vue-next'
+const authStore = useCookie('AuthStore')
+
+
+const handleLogout = () => {
+  authStore.value = ''
+  window.location.reload()
+}
+
+
 </script>
 
 <template>
@@ -25,7 +34,7 @@ import { CircleUser } from 'lucide-vue-next'
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem @click="handleLogout">Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
