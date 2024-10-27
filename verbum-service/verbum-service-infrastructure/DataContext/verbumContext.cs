@@ -156,7 +156,9 @@ public partial class verbumContext : DbContext
                 .HasColumnType("timestamp(0) without time zone")
                 .HasColumnName("due_date");
             entity.Property(e => e.Name).HasColumnName("name");
-            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Status)
+                .HasComment("NEW, IN_PROGRESS, COMPLETED")
+                .HasColumnName("status");
             entity.Property(e => e.TargetLanguageId)
                 .HasColumnType("character varying")
                 .HasColumnName("target_language_id");
@@ -291,11 +293,18 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.RatingId)
                 .ValueGeneratedNever()
                 .HasColumnName("rating_id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.RatingDetail)
+            entity.Property(e => e.Expectation).HasColumnName("expectation");
+            entity.Property(e => e.InTime).HasColumnName("in_time");
+            entity.Property(e => e.IssueResolved).HasColumnName("issue_resolved");
+            entity.Property(e => e.MoreThought)
                 .HasColumnType("character varying")
-                .HasColumnName("rating_detail");
-            entity.Property(e => e.RatingStars).HasColumnName("rating_stars");
+                .HasColumnName("more_thought");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Ratings)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("rating_order_fk");
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -433,6 +442,23 @@ public partial class verbumContext : DbContext
                 .HasForeignKey<User>(d => d.TokenId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("user_refresh_token_fk");
+
+            entity.HasMany(d => d.Jobs).WithMany(p => p.Assignees)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AssigneeJob",
+                    r => r.HasOne<Job>().WithMany()
+                        .HasForeignKey("JobId")
+                        .HasConstraintName("assignee_job_job_fk"),
+                    l => l.HasOne<User>().WithMany()
+                        .HasForeignKey("AssigneeId")
+                        .HasConstraintName("assignee_job_user_fk"),
+                    j =>
+                    {
+                        j.HasKey("AssigneeId", "JobId").HasName("assignee_job_pk");
+                        j.ToTable("assignee_job");
+                        j.IndexerProperty<Guid>("AssigneeId").HasColumnName("assignee_id");
+                        j.IndexerProperty<Guid>("JobId").HasColumnName("job_id");
+                    });
         });
 
         modelBuilder.Entity<Work>(entity =>
@@ -485,6 +511,7 @@ public partial class verbumContext : DbContext
                         j.IndexerProperty<int>("CategoryId").HasColumnName("category_id");
                     });
         });
+        modelBuilder.HasSequence("order_name_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }

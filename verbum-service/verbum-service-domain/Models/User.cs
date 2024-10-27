@@ -38,4 +38,6 @@ public partial class User
     public virtual Role RoleCodeNavigation { get; set; } = null!;
 
     public virtual RefreshToken? Token { get; set; }
+
+    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 }

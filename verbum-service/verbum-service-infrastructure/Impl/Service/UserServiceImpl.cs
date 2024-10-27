@@ -149,6 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
             string email = claims.FirstOrDefault(c => c.Type.EndsWith("emailaddress"))?.Value;
             string name = claims.FirstOrDefault(c => c.Type.EndsWith("name"))?.Value;
 
+            if (ObjectUtils.IsEmpty(email) && ObjectUtils.IsEmpty(name)) return null;
+
             User oldUser = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
             if (oldUser != null)

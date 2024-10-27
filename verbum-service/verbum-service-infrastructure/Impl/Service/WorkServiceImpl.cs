@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -121,6 +123,30 @@ namespace verbum_service_infrastructure.Impl.Service
             }
 
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task GenerateWork(GenerateWork request)
+        {
+            List<string> oldCodes = ["EV", "ED", "TL"];
+            if(!request.ServiceCodes.All(code => oldCodes.Any(c => c == code)))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "ServiceCodes"));
+            }
+            else
+            {
+                var works = request.ServiceCodes.Select(serviceCode => new Work
+                {
+                    WorkId = Guid.NewGuid(),
+                    OrderId = request.OrderId,
+                    WorkName = request.OrderName,
+                    ServiceCode = serviceCode,
+                    CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
+                    DueDate = request.DueDate
+                });
+
+                context.Works.AddRangeAsync(works);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

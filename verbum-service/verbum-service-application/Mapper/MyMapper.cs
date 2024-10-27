@@ -50,6 +50,9 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(src => src.Assignee.Name))
                 .ForMember(dest => dest.IssueAttachments, opt => opt.MapFrom(src => src.IssueAttachments.Where(a => !a.IsDeleted)))
                 .ReverseMap();
+            CreateMap<Rating, RatingResponse>().ReverseMap();
+            CreateMap<Rating, RatingCreate>().ReverseMap();
+            CreateMap<Rating, RatingUpdate>().ReverseMap();
         }
     }
 }

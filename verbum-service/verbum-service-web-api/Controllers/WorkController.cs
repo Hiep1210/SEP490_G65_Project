@@ -39,7 +39,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> AddWork([FromBody] WorkCreate work)
         {
-            createWorkWorkflow.process(work);
+            await createWorkWorkflow.process(work);
             return NoContent();
         }
 
@@ -50,8 +50,19 @@ namespace verbum_service.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> UpdateWork([FromBody] WorkUpdate work)
         {
-            updateWorkWorkflow.process(work);
+            await updateWorkWorkflow.process(work);
             return NoContent();
+        }
+
+        [HttpPost("generate")]
+        //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GenerateWork([FromBody] GenerateWork request)
+        {
+            await workService.GenerateWork(request);
+            return Created();
         }
     }
 }

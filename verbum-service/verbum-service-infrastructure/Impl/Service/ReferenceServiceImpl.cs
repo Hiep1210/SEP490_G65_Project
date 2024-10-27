@@ -20,23 +20,36 @@ namespace verbum_service_infrastructure.Impl.Service
             this.mapper = mapper;
         }
 
+        private bool AreAllUrlsValid(List<string> urls)
+        {
+            if (urls == null || urls.Count == 0)
+            {
+                return false; // No URLs to check
+            }
+
+            return urls.All(url => !string.IsNullOrWhiteSpace(url));
+        }
+
         public async Task AddRange(Guid orderId, List<string> fileURLs, string tag)
         {
-            try
+            if (AreAllUrlsValid(fileURLs))
             {
-                var references = fileURLs.Select(fileURL => new OrderReference
+                try
                 {
-                    OrderId = orderId,
-                    ReferenceFileUrl = fileURL,
-                    Tag = tag,
-                    IsDeleted = false
-                });
-                context.OrderReferences.AddRange(references);
-                await context.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-                throw;
+                    var references = fileURLs.Select(fileURL => new OrderReference
+                    {
+                        OrderId = orderId,
+                        ReferenceFileUrl = fileURL,
+                        Tag = tag,
+                        IsDeleted = false
+                    });
+                    context.OrderReferences.AddRange(references);
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
 

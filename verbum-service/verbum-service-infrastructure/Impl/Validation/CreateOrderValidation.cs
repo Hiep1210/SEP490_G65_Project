@@ -29,10 +29,6 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "TargetLanguage"));
             }
-            if (ObjectUtils.IsEmpty(request.OrderName))
-            {
-                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "OrderName"));
-            }
             if (ObjectUtils.IsEmpty(request.SourceLanguageId))
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "SourceLanguageId"));
@@ -40,6 +36,10 @@ namespace verbum_service_infrastructure.Impl.Validation
             if (request.HasTranslateService == false && request.HasEvaluateService == false && request.HasEditService == false)
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "You need to order at least 1 service"));
+            }
+            if (ObjectUtils.IsEmpty(request.TranslationFileURL))
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "Translation File"));
             }
         }
 
