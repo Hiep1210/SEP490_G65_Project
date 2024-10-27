@@ -13,6 +13,6 @@ namespace verbum_service_application.Service
         Task AddRange(Guid orderId,DateTime? dueDate,List<string> serviceCodes);
         Task AddWorkCategory(Guid workId, List<int> categoryIds);
         Task<List<Guid>> GetWorkIdsListByOrderId(Guid orderId);
-        Task GenerateWork(GenerateWork request);
+        Task<List<Guid>> GenerateWork(GenerateWork request);
     }
 }

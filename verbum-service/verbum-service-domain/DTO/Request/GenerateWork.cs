@@ -5,6 +5,8 @@
         public Guid OrderId { get; set; }
         public string OrderName { get; set; }
         public DateTime? DueDate { get; set; }
-        public List<string> ServiceCodes { get; set; }
+        public bool HasTranslateService { get; set; }
+        public bool HasEditService { get; set; }
+        public bool HasEvaluateService { get; set; }
     }
 }

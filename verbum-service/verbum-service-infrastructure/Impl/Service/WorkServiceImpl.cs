@@ -9,6 +9,7 @@ using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
+using verbum_service_domain.Utils;
 using verbum_service_infrastructure.DataContext;
 
 namespace verbum_service_infrastructure.Impl.Service
@@ -125,16 +126,20 @@ namespace verbum_service_infrastructure.Impl.Service
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
-        public async Task GenerateWork(GenerateWork request)
+        public async Task<List<Guid>> GenerateWork(GenerateWork request)
         {
-            List<string> oldCodes = ["EV", "ED", "TL"];
-            if(!request.ServiceCodes.All(code => oldCodes.Any(c => c == code)))
+            List<string> serviceCodes = new List<string>();
+            if (request.HasTranslateService) serviceCodes.Add("TL");
+            if (request.HasEditService) serviceCodes.Add("ED");
+            if (request.HasEvaluateService) serviceCodes.Add("EV");
+
+            if (ObjectUtils.IsEmpty(serviceCodes))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "ServiceCodes"));
             }
             else
             {
-                var works = request.ServiceCodes.Select(serviceCode => new Work
+                var works = serviceCodes.Select(serviceCode => new Work
                 {
                     WorkId = Guid.NewGuid(),
                     OrderId = request.OrderId,
@@ -142,10 +147,14 @@ namespace verbum_service_infrastructure.Impl.Service
                     ServiceCode = serviceCode,
                     CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
                     DueDate = request.DueDate
-                });
+                }).ToList();
 
-                context.Works.AddRangeAsync(works);
+                var workIds = works.Select(w => w.WorkId).ToList();
+
+                context.Works.AddRange(works);
                 await context.SaveChangesAsync();
+
+                return workIds;
             }
         }
     }

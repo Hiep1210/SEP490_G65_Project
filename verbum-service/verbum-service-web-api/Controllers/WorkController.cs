@@ -56,13 +56,12 @@ namespace verbum_service.Controllers
 
         [HttpPost("generate")]
         //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
-        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(List<Guid>),200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GenerateWork([FromBody] GenerateWork request)
+        public async Task<List<Guid>> GenerateWork([FromBody] GenerateWork request)
         {
-            await workService.GenerateWork(request);
-            return Created();
+            return await workService.GenerateWork(request);
         }
     }
 }
