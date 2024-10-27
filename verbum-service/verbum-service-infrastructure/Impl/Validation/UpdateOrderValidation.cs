@@ -37,7 +37,7 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "SourceLanguageId"));
             }
-            if (request.TrasnlateService == false && request.EvaluateService == false && request.EditService == false)
+            if (request.TranslateService == false && request.EvaluateService == false && request.EditService == false)
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "You need to order at least 1 service"));
             }

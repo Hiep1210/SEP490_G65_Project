@@ -115,7 +115,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
                                         .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
                                         .SetProperty(u => u.DueDate, request.DueDate)
-                                        .SetProperty(u => u.HasTranslateService, request.TrasnlateService)
+                                        .SetProperty(u => u.HasTranslateService, request.TranslateService)
                                         .SetProperty(u => u.HasEditService, request.EditService)
                                         .SetProperty(u => u.HasEvaluateService, request.EvaluateService));
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
