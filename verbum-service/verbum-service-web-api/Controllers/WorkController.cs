@@ -18,7 +18,6 @@ namespace verbum_service.Controllers
     public partial class WorkController : ControllerBase
     {
         private readonly WorkService workService;
-        private readonly CreateWorkWorkflow createWorkWorkflow;
         private readonly UpdateWorkWorkflow updateWorkWorkflow;
 
         [HttpGet("get-all")]
@@ -30,17 +29,6 @@ namespace verbum_service.Controllers
         public async Task<List<WorkResponse>> GetAllWork()
         {
             return await workService.GetAllWork();
-        }
-
-        [HttpPost("add")]
-        //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> AddWork([FromBody] WorkCreate work)
-        {
-            await createWorkWorkflow.process(work);
-            return NoContent();
         }
 
         [HttpPut("update")]
@@ -55,7 +43,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPost("generate")]
-        //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
+        [Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
         [ProducesResponseType(201)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]

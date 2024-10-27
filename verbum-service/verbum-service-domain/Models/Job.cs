@@ -12,13 +12,13 @@ public partial class Job
     /// <summary>
     /// NEW, IN_PROGRESS, COMPLETED
     /// </summary>
-    public long Status { get; set; }
+    public string Status { get; set; } = null!;
 
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     public int WordCount { get; set; }
 

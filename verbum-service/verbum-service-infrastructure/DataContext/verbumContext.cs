@@ -143,8 +143,6 @@ public partial class verbumContext : DbContext
 
             entity.ToTable("job");
 
-            entity.HasIndex(e => e.TargetLanguageId, "job_unique").IsUnique();
-
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");

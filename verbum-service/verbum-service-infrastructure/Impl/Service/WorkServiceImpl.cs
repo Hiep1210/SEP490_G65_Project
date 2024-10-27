@@ -144,7 +144,7 @@ namespace verbum_service_infrastructure.Impl.Service
                     DueDate = request.DueDate
                 });
 
-                context.Works.AddRangeAsync(works);
+                context.Works.AddRange(works);
                 await context.SaveChangesAsync();
             }
         }

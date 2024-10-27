@@ -53,6 +53,9 @@ namespace verbum_service_application.Mapper
             CreateMap<Rating, RatingResponse>().ReverseMap();
             CreateMap<Rating, RatingCreate>().ReverseMap();
             CreateMap<Rating, RatingUpdate>().ReverseMap();
+            CreateMap<Job, JobInfoResponse>()
+                .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.Select(x => x.Name)))
+                .ReverseMap();
         }
     }
 }
