@@ -16,13 +16,13 @@ namespace verbum_service_domain.DTO.Response
         /// <summary>
         /// NEW, IN_PROGRESS, COMPLETED
         /// </summary>
-        public long Status { get; set; }
+        public string Status { get; set; }
 
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public int WordCount { get; set; }
 
@@ -31,6 +31,6 @@ namespace verbum_service_domain.DTO.Response
         public string TargetLanguageId { get; set; } = null!;
 
         public Guid? WorkId { get; set; }
-        public List<string> AssigneeNames { get; set; }
+        public ICollection<string> AssigneeNames { get; set; }
     }
 }
