@@ -1,1 +1,6 @@
-<template><h1>index</h1></template>
+<script lang="ts">
+
+</script>
+<template>
+    <IssuesCreateForm/>
+</template>

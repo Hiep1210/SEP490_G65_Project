@@ -13,10 +13,33 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-import mockIssues from '~/mock/issues'
 import type { Issue } from '~/types/issues'
 
-const items: Issue[] = mockIssues
+
+const props = defineProps<{
+  issues: Issue[]
+}>();
+
+const inprogressIssues = computed(() => 
+  props.issues.filter( 
+    item => item.status === "OPEN"
+  )
+)
+const items = ref(inprogressIssues.value) 
+
+watch(
+  () => props.issues,
+  (newList) => {
+    items.value = [...newList]
+  },
+  { deep: true }
+)
+
+
+console.log(props.issues)
+
+
+
 </script>
 
 <template>
@@ -30,6 +53,7 @@ const items: Issue[] = mockIssues
         <Card>
           <CardHeader>
             <CardTitle>{{ item.issueName }}</CardTitle>
+            <CardDescription>Status: {{ item.status }}</CardDescription>
             <CardDescription>{{ item.issueDescription }}</CardDescription>
           </CardHeader>
           <CardFooter>

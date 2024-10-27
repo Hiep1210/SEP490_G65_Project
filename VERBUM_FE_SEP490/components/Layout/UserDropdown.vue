@@ -9,10 +9,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { CircleUser } from 'lucide-vue-next'
 const authStore = useCookie('AuthStore')
+const access_token = useCookie('access_token')
+const refresh_token = useCookie('refresh_token')
 
 
 const handleLogout = () => {
   authStore.value = ''
+  access_token.value = ''
+  refresh_token.value = ''
   window.location.reload()
 }
 

@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import mockIssues from '~/mock/issues'
+// import mockIssues from '~/mock/issues'
 import { formatDistanceToNow } from 'date-fns'
+import type { Issue } from '~/types/issues';
 
-const issues = mockIssues
 
 const getBadgeClass = (status: string) => {
   switch (status) {
@@ -24,6 +24,21 @@ const getBadgeClass = (status: string) => {
       return 'bg-gray-300 text-black'
   }
 }
+
+const props = defineProps<{
+  issues: Issue[]
+}>();
+
+const issues = ref(props.issues);
+
+watch(
+  () => props.issues,
+  (newList) => {
+    issues.value = [...newList]
+  },
+  { deep: true }
+)
+
 </script>
 
 <template>
