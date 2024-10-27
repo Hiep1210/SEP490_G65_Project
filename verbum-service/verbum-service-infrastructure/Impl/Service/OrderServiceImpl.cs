@@ -113,9 +113,10 @@ namespace verbum_service_infrastructure.Impl.Service
             int records = await context.Orders
                 .Where(x => x.OrderId == request.OrderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
+                                        .SetProperty(u => u.OrderPrice, request.OrderPrice)
                                         .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
                                         .SetProperty(u => u.DueDate, request.DueDate)
-                                        .SetProperty(u => u.HasTranslateService, request.TrasnlateService)
+                                        .SetProperty(u => u.HasTranslateService, request.TranslateService)
                                         .SetProperty(u => u.HasEditService, request.EditService)
                                         .SetProperty(u => u.HasEvaluateService, request.EvaluateService));
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
@@ -187,6 +188,11 @@ namespace verbum_service_infrastructure.Impl.Service
                     throw;
                 }
             } 
+        }
+
+        public async Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles()
+        {
+            return mapper.Map<List<UploadOrderFileRequest>>(await context.OrderReferences.Where(x => !x.IsDeleted).ToListAsync());
         }
     }
 }

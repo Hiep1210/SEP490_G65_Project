@@ -7,6 +7,7 @@ using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_infrastructure.DataContext;
 
@@ -38,6 +39,11 @@ namespace verbum_service_infrastructure.Impl.Service
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
+        public async Task<List<UploadIssueAttachmentFiles>> GetAllIssueAttachments()
+        {
+            return mapper.Map<List<UploadIssueAttachmentFiles>>(await context.IssueAttachments.Where(x => !x.IsDeleted).ToListAsync());
+        }
+
         public async Task RecoverDeletedFiles(Guid issueId, string attachmentUrl)
         {
             int records = await context.IssueAttachments
@@ -48,11 +54,14 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateIssue(UpdateIssueRequest request)
         {
-            int records = await context.Issues
-                .Where(x => x.IssueId == request.IssueId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.UpdatedAt, DateTime.Now)
-                                        .SetProperty(u => u.IssueName, request.IssueName)
-                                        .SetProperty(u => u.IssueDescription, request.IssueDescription));
+            Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
+            updateIssue.UpdatedAt = DateTime.Now;
+            updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
+            updateIssue.IssueName = request.IssueName;
+            updateIssue.IssueDescription = request.IssueDescription;
+            updateIssue.AssigneeId = request.AssigneeId;
+            context.Issues.Update(updateIssue);
+            int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
@@ -75,30 +84,29 @@ namespace verbum_service_infrastructure.Impl.Service
             }
         }
 
-        public async Task<List<Issue>> ViewAllIssue()
+        public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = new List<Issue>();
-            switch(currentUser.Role)
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.Client).ToListAsync();
+            switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    issues = await context.Issues
+                    issues = issues
                         .Where(x => x.ClientId == currentUser.Id)
-                        .ToListAsync();
+                        .ToList();
                     break;
                 case UserRole.LINGUIST:
-                    issues = await context.Issues
+                    issues = issues
                         .Where(x => x.AssigneeId == currentUser.Id)
-                        .ToListAsync();
+                        .ToList();
                     break;
                 case UserRole.TRANSLATE_MANAGER:
                 case UserRole.EDIT_MANAGER:
                 case UserRole.EVALUATE_MANAGER:
-                    issues = await context.Issues.ToListAsync();
                     break;
                 default:
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
             }
-            return issues;
+            return mapper.Map<List<IssueResponse>>(issues);
         }
     }
 }

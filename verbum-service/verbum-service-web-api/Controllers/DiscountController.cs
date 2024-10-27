@@ -13,7 +13,7 @@ namespace verbum_service.Controllers
 {
     [Route("api/discount")]
     [ApiController]
-    //[Roles(UserRole.DIRECTOR)]
+    [Roles(UserRole.DIRECTOR)]
     [RequiredArgsConstructor]
     public partial class DiscountController : ControllerBase
     {

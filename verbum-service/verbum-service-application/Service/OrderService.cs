@@ -17,5 +17,6 @@ namespace verbum_service_application.Service
         Task RecoverDeletedFiles(Guid orderId, string url);
         Task DeleteOrderReferenceFile(Guid orderId, string url);
         Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request);
+        Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles();
     }
 }

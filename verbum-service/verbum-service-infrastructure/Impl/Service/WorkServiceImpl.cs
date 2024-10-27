@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
+using verbum_service_domain.Utils;
 using verbum_service_infrastructure.DataContext;
 
 namespace verbum_service_infrastructure.Impl.Service
@@ -121,6 +124,38 @@ namespace verbum_service_infrastructure.Impl.Service
             }
 
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task<List<Guid>> GenerateWork(GenerateWork request)
+        {
+            List<string> serviceCodes = new List<string>();
+            if (request.HasTranslateService) serviceCodes.Add("TL");
+            if (request.HasEditService) serviceCodes.Add("ED");
+            if (request.HasEvaluateService) serviceCodes.Add("EV");
+
+            if (ObjectUtils.IsEmpty(serviceCodes))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "ServiceCodes"));
+            }
+            else
+            {
+                var works = serviceCodes.Select(serviceCode => new Work
+                {
+                    WorkId = Guid.NewGuid(),
+                    OrderId = request.OrderId,
+                    WorkName = request.OrderName,
+                    ServiceCode = serviceCode,
+                    CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
+                    DueDate = request.DueDate
+                }).ToList();
+
+                var workIds = works.Select(w => w.WorkId).ToList();
+
+                context.Works.AddRange(works);
+                await context.SaveChangesAsync();
+
+                return workIds;
+            }
         }
     }
 }

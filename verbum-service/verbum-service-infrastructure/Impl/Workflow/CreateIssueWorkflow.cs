@@ -8,6 +8,7 @@ using verbum_service_application.Service;
 using verbum_service_application.Workflow;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.Models;
 using verbum_service_domain.Utils;
 using verbum_service_infrastructure.Impl.Validation;
 

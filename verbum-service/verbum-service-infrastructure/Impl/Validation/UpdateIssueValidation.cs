@@ -19,7 +19,7 @@ namespace verbum_service_infrastructure.Impl.Validation
         public async Task<List<string>> Validate(UpdateIssueRequest request)
         {
             List<string> errors = new List<string>();
-            if(await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName)))
+            if(await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName) && x.IssueId != request.IssueId))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
             }

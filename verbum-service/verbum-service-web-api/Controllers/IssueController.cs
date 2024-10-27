@@ -5,6 +5,7 @@ using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
+using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_infrastructure.Impl.Workflow;
 
@@ -22,7 +23,7 @@ namespace verbum_service.Controllers
         private readonly UpdateIssueWorkflow updateIssueWorkflow;
         [HttpGet]
         [Roles(UserRole.MANAGER, UserRole.LINGUIST, UserRole.CLIENT)]
-        [ProducesResponseType(typeof(List<Issue>), 200)]
+        [ProducesResponseType(typeof(List<IssueResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -38,11 +39,11 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> AddIssue(CreateIssueRequest request)
         {
             await createIssueWorkflow.process(request);
-            return Created();
+            return StatusCode(201);
         }
 
         [HttpPut]
-        [Roles(UserRole.CLIENT)]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -52,30 +53,8 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPost("file")]
-        [Roles(UserRole.CLIENT)]
-        [ProducesResponseType(typeof(string), 201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> UploadIssueAttachment(List<UploadIssueAttachmentFiles> attachmentFiles)
-        {
-            await issueService.UploadIssueAttachment(attachmentFiles);
-            return Created();
-        }
-
-        [HttpDelete("file")]
-        [Roles(UserRole.MANAGER)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteIssueAttachmentFile(Guid issueId, string fileURl)
-        {
-            await issueService.DeleteIssueAttachmentFile(issueId, fileURl);
-            return NoContent();
-        }
-
-        [HttpDelete("file-recover")]
-        [Roles(UserRole.MANAGER)]
+        [HttpPut("file-recover")]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]

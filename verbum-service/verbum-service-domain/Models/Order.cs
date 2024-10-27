@@ -16,8 +16,6 @@ public partial class Order
 
     public string SourceLanguageId { get; set; } = null!;
 
-    public string OrderName { get; set; } = null!;
-
     public string? OrderStatus { get; set; }
 
     public decimal? OrderPrice { get; set; }
@@ -34,6 +32,8 @@ public partial class Order
 
     public DateTime? CreatedDate { get; set; }
 
+    public string? OrderName { get; set; }
+
     public virtual User Client { get; set; } = null!;
 
     public virtual Discount? Discount { get; set; }
@@ -41,6 +41,8 @@ public partial class Order
     public virtual ICollection<Issue> Issues { get; set; } = new List<Issue>();
 
     public virtual ICollection<OrderReference> OrderReferences { get; set; } = new List<OrderReference>();
+
+    public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual Language SourceLanguage { get; set; } = null!;
 

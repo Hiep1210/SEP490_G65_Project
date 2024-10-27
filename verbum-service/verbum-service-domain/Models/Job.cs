@@ -9,13 +9,16 @@ public partial class Job
 
     public string Name { get; set; } = null!;
 
-    public long Status { get; set; }
+    /// <summary>
+    /// NEW, IN_PROGRESS, COMPLETED
+    /// </summary>
+    public string Status { get; set; } = null!;
 
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     public int WordCount { get; set; }
 
@@ -26,4 +29,6 @@ public partial class Job
     public Guid? WorkId { get; set; }
 
     public virtual Work? Work { get; set; }
+
+    public virtual ICollection<User> Assignees { get; set; } = new List<User>();
 }
