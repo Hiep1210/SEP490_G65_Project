@@ -22,7 +22,7 @@ const props = defineProps<{
 
 const inprogressIssues = computed(() => 
   props.issues.filter( 
-    item => item.status === "OPEN"
+    item => item.status === "ACCEPTED"
   )
 )
 const items = ref(inprogressIssues.value) 
@@ -48,7 +48,6 @@ watch(
         <Card>
           <CardHeader>
             <CardTitle>{{ item.issueName }}</CardTitle>
-            <CardDescription>Status: {{ item.status }}</CardDescription>
             <CardDescription>{{ item.issueDescription }}</CardDescription>
           </CardHeader>
           <CardFooter>

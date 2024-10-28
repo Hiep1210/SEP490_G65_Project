@@ -13,5 +13,6 @@ export type Issue = {
   orderId: string
   issueDescription: string
   assigneeName: string
+  assigneeId: string
   issueAttachments: IssueAttachment[]
 }

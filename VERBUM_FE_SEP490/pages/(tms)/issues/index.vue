@@ -2,15 +2,20 @@
 // middleware: false
 
 import { useIssues } from '~/composables/useIssues'
+import type { Issue } from '~/types/issues';
 
-const { issues, getIssues } = useIssues()
+const { issues, getIssues, updateIssue } = useIssues()
 
 onMounted(() => {
   if (!issues.value.length) {
     getIssues()
   }
-  console.log({ issues })
 })
+
+const handleUpdate = async (updateIssues: Issue) => {
+  await updateIssue(updateIssues)
+  await getIssues()
+}
 </script>
 
 <template>
@@ -18,6 +23,6 @@ onMounted(() => {
     <h1 class="text-2xl font-semibold">Active Issues</h1>
     <IssuesCarousel :issues="issues" />
     <h1 class="text-2xl font-semibold">All issues</h1>
-    <IssuesTable :issues="issues"/>
+    <IssuesTable :issues="issues" @update="handleUpdate"/>
   </div>
 </template>

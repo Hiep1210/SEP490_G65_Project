@@ -31,13 +31,32 @@ export const useIssues = () => {
           }
     }
 
-    // const createIssues = async () => {
-
-    // }
+    const updateIssue = async (issue: Issue) => {
+      try {
+        const payload = issue
+        await useAPI('/issue', {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        })
+        console.log({payload})
+        toast({
+          title: 'Issue updated !!',
+          description: `Issue has been updated!!`
+        })
+      } catch (error) {
+        toast({
+          title: 'Error updating issue',
+          description: 'An error occurred while updating the issue!!'
+        })
+        console.error('Error updating issue:', error)
+      }
+    }
 
     return{
         isLoading,
         issues,
-        getIssues
+        getIssues,
+        updateIssue
     }
 }
