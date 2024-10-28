@@ -1,9 +1,11 @@
 ﻿using Lombok.NET;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using verbum_service.Filter;
 using verbum_service_application.Service;
+using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
@@ -23,6 +25,7 @@ namespace verbum_service.Controllers
 
         [HttpGet("get-all")]
         [EnableQuery]
+        [Authorize]
         [ProducesResponseType(typeof(List<CategoryInfoResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
@@ -34,6 +37,7 @@ namespace verbum_service.Controllers
 
         [HttpGet("search-name")]
         [EnableQuery]
+        [Authorize]
         [ProducesResponseType(typeof(CategoryInfoResponse), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
@@ -45,6 +49,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPost("add")]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(201)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -55,6 +60,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("update")]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -65,6 +71,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpDelete("delete")]
+        [Roles(UserRole.ADMIN)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]

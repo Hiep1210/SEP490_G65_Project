@@ -18,5 +18,6 @@ namespace verbum_service_application.Service
         Task DeleteOrderReferenceFile(Guid orderId, string url);
         Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request);
         Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles();
+        Task UpdateOrderPrice(Guid orderId, decimal price);
     }
 }
