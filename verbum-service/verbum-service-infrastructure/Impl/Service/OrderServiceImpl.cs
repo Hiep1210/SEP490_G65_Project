@@ -2,6 +2,7 @@
 using Lombok.NET;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Linq.Expressions;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
@@ -113,12 +114,19 @@ namespace verbum_service_infrastructure.Impl.Service
             int records = await context.Orders
                 .Where(x => x.OrderId == request.OrderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
-                                        .SetProperty(u => u.OrderPrice, request.OrderPrice)
                                         .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
                                         .SetProperty(u => u.DueDate, request.DueDate)
                                         .SetProperty(u => u.HasTranslateService, request.TranslateService)
                                         .SetProperty(u => u.HasEditService, request.EditService)
                                         .SetProperty(u => u.HasEvaluateService, request.EvaluateService));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task UpdateOrderPrice(Guid orderId, decimal price)
+        {
+            int records = await context.Orders
+                .Where(x => x.OrderId == orderId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderPrice, price));
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
