@@ -44,7 +44,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut]
-        [Roles(UserRole.CLIENT)]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
