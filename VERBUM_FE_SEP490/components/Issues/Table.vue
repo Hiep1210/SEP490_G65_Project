@@ -14,7 +14,7 @@ import type { Issue } from '~/types/issues';
 
 const getBadgeClass = (status: string) => {
   switch (status) {
-    case 'Open':
+    case 'OPEN':
       return 'bg-green-500 text-white'
     case 'In Progress':
       return 'bg-yellow-500 text-black'
@@ -24,6 +24,21 @@ const getBadgeClass = (status: string) => {
       return 'bg-gray-300 text-black'
   }
 }
+
+const showIssuesDialog = ref(false)
+const selectedData = ref();
+defineEmits(['update'])
+
+const openIssuesDialog = (data: Issue) => {
+  selectedData.value = data;
+  showIssuesDialog.value = true;
+}
+const closeIssuesDialog = () => {
+  selectedData.value = '';
+  showIssuesDialog.value = false;
+}
+
+
 
 const props = defineProps<{
   issues: Issue[]
@@ -53,7 +68,7 @@ watch(
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow v-for="issue in issues" :key="issue.issueId">
+      <TableRow v-for="issue in issues" :key="issue.issueId" @click="openIssuesDialog(issue)">
         <TableCell class="font-medium">
           {{ issue.issueName }}
         </TableCell>
@@ -90,4 +105,10 @@ watch(
       </TableRow>
     </TableBody>
   </Table>
+  <IssuesDialog
+  v-if="showIssuesDialog"
+  :row-data="selectedData"
+  :open="showIssuesDialog"
+  @close="closeIssuesDialog"
+  />
 </template>

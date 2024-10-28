@@ -36,7 +36,12 @@ watch(files, () => {
 </script>
 
 <template>
-  <FormField v-slot="{ componentField }" name="issueName">
+  <div class="flex justify-end gap-2"> 
+    <Button class="bg-slate-500 hover:bg-slate-600"> Cancel</Button>
+    <Button> Create issue</Button>
+  </div>
+
+  <FormField  v-slot="{ componentField }" name="issueName" >
     <FormItem>
       <FormLabel>Title</FormLabel>
       <FormControl>
@@ -50,8 +55,8 @@ watch(files, () => {
     </FormItem>
   </FormField>
 
-  <FormField v-slot="{ componentField }" name="issueDescription">
-    <FormItem>
+  <FormField v-slot="{ componentField }" name="issueDescription" >
+    <FormItem class="mt-2">
       <FormLabel>Details</FormLabel>
       <FormControl>
         <Textarea
@@ -69,8 +74,8 @@ watch(files, () => {
     name="referenceFileURLs"
     :model-value="downloadUrlsString"
   >
-    <FormItem class="flex flex-col">
-      <FormLabel>Reference Files</FormLabel>
+    <FormItem class="flex flex-col align-middle gap-2 mt-2" >
+      <FormLabel class="my-auto ">Reference Files</FormLabel>
       <FormControl>
         <Button type="button" @click="open({ accept: '*', multiple: true })">
           Upload Files

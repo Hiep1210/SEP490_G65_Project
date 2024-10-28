@@ -35,11 +35,6 @@ watch(
   { deep: true }
 )
 
-
-console.log(props.issues)
-
-
-
 </script>
 
 <template>
