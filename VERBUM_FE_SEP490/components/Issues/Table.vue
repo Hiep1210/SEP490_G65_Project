@@ -92,7 +92,7 @@ watch(
         <TableCell>
           <Badge :class="getBadgeClass(issue.status)">{{ issue.status }}</Badge>
         </TableCell>
-        <TableCell>
+        <TableCell @click.stop>
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Button variant="default">View All Files</Button>

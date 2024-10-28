@@ -20,13 +20,30 @@ const props = defineProps<{
   issues: Issue[]
 }>();
 
-const inprogressIssues = computed(() => 
-  props.issues.filter( 
+const acceptedIssues = (data: Issue[]) => {
+  return data.filter( 
     item => item.status === "ACCEPTED"
   )
-)
-const items = ref(inprogressIssues.value) 
+}
+const items = ref(props.issues) 
 
+const showIssuesDialog = ref(false)
+const selectedData = ref();
+const emit = defineEmits(['update'])
+
+const openIssuesDialog = (data: Issue) => {
+  selectedData.value = data;
+  showIssuesDialog.value = true;
+}
+const closeIssuesDialog = () => {
+  selectedData.value = '';
+  showIssuesDialog.value = false;
+}
+
+const updateIssueInTable = (updatedIssue: Issue) => {
+  emit('update', updatedIssue)
+  closeIssuesDialog()
+}
 watch(
   () => props.issues,
   (newList) => {
@@ -41,9 +58,10 @@ watch(
   <Carousel class="w-full max-w-[80vw] px-5">
     <CarouselContent>
       <CarouselItem
-        v-for="item in items"
+        v-for="item in acceptedIssues(items)"
         :key="item.issueId"
         class="md:basis-1/2 lg:basis-1/3"
+        @click="openIssuesDialog(item)"
       >
         <Card>
           <CardHeader>
@@ -59,6 +77,13 @@ watch(
     <CarouselPrevious />
     <CarouselNext />
   </Carousel>
+  <IssuesDialog
+  v-if="showIssuesDialog"
+  :row-data="selectedData"
+  :open="showIssuesDialog"
+  @close="closeIssuesDialog"
+  @update="updateIssueInTable"
+  />
 </template>
 
 <style></style>
