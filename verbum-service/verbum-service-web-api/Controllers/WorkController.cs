@@ -26,9 +26,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<WorkResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<List<WorkResponse>> GetAllWork()
+        public async Task<IActionResult> GetAllWork()
         {
-            return await workService.GetAllWork();
+            return ResponseFilter.OkOrNoContent(await workService.GetAllWork(), this);
         }
 
         [HttpPut("update")]

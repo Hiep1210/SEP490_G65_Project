@@ -28,9 +28,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<OrderResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<List<OrderDetailsResponse>> GetAllOrder()
+        public async Task<IActionResult> GetAllOrder()
         {
-            return await orderService.GetAllOrder();
+            return ResponseFilter.OkOrNoContent(await orderService.GetAllOrder(), this);
         }
 
         [HttpGet("get-details")]
@@ -38,9 +38,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(OrderDetailsResponse), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
+        public async Task<IActionResult> GetOrderDetails(Guid id)
         {
-            return await orderService.GetOrderDetails(id);
+            return ResponseFilter.OkOrNoContent(await orderService.GetOrderDetails(id), this);
         }
 
         [HttpPost("add")]
