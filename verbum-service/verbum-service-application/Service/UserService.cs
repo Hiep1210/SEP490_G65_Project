@@ -14,5 +14,6 @@ namespace verbum_service_application.Service
         Task<string> SendConfirmationEmail(string email);
         Task<Tokens> LoginGoogleCallback();
         Task UpdateUser(UserUpdate userUpdate);
+        Task<List<UserInfo>> GetAssignList();
     }
 }

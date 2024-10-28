@@ -9,6 +9,7 @@ namespace verbum_service_application.Mapper
     {
         public MyMapper()
         {
+            CreateMap<User, UserInfo>().ReverseMap();
             CreateMap<UserSignUp, User>().ReverseMap();
             CreateMap<Category, CategoryInfoResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CategoryId))
