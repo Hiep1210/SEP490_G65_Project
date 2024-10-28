@@ -28,7 +28,7 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
             context.Issues.Add(issue);
-            await context.SaveChangesAsync();
+            if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
         public async Task DeleteIssueAttachmentFile(Guid issueId, string attachmentUrl)
@@ -63,6 +63,20 @@ namespace verbum_service_infrastructure.Impl.Service
             context.Issues.Update(updateIssue);
             int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task UpdateIssueStatus(Guid issueId, string status)
+        {
+            if (!Enum.IsDefined(typeof(IssueStatusEnum), status)
+                || IssueStatusEnum.OPEN.ToString().Equals(status) 
+                || (UserRole.CLIENT.Equals(currentUser.Role) && !IssueStatusEnum.CANCEL.ToString().Equals(status)))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
+            }
+            if (await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(o => o.SetProperty(a => a.Status, status)) < 1)
+            {
+                throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            }
         }
 
         public async Task UploadIssueAttachment(List<UploadIssueAttachmentFiles> attachmentFiles)
