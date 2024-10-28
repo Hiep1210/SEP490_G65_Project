@@ -9,8 +9,9 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import type { Discount } from '~/types/discount'
-const token = useCookie('access_token')
+import { useDiscounts } from '~/composables/useDiscount'
 
+const { deleteDiscount} = useDiscounts()
 const props = defineProps<{
   open: boolean
   rowData: Discount // Receive row data as a prop
@@ -27,20 +28,22 @@ watch(
 )
 
 
-const deleteDiscount = async () => {
-  try {
-    await $fetch(`http://localhost:8000/api/discount?discountId=${props.rowData.discountId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-    emit('delete', props.rowData); 
-    closeDialog();
-  } catch (error) {
-    console.error('Failed to delete discount:', error);
-    alert('Failed to delete discount. Please try again.');
-  }
+const deleteDiscountItem = async () => {
+  await deleteDiscount(props.rowData.discountId)
+  closeDialog();
+  // try {
+  //   await $fetch(`http://localhost:8000/api/discount?discountId=${props.rowData.discountId}`, {
+  //     method: 'DELETE',
+  //     headers: {
+  //       Authorization: `Bearer ${token.value}`,
+  //     },
+  //   });
+  //   emit('delete', props.rowData); 
+  //   closeDialog();
+  // } catch (error) {
+  //   console.error('Failed to delete discount:', error);
+  //   alert('Failed to delete discount. Please try again.');
+  // }
 };
 
 const closeDialog = () => {
@@ -61,7 +64,7 @@ const closeDialog = () => {
       </DialogHeader>
       <DialogFooter>
         <Button @click="closeDialog">Cancel</Button>
-        <Button @click="deleteDiscount">Delete Discount</Button>
+        <Button @click="deleteDiscountItem">Delete Discount</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
