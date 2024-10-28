@@ -19,5 +19,6 @@ namespace verbum_service_application.Service
         Task RecoverDeletedFiles(Guid issueId, string attachmentUrl);
         Task DeleteIssueAttachmentFile(Guid issueId, string attachmentUrl);
         Task<List<UploadIssueAttachmentFiles>> GetAllIssueAttachments();
+        Task UpdateIssueStatus(Guid issueId, string status);
     }
 }

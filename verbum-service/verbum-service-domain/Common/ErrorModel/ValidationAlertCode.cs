@@ -19,5 +19,6 @@ namespace verbum_service_domain.Common.ErrorModel
         public const string LOGIN_FAIL = "Login fail";
         public const string UPDATE_RECORD_FAIL = "No record affected";
         public const string CANNOT_DELETE = "Cannot delete this {0}";
+        public const string CANNOT_UPDATE = "Cannot update this {0}";
     }
 }

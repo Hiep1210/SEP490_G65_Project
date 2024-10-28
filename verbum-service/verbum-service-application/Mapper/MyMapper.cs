@@ -9,6 +9,7 @@ namespace verbum_service_application.Mapper
     {
         public MyMapper()
         {
+            CreateMap<User, UserInfo>().ReverseMap();
             CreateMap<UserSignUp, User>().ReverseMap();
             CreateMap<Category, CategoryInfoResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CategoryId))
@@ -55,6 +56,9 @@ namespace verbum_service_application.Mapper
             CreateMap<Rating, RatingUpdate>().ReverseMap();
             CreateMap<Job, JobInfoResponse>()
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.Select(x => x.Name).ToList()))
+                .ReverseMap();
+            CreateMap<Job, UpdateJobRequest>()
+                .ForMember(dest => dest.AssigneesId, opt => opt.MapFrom(src => src.Assignees.Select(x => x.Id).ToList()))
                 .ReverseMap();
         }
     }

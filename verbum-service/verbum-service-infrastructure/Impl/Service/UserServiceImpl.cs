@@ -208,5 +208,10 @@ namespace verbum_service_infrastructure.Impl.Service
                 }
             }
         }
+
+        public async Task<List<UserInfo>> GetAssignList()
+        {
+            return mapper.Map<List<UserInfo>>(await context.Users.Where(x => x.RoleCode.Equals(UserRole.LINGUIST)).ToListAsync());
+        }
     }
 }

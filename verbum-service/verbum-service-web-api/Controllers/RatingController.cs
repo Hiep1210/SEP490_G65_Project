@@ -30,9 +30,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<RatingResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<List<RatingResponse>> GetAllRating()
+        public async Task<IActionResult> GetAllRating()
         {
-            return await ratingService.GetAllRating();
+            return ResponseFilter.OkOrNoContent(await ratingService.GetAllRating(), this);
         }
 
         [HttpPost("add")]

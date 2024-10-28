@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using verbum_service.Filter;
 using verbum_service_application.Service;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
@@ -28,6 +29,15 @@ namespace verbum_service.Controllers
         {
             await updateUserWorkflow.process(userUpdate);
             return Ok();
+        }
+
+        [HttpGet("assign-list")]
+        [ProducesResponseType(typeof(List<UserInfo>), 200)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAssignList()
+        {
+            return ResponseFilter.OkOrNoContent(await userService.GetAssignList(), this);
         }
     }
 }

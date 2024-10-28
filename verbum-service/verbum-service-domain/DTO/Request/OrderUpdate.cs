@@ -9,7 +9,6 @@
         public bool TranslateService { get; set; }
         public bool EditService { get; set; }
         public bool EvaluateService { get; set; }
-        public decimal? OrderPrice { get; set; }
         public DateTime? DueDate { get; set; }
         public Guid? DiscountId { get; set; }
     }

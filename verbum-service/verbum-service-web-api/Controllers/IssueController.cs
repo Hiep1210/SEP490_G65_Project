@@ -1,5 +1,6 @@
 ﻿using Lombok.NET;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
@@ -50,6 +51,17 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> UpdateIssue(UpdateIssueRequest request)
         {
             await updateIssueWorkflow.process(request);
+            return NoContent();
+        }
+
+        [HttpPut("change-status")]
+        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> UpdateIssueStatus([FromQuery][Required] Guid issueId, [FromQuery][Required]string status)
+        {
+            await issueService.UpdateIssueStatus(issueId, status);
             return NoContent();
         }
 

@@ -3,7 +3,9 @@ import { ref } from 'vue'
 import type { Discount } from '~/types/discount'
 import { columns } from '~/components/Discounts/columns'
 import { Button } from '@/components/ui/button'
-const token = useCookie('access_token')
+import { useDiscounts } from '~/composables/useDiscount'
+
+const { discounts, getDiscounts, createDiscount } = useDiscounts()
 
 useSeoMeta({
   title: 'Discounts'
@@ -13,74 +15,37 @@ definePageMeta({
   layout: 'default'
 })
 
-// Fetch discounts from API
-const { data: discountData, error: discountError } = await useAsyncData<
-  Discount[]
->('discountData', () =>
-  $fetch('http://localhost:8000/api/discount', {
-    headers: {
-      Authorization: `Bearer ${token.value}`
-    }
-  })
-)
-
-if (discountError.value) {
-  console.error('Failed to fetch data:', discountError.value)
-}
-
-console.log(discountData)
-
-// Initialize data with fetched discounts or fallback data
-const data = ref<Discount[]>(discountData.value || [])
+onMounted(() => {
+  if (!discounts.value.length) {
+    getDiscounts()
+  }
+})
 
 // Track dialog state
 const isDialogOpen = ref(false)
 
-// Function to refresh discount data
-const refreshDiscounts = async () => {
-  try {
-    const response: Discount[] = await $fetch(
-      'http://localhost:8000/api/discount',
-      {
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        }
-      }
-    )
-    data.value = response // Update the data with the latest from the API
-  } catch (error) {
-    console.error('Failed to refresh discounts:', error)
-  }
-}
 
 // Handle creating a new discount
 const handleCreateDiscount = async (newDiscount: Discount) => {
-  try {
-    await $fetch('http://localhost:8000/api/discount', {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
-      method: 'POST',
-      body: {
-        ...newDiscount,
-        isUpdate: true // Add the required `isUpdate` flag
-      }
-    })
-
-    // Refresh the discounts after successful creation
-    await refreshDiscounts()
-
-    isDialogOpen.value = false // Close the dialog
-  } catch (error) {
-    console.error('Failed to create discount:', error)
-    alert('Failed to create discount. Please try again.')
+  const newDiscountItem = {
+    discountId: newDiscount.discountId,
+    discountName: newDiscount.discountName,
+    discountPercent: newDiscount.discountPercent,
+    isUpdate: true
   }
+  if (!newDiscount) return
+  await createDiscount(newDiscountItem)
+  await getDiscounts()
+  
+  closeDialog();
 }
 
 // Handle dialog close
 const closeDialog = () => {
   isDialogOpen.value = false
 }
+
+// watch(discounts, newDiscounts)
 </script>
 
 <template>
@@ -89,7 +54,7 @@ const closeDialog = () => {
       >Create Discount
     </Button>
 
-    <DiscountsTable :columns="columns" :data="data" />
+    <DiscountsTable :columns="columns" :data="discounts" />
 
     <!-- Create Discount Dialog -->
     <DiscountsCreateDialog

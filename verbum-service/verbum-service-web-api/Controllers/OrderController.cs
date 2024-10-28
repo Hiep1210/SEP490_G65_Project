@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
@@ -28,9 +29,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<OrderResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<List<OrderDetailsResponse>> GetAllOrder()
+        public async Task<IActionResult> GetAllOrder()
         {
-            return await orderService.GetAllOrder();
+            return ResponseFilter.OkOrNoContent(await orderService.GetAllOrder(), this);
         }
 
         [HttpGet("get-details")]
@@ -38,9 +39,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(OrderDetailsResponse), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
+        public async Task<IActionResult> GetOrderDetails(Guid id)
         {
-            return await orderService.GetOrderDetails(id);
+            return ResponseFilter.OkOrNoContent(await orderService.GetOrderDetails(id), this);
         }
 
         [HttpPost("add")]
@@ -55,12 +56,24 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("update")]
+        [Roles(UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> UpdateOrder([FromBody] OrderUpdate order)
         {
             await updateOrderWorkflow.process(order);
+            return NoContent();
+        }
+
+        [HttpPut("price")]
+        [Roles(UserRole.DIRECTOR)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> UpdateOrderPrice([FromQuery][Required] Guid orderId, [FromQuery][Required] decimal price)
+        {
+            await orderService.UpdateOrderPrice(orderId, price);
             return NoContent();
         }
 

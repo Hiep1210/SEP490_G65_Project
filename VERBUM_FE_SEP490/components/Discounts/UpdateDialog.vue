@@ -11,7 +11,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { Discount } from '~/types/discount'
-const token = useCookie('access_token')
+import { useDiscounts } from '~/composables/useDiscount';
+
 
 const props = defineProps<{
   open: boolean
@@ -20,10 +21,9 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'update']) // Emit update event
 const isOpen = ref(props.open)
-
-// Form field values
 const name = ref(props.rowData.discountName)
 const percent = ref(props.rowData.discountPercent)
+const { updateDiscount, getDiscounts} = useDiscounts()
 
 watch(
   () => props.open,
@@ -32,33 +32,18 @@ watch(
   }
 )
 
-// Update discount function
 
-
-const updateDiscount = async () => {
+const updateDiscountItem = async () => {
   const updateDiscountItem = {
   discountId: props.rowData.discountId,
   discountName: name.value,
   discountPercent: percent.value,
   isUpdate: true
 }
-  try {
-    await $fetch(`http://localhost:8000/api/discount`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-        'Content-Type': 'application/json'
-      },
-      body: updateDiscountItem
-    })
-    emit('update', {
-      updateDiscountItem
-    })
-    closeDialog()
-  } catch (error) {
-    console.error('Failed to update discount:', error)
-    alert('Failed to update discount. Please try again.')
-  }
+  await updateDiscount(updateDiscountItem);
+  await getDiscounts();
+  closeDialog();
+  
 }
 
 const closeDialog = () => {
@@ -91,7 +76,7 @@ const closeDialog = () => {
 
       <DialogFooter>
         <Button @click="closeDialog">Cancel</Button>
-        <Button @click="updateDiscount">Save changes</Button>
+        <Button @click="updateDiscountItem">Save changes</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

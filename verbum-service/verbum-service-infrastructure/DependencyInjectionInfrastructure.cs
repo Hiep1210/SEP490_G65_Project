@@ -84,6 +84,7 @@ namespace VNH.Infrastructure
             services.AddScoped<SaveDiscountValidation>();
             services.AddScoped<CreateRatingValidation>();
             services.AddScoped<UpdateRatingValidation>();
+            services.AddScoped<UpdateJobValidation>();
 
             services.AddHttpContextAccessor();
 
