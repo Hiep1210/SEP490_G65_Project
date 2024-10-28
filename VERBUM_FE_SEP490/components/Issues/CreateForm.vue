@@ -36,10 +36,7 @@ watch(files, () => {
 </script>
 
 <template>
-  <div class="flex justify-end gap-2"> 
-    <Button class="bg-slate-500 hover:bg-slate-600"> Cancel</Button>
-    <Button> Create issue</Button>
-  </div>
+  
 
   <FormField  v-slot="{ componentField }" name="issueName" >
     <FormItem>
@@ -112,4 +109,9 @@ watch(files, () => {
       <FormMessage />
     </FormItem>
   </FormField>
+
+  <div class="flex justify-end gap-2 mt-5"> 
+    <Button class="bg-slate-500 hover:bg-slate-600"> Cancel</Button>
+    <Button> Create issue</Button>
+  </div>
 </template>

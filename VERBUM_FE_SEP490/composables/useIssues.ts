@@ -1,5 +1,5 @@
 import { useToast } from "~/components/ui/toast";
-import type { Issue } from "~/types/issues";
+import type { Issue, IssueAttachment } from "~/types/issues";
 
 const {toast} = useToast();
 export const useIssues = () => {
@@ -53,10 +53,67 @@ export const useIssues = () => {
       }
     }
 
+    const createIssue = async (
+      issueName: string, 
+      orderId: string,
+      issueDescription: string,
+      issueAttachments: IssueAttachment[]
+    ) => {
+      try {
+        const payload = {
+          issueName : issueName,
+          orderId: orderId,
+          issueDescription: issueDescription,
+          issueAttachments: issueAttachments
+        }
+        await useAPI('/issue', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        })
+        console.log({payload})
+        toast({
+          title: 'Issue created !!',
+          description: `Issue has been created!!`
+        })
+      } catch (error) {
+        toast({
+          title: 'Error creating issue',
+          description: 'An error occurred while creating the issue!!'
+        })
+        console.error('Error creating issue:', error)
+      }
+    }
+
+    const updateIssueStatus = async (
+      issuesId: string,
+      status: string
+    ) => {
+      try {
+        
+        await useAPI(`/issue/change-status?issueId=${issuesId}&status=${status}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        toast({
+          title: 'Issue status updated !!',
+          description: `Issue status has been updated!!`
+        })
+      } catch (error) {
+        toast({
+          title: 'Error updating issue status',
+          description: 'An error occurred while updating the issue status!!'
+        })
+        console.error('Error updating issue status:', error)
+      }
+    }
+
     return{
         isLoading,
         issues,
         getIssues,
-        updateIssue
+        updateIssue,
+        createIssue,
+        updateIssueStatus
     }
 }

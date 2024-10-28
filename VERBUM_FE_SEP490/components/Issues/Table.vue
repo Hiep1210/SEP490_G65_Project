@@ -29,7 +29,7 @@ const getBadgeClass = (status: string) => {
 
 const showIssuesDialog = ref(false)
 const selectedData = ref();
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'update-status'])
 
 const openIssuesDialog = (data: Issue) => {
   selectedData.value = data;
@@ -51,6 +51,11 @@ const issues = ref(props.issues);
 const updateIssueInTable = (updatedIssue: Issue) => {
   emit('update', updatedIssue)
   closeIssuesDialog()
+}
+
+const updateIssueStatus = (issuesId: string, status: string) => {
+  emit('update-status', issuesId, status)
+
 }
 
 watch(
@@ -118,5 +123,6 @@ watch(
   :open="showIssuesDialog"
   @close="closeIssuesDialog"
   @update="updateIssueInTable"
+  @update-status="updateIssueStatus"
   />
 </template>
