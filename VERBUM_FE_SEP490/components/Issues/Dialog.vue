@@ -223,6 +223,7 @@ watch(
       </div>
       <DialogFooter>
         <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel</Button>
+        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close</Button>
         <Button v-if="!isEditing" @click="enableEditing">Edit</Button>
         <Button v-if="isEditing" @click="emitUpdate">Update</Button>
       </DialogFooter>
