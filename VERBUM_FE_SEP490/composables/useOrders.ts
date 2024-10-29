@@ -126,7 +126,7 @@ export const useOrders = () => {
         const payload = {
           orderId: order.value.orderId,
           orderName: order.value.orderName,
-          dueDate: order.value.dueDate ? new Date(order.value.dueDate).toISOString() : null,
+          dueDate: order.value.dueDate ? new Date(order.value.dueDate).toISOString().replace('Z', '') : null,
           hasTranslateService: order.value.hasTranslateService,
           hasEditService: order.value.hasEditService,
           hasEvaluateService: order.value.hasEvaluateService,
@@ -138,9 +138,14 @@ export const useOrders = () => {
         })
 
         if (guidResponse?.value?.length) {
+          const payload2 = {
+            workIds: guidResponse.value,
+            documentURLs: order.value.translationFileUrls,
+            targetLanguageIds: order.value.targetLanguageId,
+          }
           await useAPI('job/add', {
             method: 'POST', credentials: 'include',
-            body: JSON.stringify(guidResponse.value),
+            body: JSON.stringify(payload2),
             headers: { 'Content-Type': 'application/json' }
           })
         }
