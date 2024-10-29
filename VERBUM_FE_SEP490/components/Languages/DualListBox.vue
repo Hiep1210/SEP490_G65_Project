@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   titleAvailableItems: String('Available Items'),
@@ -17,6 +17,7 @@ const props = defineProps({
     default: () => []
   }
 })
+
 defineEmits(['cancel', 'save'])
 
 // Available and selected items
@@ -25,6 +26,23 @@ const selectedItems = ref(props.selectedItemsList)
 const selects = ref(props.selects)
 const selectedAvailableItems = ref([])
 const selectedSelectedItems = ref([])
+
+watch(
+  () => props.availableItemsList,
+  (newList) => {
+    availableItems.value = [...newList]
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.selectedItemsList,
+  (newList) => {
+    selectedItems.value = [...newList]
+  },
+  { deep: true }
+)
+
 
 // Search queries
 const searchAvailableQuery = ref('')
@@ -118,7 +136,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search available..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      />
+      >
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li
@@ -163,7 +181,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search selected..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      />
+      >
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li
@@ -180,7 +198,7 @@ const moveSelectedToAvailableList = () => {
           ]"
           @click="toggleSelectItem(item, 'selected')"
         >
-          <span v-if="item.support">
+          <span v-show="item.support">
             {{ item.languageName }}
           </span>
         </li>
