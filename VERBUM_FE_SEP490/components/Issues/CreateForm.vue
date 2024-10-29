@@ -3,11 +3,22 @@ import { useFileDialog } from '@vueuse/core'
 import { ref, watch, computed } from 'vue'
 import { cn } from '@/lib/utils'
 import { ref as storageRef, getDownloadURL } from 'firebase/storage'
+import type { IssueAttachment } from '~/types/issues';
+import { useIssues } from '~/composables/useIssues'
 
 const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
+const isConfirmDialogOpen = ref(false)
+
+const titleStatusConfirm = "Create issue?";
+const descriptionStatusConfirm = "We apologize for any errors in our work that do not align with your requirements. This issue will be created as what you wrote, and we will check and notify you! "
 
 const downloadUrlsString = computed(() => downloadUrls.value.join(','))
+const {createIssue} = useIssues();
+
+const validateForm = () => {
+  return newIssue.value.issueName.trim() !== '' && newIssue.value.issueDescription.trim() !== '';
+};
 
 async function uploadFiles() {
   if (files.value?.length) {
@@ -24,6 +35,45 @@ async function uploadFiles() {
     const urls = await Promise.all(promises)
     downloadUrls.value = [...downloadUrls.value, ...urls]
   }
+}
+
+interface NewIssue {
+  orderId: string, 
+  issueName: string,
+  issueDescription: string,
+  issueAttachments: IssueAttachment[]
+}
+
+const props = defineProps<{
+  orderId: string
+}>()
+const newIssue = ref<NewIssue>({
+  orderId: props.orderId,
+  issueName: '',
+  issueDescription: '',
+  issueAttachments: []
+})
+
+const handleCreateIssue = async (newIssue: NewIssue) => {
+  await createIssue(newIssue.issueName, newIssue.orderId, newIssue.issueDescription, newIssue.issueAttachments);
+}
+
+const openConfirmDialog = () => {
+  if (validateForm()) {
+    isConfirmDialogOpen.value = true;
+  } else {
+    // Handle the error (e.g., show a message to the user)
+    alert('Please fill in all required fields.');
+  }
+};
+
+const handleConfirmCreate = () => {
+  handleCreateIssue(newIssue.value)
+  isConfirmDialogOpen.value = false // Close the confirmation dialog
+}
+
+const handleCancelConfirm = () => {
+  isConfirmDialogOpen.value = false
 }
 
 const { files, open } = useFileDialog()
@@ -43,9 +93,11 @@ watch(files, () => {
       <FormLabel>Title</FormLabel>
       <FormControl>
         <Textarea
+          v-model="newIssue.issueName"
           placeholder="The tile for this issue"
           class="resize-none"
           v-bind="componentField"
+          required
         />
       </FormControl>
       <FormMessage />
@@ -57,9 +109,11 @@ watch(files, () => {
       <FormLabel>Details</FormLabel>
       <FormControl>
         <Textarea
+        v-model="newIssue.issueDescription"
           placeholder="Tell us whats the issues our translation having"
           class="resize-none"
           v-bind="componentField"
+          required
         />
       </FormControl>
       <FormMessage />
@@ -112,6 +166,14 @@ watch(files, () => {
 
   <div class="flex justify-end gap-2 mt-5"> 
     <Button class="bg-slate-500 hover:bg-slate-600"> Cancel</Button>
-    <Button> Create issue</Button>
+    <Button @click="openConfirmDialog"> Create issue</Button>
   </div>
+
+  <IssuesConfirmDialog
+  :title="titleStatusConfirm"
+  :description="descriptionStatusConfirm"
+  :open="isConfirmDialogOpen"
+  @close="handleCancelConfirm"
+  @confirm="handleConfirmCreate"
+/>
 </template>
