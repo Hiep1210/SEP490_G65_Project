@@ -54,7 +54,46 @@ export const useOrders = () => {
         navigateTo('/orders')
         order.value = null
       } else {
-        order.value = orderData.value
+        // Helper function to safely extract filename from a Firebase URL
+        const getFileNameFromUrl = (
+          url: string | undefined | null
+        ): string | null => {
+          if (
+            typeof url === 'string' &&
+            url.includes('uploads') &&
+            url.includes('?alt=media')
+          ) {
+            const decodedUrl = decodeURIComponent(url)
+            const match = decodedUrl.match(/uploads\/(.+?)\?alt=media/)
+            return match ? match[1] : null
+          }
+          return null
+        }
+
+        // Helper function to trim off the date and time from a date string
+        const trimDateTime = (date: string | undefined): string | undefined => {
+          return date ? date.split(' ')[0] : undefined
+        }
+
+        const modifiedOrder = {
+          ...orderData.value,
+          translationFileUrls:
+            orderData.value.translationFileUrls
+              ?.map(getFileNameFromUrl)
+              .filter((file): file is string => file !== null) || [],
+          referenceFileUrls:
+            orderData.value.referenceFileUrls
+              ?.map(getFileNameFromUrl)
+              .filter((file): file is string => file !== null) || [],
+          deliverableFileUrls:
+            orderData.value.deliverableFileUrls
+              ?.map(getFileNameFromUrl)
+              .filter((file): file is string => file !== null) || [],
+          createdDate: trimDateTime(orderData.value.createdDate),
+          dueDate: trimDateTime(orderData.value.dueDate)
+        }
+
+        order.value = modifiedOrder
       }
     } catch (error) {
       console.error('Failed to fetch order details:', error)
@@ -67,5 +106,53 @@ export const useOrders = () => {
     }
   }
 
-  return { isLoading, orders, order, getOrders, getOrder }
+  const cancelOrder = async (id: string) => {
+    isLoading.value = true
+    try {
+      await useAPI('/order/cancel', { method: 'PUT', credentials: 'include', params: { orderId: id } })
+    } catch (error) {
+      console.error('Failed to cancel order:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const acceptorDeclineOrder = async (id: string, status: string) => {
+    isLoading.value = true
+    try {
+      await useAPI('/order/acceptordecline', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
+
+      if (status === 'ACCEPTED' && order.value) {
+        const payload = {
+          orderId: order.value.orderId,
+          orderName: order.value.orderName,
+          dueDate: order.value.dueDate ? new Date(order.value.dueDate).toISOString() : null,
+          hasTranslateService: order.value.hasTranslateService,
+          hasEditService: order.value.hasEditService,
+          hasEvaluateService: order.value.hasEvaluateService,
+        }
+        const { data: guidResponse } = await useAPI<string[]>('work/generate', {
+          method: 'POST', credentials: 'include',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        })
+
+        if (guidResponse?.value?.length) {
+          await useAPI('job/add', {
+            method: 'POST', credentials: 'include',
+            body: JSON.stringify(guidResponse.value),
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+      }
+      toast({ title: 'Success', description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully` })
+    } catch (error) {
+      console.error(`Failed to ${status} order:`, error)
+      toast({ title: 'Error', description: `Failed to ${status} order. Please try again later.` })
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return { isLoading, orders, order, getOrders, getOrder, cancelOrder, acceptorDeclineOrder }
 }
