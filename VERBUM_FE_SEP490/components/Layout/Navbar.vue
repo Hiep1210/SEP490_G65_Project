@@ -1,19 +1,50 @@
 <script setup lang="ts">
-import { House, FolderOpen, FileWarning, Book, User } from 'lucide-vue-next'
+import { House, FolderOpen, FileWarning, Book, User, ChartBar, DollarSign } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+const auth = useAuthStore()
+
+const roleMenuItems = {
+  CLIENT: [
+    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },
+    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
+  ],
+  ADMIN: [
+    { navName: 'Categories', navLink: '/categories', navIcon: FileWarning },
+    { navName: 'Users', navLink: '/users', navIcon: User },
+    { navName: 'Languages', navLink: '/languages', navIcon: Book }
+  ],
+  MANAGER: [
+    { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
+    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
+  ],
+  STAFF: [
+    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
+  ],
+  LINGUIST: [
+    { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
+    { navName: 'Jobs', navLink: '/jobs', navIcon: FolderOpen }
+  ],
+  CENTER_DIRECTOR: [
+    { navName: 'Statistics', navLink: '/statistics', navIcon: ChartBar },
+    { navName: 'Prices', navLink: '/prices', navIcon: DollarSign }
+  ]
+} as const
+
+type UserRole = keyof typeof roleMenuItems
 
 const navbarItems = [
-  { navName: 'Home', navLink: '/', navIcon: House },
-  { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },
-  {
-    navName: 'Issues',
-    navLink: '/issues',
-    navIcon: FileWarning
-  },
-  { navName: 'Term bases', navLink: '/term-bases', navIcon: Book },
-  { navName: 'Users', navLink: '/users', navIcon: User }
+  { navName: 'Home', navLink: '/', navIcon: House }
 ]
+
+if (auth.user?.role) {
+  const role = auth.user.role as UserRole
+  if (role.includes('MANAGER')) {
+    navbarItems.push(...roleMenuItems.MANAGER)
+  } else {
+    navbarItems.push(...(roleMenuItems[role] || []))
+  }
+}
 </script>
 
 <template>
