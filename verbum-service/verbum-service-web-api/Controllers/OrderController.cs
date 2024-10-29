@@ -25,7 +25,7 @@ namespace verbum_service.Controllers
 
         [HttpGet("get-all")]
         [EnableQuery]
-        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
+        [Authorize]
         [ProducesResponseType(typeof(List<OrderResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]

@@ -77,7 +77,11 @@ namespace verbum_service_infrastructure.Impl.Service
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
-                case UserRole.ADMIN: case UserRole.STAFF:
+                case UserRole.ADMIN: 
+                case UserRole.STAFF: 
+                case UserRole.DIRECTOR:
+                case UserRole.LINGUIST:
+                case UserRole.MANAGER: 
                     orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
                         .ToListAsync();
                     break;
