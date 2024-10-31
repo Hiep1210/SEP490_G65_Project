@@ -88,14 +88,14 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("acceptordecline")]
-        [Roles(UserRole.STAFF)]
+        [HttpPut("change-status")]
+        [Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)] //if status is not accept or rejected
         [ProducesResponseType(500)]
-        public async Task<IActionResult> AcceptOrDelineOrder(Guid orderId, string orderStatus)
+        public async Task<IActionResult> ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            await orderService.AcceptOrDeclineOrder(orderId, orderStatus);
+            await orderService.ChangeOrderStatus(orderId, orderStatus);
             return NoContent();
         }
 
