@@ -134,5 +134,3 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
-
-./verbum-service-web-api/appsettings.json
