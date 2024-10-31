@@ -33,6 +33,7 @@ namespace verbum_service.Controllers
 
         [HttpGet("assign-list")]
         [ProducesResponseType(typeof(List<UserInfo>), 200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetAssignList()
