@@ -58,7 +58,7 @@ namespace verbum_service_test
             string invalidStatus = "INVALID_STATUS";
 
             // Act
-            await orderService.AcceptOrDeclineOrder(orderId, invalidStatus);
+            await orderService.ChangeOrderStatus(orderId, invalidStatus);
 
             // Assert is handled by the ExpectedException attribute
         }
@@ -77,7 +77,7 @@ namespace verbum_service_test
             //             .ReturnsAsync(1); // Simulate successful update
 
             // Act
-            await orderService.AcceptOrDeclineOrder(orderId, validStatus);
+            await orderService.ChangeOrderStatus(orderId, validStatus);
 
             // Assert
             mockOrderSet.Verify(m => m.ExecuteUpdateAsync(It.IsAny<Expression<Func<SetPropertyCalls<Order>, SetPropertyCalls<Order>>>>(), default), Times.Once);
