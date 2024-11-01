@@ -139,7 +139,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 {
                     Expires = DateTimeOffset.UtcNow.AddHours(SystemConfig.ACCESS_TOKEN_LIFE),
                     IsEssential = true, //ensure cookie always sent even when user disable cookie
-                    //Secure = true,
+                    Secure = true,
                     SameSite = SameSiteMode.None
                 });
 
@@ -149,7 +149,7 @@ namespace verbum_service_infrastructure.Impl.Service
                     Expires = DateTimeOffset.UtcNow.AddDays(SystemConfig.REFRESH_TOKEN_LIFE),
                     HttpOnly = true,
                     IsEssential = true,
-                    //Secure = true,
+                    Secure = true,
                     SameSite = SameSiteMode.None
                 });
         }
