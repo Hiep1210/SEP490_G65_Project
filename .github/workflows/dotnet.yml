@@ -62,10 +62,10 @@ jobs:
     if: github.ref == 'refs/heads/release'
     
     steps:
-    - 
-      name: Deploy
-      uses: actions/checkout@v3
-      with:
-        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-        run: |
-          curl "$deploy_url"
+      - 
+        name: Deploy
+        uses: actions/checkout@v3
+        with:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          run: |
+            curl "$deploy_url"
