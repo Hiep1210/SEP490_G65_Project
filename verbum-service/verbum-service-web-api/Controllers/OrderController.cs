@@ -77,17 +77,6 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("cancel")]
-        [Roles(UserRole.CLIENT)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> CancelOrder(Guid orderId)
-        {
-            await orderService.CancelOrder(orderId);
-            return NoContent();
-        }
-
         [HttpPut("change-status")]
         [Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]

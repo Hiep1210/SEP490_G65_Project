@@ -20,12 +20,6 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly CurrentUser currentUser;
 
-        public async Task CancelOrder(Guid id)
-        {
-            await context.Orders.Where(o => o.OrderId == id).ExecuteUpdateAsync(o =>
-                o.SetProperty(c => c.OrderStatus, OrderStatus.CANCELLED.ToString()));
-        }
-
         public async Task CreateOrder(Order info)
         {
             try
