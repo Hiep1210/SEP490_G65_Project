@@ -220,7 +220,7 @@ onMounted(async () => {
                     <Button
                             v-if="role === 'CLIENT'"
                             variant="outline"
-                            @click="changeOrderStatus(order.orderId, 'CANCELED')">Cancel Order</Button>
+                            @click="changeOrderStatus(order.orderId, 'CANCELLED')">Cancel Order</Button>
                     <template v-if="role === 'STAFF'">
                         <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')">Accept Order</Button>
                         <Button variant="outline" @click="changeOrderStatus(order.orderId, 'REJECTED')">Reject Order</Button>
