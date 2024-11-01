@@ -2,6 +2,8 @@
 using Lombok.NET;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Linq.Expressions;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -146,11 +148,9 @@ namespace verbum_service_infrastructure.Impl.Service
             await AddRangeMiddle(request.OrderId, request.TargetLanguageIdList);
         }
 
-        public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
+        public async Task AcceptOrDeclineOrder(Guid orderId, string orderStatus)
         {
-            if(OrderStatus.NEW.ToString().Equals(orderStatus) 
-                || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
-                || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
+            if(!OrderStatus.ACCEPTED.ToString().Equals(orderStatus) && !OrderStatus.REJECTED.ToString().Equals(orderStatus))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
             }
