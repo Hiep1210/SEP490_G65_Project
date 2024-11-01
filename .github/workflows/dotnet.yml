@@ -59,10 +59,10 @@ jobs:
 
     runs-on: ubuntu-latest
     needs: deploydocker  # Ensures 'build' job completes before 'deploy'
-    if: github.ref == 'refs/heads/release' # Deploy runs only on 'release' branch
-
+    
     steps:
     - name: Deploy
+    if: github.ref == 'refs/heads/release'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
