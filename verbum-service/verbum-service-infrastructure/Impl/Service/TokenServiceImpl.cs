@@ -139,8 +139,8 @@ namespace verbum_service_infrastructure.Impl.Service
                 {
                     Expires = DateTimeOffset.UtcNow.AddHours(SystemConfig.ACCESS_TOKEN_LIFE),
                     IsEssential = true, //ensure cookie always sent even when user disable cookie
-                    // Secure = true,
-                    SameSite = SameSiteMode.None
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax
                 });
 
             context.Response.Cookies.Append("refresh_token", tokens.RefreshToken,
@@ -149,8 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
                     Expires = DateTimeOffset.UtcNow.AddDays(SystemConfig.REFRESH_TOKEN_LIFE),
                     HttpOnly = true,
                     IsEssential = true,
-                    // Secure = true,
-                    SameSite = SameSiteMode.None
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax
                 });
         }
     }
