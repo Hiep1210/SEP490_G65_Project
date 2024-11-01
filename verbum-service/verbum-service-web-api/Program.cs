@@ -17,6 +17,7 @@ namespace verbum_service
     {
         public static void Main(string[] args)
         {
+            //run
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddInfrastructure(builder.Configuration);
