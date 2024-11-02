@@ -72,12 +72,18 @@ namespace verbum_service_infrastructure.Impl.Service
                         .ToListAsync();
                     break;
                 case UserRole.EDIT_MANAGER:
-                    orders = await context.Works.Where(w => w.ServiceCode == "ED").ToListAsync();
+                    orders = await context.Works
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Where(w => w.ServiceCode == "ED").ToListAsync();
                     break;
                 case UserRole.EVALUATE_MANAGER:
-                    orders = await context.Works.Where(w => w.ServiceCode == "EV").ToListAsync();
+                    orders = await context.Works
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Where(w => w.ServiceCode == "EV").ToListAsync();
                     break;
-                case UserRole.CLIENT:
+                case UserRole.LINGUIST:
                     orders = await context.Works
                         .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
                         .Include(w => w.Order).ThenInclude(w => w.OrderReferences)

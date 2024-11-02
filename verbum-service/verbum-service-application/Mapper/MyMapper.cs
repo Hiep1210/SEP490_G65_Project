@@ -28,9 +28,10 @@ namespace verbum_service_application.Mapper
             CreateMap<Order, OrderResponse>().ReverseMap();
             CreateMap<Order, OrderDetailsResponse>()
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
-                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES").Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "DELIVERABLES").Select(t => t.ReferenceFileUrl).ToList()));
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "DELIVERABLES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.DeleteddFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.IsDeleted == true).Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
             CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
             CreateMap<IssueAttachment, UpdateIssueAttachmentFile>().ReverseMap();

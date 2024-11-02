@@ -17,6 +17,7 @@
         public List<string> TranslationFileUrls { get; set; }
         public List<string> ReferenceFileUrls { get; set; }
         public List<string> DeliverableFileUrls { get; set; }
+        public List<string> DeleteddFileUrls { get; set; }
         public string PaymentStatus { get; set; }
     }
 }
