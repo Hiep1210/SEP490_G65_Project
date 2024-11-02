@@ -2,7 +2,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const access_token = useCookie('access_token')
 
   const api = $fetch.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: 'https://verbum-miwa.onrender.com',
     onRequest({ options }) {
       if (access_token?.value) {
         const headers = new Headers(options.headers)
