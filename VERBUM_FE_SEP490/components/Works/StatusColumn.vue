@@ -83,12 +83,12 @@ const previousPage = (status: Status) => {
 </script>
 
 <template>
-  <div class="relative w-3/5">
+  <div class="relative w-2/6 mb-3">
     <input
       id="default-search"
       v-model="searchQuery"
       type="search"
-      class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="Enter work name ..."
     >
     <button
@@ -98,14 +98,14 @@ const previousPage = (status: Status) => {
       Search
     </button>
   </div>
-  <div class="flex flex-row gap-2 mt-2">
+  <div class="flex flex-row gap-3 mt-2">
     <div
       v-for="item in allStatus"
       :key="item.status"
       class="flex flex-col w-1/4 statusCol"
     >
       <div :class="item.class" class="p-2 rounded-xl h-5/6">
-        <p class="font-bold text-cyan-950 text-center mb-3">
+        <p class="font-bold text-cyan-950 text-center my-3">
           {{ item.status }}
         </p>
         <div v-for="work in paginatedWorks(item)" :key="work.workId">

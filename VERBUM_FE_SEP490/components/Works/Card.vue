@@ -7,7 +7,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="bg-slate-50 m-1 rounded-lg p-2 h-24">
+  <div class="bg-slate-50 m-1 mb-3 rounded-lg p-2 h-24">
     <div class="font-semibold">
       {{ props.data.workName }}
     </div>
