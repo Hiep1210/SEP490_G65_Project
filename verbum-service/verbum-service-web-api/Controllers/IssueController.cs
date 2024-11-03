@@ -1,5 +1,6 @@
 ﻿using Lombok.NET;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
@@ -23,6 +24,7 @@ namespace verbum_service.Controllers
         private readonly CreateIssueWorkflow createIssueWorkflow;
         private readonly UpdateIssueWorkflow updateIssueWorkflow;
         [HttpGet]
+        [EnableQuery]
         [Roles(UserRole.MANAGER, UserRole.LINGUIST, UserRole.CLIENT)]
         [ProducesResponseType(typeof(List<IssueResponse>), 200)]
         [ProducesResponseType(204)]
