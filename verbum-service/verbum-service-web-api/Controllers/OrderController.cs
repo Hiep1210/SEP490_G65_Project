@@ -82,7 +82,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)] 
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ChangeOrderStatus(Guid orderId, string orderStatus)
+        public async Task<IActionResult> ChangeOrderStatus([Required]Guid orderId, [Required]string orderStatus)
         {
             await orderService.ChangeOrderStatus(orderId, orderStatus);
             return NoContent();

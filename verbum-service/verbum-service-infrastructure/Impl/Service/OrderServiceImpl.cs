@@ -149,6 +149,12 @@ namespace verbum_service_infrastructure.Impl.Service
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
             }
+            if(OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
+            {
+                await context.Orders
+                .Where(x => x.OrderId == orderId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectReason, (string?)null));
+            }
             int records = await context.Orders
                 .Where(x => x.OrderId == orderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, orderStatus));
