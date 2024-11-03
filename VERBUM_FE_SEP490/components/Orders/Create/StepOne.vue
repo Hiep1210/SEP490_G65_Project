@@ -21,10 +21,11 @@ import { format } from 'date-fns'
 import { useFileDialog } from '@vueuse/core'
 import { ref as storageRef, getDownloadURL } from 'firebase/storage'
 import { useAPI } from '@/composables/useCustomFetch'
+import type { Language } from '~/types/language'
 
 const openTarget = ref(false)
 const selectedValues = ref<string[]>([])
-const languages = ref([])
+const languages = ref<Language[]>([])
 
 const selectedValuesString = computed(() => selectedValues.value.join(','))
 
@@ -66,69 +67,61 @@ watch(files, () => {
   }
 })
 
-// Fetch languages on component mount
 onMounted(async () => {
   const { data, error } = await useAPI('/lang')
   if (!error.value) {
-    languages.value = data.value || []
+    languages.value = (data.value as Language[]) || []
   }
 })
-
 </script>
 
 <template>
   <div>
     <FormField
-    v-slot="{ componentField }"
-    name="translationFileURL"
-    :model-value="downloadUrlsString"
-  >
-    <FormItem class="flex flex-col">
-      <FormLabel>Files</FormLabel>
-      <FormControl>
-        <Button
-          type="button"
-          @click="open({ accept: '*', multiple: true })"
-        >
-          Upload Files
-        </Button>
-        <Input
-          type="hidden"
-          v-bind="componentField"
-          :value="downloadUrlsString"
-        />
-      </FormControl>
-      <Card v-if="files?.length" :class="cn( $attrs.class ?? '')">
-        <CardHeader>
-          <CardDescription>Uploaded files</CardDescription>
-        </CardHeader>
-        <CardContent class="grid gap-4">
-          <div>
-            <div
-              v-for="file in files"
-              :key="file.name"
-              class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
-            >
-              <span
-                class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"
-              />
-              <div class="space-y-1">
-                <p class="text-sm font-medium leading-none">
-                  {{ file.name }}
-                </p>
+      v-slot="{ componentField }"
+      name="translationFileURL"
+      :model-value="downloadUrlsString"
+    >
+      <FormItem class="flex flex-col">
+        <FormLabel>Files</FormLabel>
+        <FormControl>
+          <Button type="button" @click="open({ accept: '*', multiple: true })">
+            Upload Files
+          </Button>
+          <Input
+            type="hidden"
+            v-bind="componentField"
+            :value="downloadUrlsString"
+          />
+        </FormControl>
+        <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
+          <CardHeader>
+            <CardDescription>Uploaded files</CardDescription>
+          </CardHeader>
+          <CardContent class="grid gap-4">
+            <div>
+              <div
+                v-for="file in files"
+                :key="file.name"
+                class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
+              >
+                <span
+                  class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"
+                />
+                <div class="space-y-1">
+                  <p class="text-sm font-medium leading-none">
+                    {{ file.name }}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      <FormMessage />
-    </FormItem>
-  </FormField>
+          </CardContent>
+        </Card>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-    <FormField
-      v-slot="{ componentField }"
-      name="sourceLanguageId"
-    >
+    <FormField v-slot="{ componentField }" name="sourceLanguageId">
       <FormItem>
         <FormLabel>Source Language</FormLabel>
         <Select v-bind="componentField">
@@ -182,7 +175,8 @@ onMounted(async () => {
                         .map(
                           (val) =>
                             languages.find(
-                              (language: any) => language.languageId === val
+                              (language: Language) =>
+                                language.languageId === val
                             )?.languageName
                         )
                         .join(', ')
@@ -235,12 +229,15 @@ onMounted(async () => {
           <PopoverTrigger as-child>
             <FormControl>
               <Button
-                variant="outline" :class="cn(
-                  'w-[240px] ps-3 text-start font-normal',
-                  !value && 'text-muted-foreground',
-                )"
+                variant="outline"
+                :class="
+                  cn(
+                    'w-[240px] ps-3 text-start font-normal',
+                    !value && 'text-muted-foreground'
+                  )
+                "
               >
-                <span>{{ value ? format(value, "PPP") : "Pick a date" }}</span>
+                <span>{{ value ? format(value, 'PPP') : 'Pick a date' }}</span>
                 <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
               </Button>
             </FormControl>

@@ -27,6 +27,10 @@ const handleUpdateStatus = async (issuesId: string, status: string) => {
     <h1 class="text-2xl font-semibold">Active Issues</h1>
     <IssuesCarousel :issues="issues" />
     <h1 class="text-2xl font-semibold">All issues</h1>
-    <IssuesTable :issues="issues" @update="handleUpdate" @update-status="handleUpdateStatus"/>
+    <IssuesTable
+      :issues="issues"
+      @update="handleUpdate"
+      @update-status="handleUpdateStatus"
+    />
   </div>
 </template>

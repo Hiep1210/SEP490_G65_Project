@@ -1,20 +1,26 @@
 <script setup>
-import DualListBox from '~/components/Languages/DualListBox.vue';
-import { useLanguages } from '~/composables/useLanguages';
+import DualListBox from '~/components/Languages/DualListBox.vue'
+import { useLanguages } from '~/composables/useLanguages'
 
-const { languages, supportedLanguages, getLanguages, getSupportedLanguages, updateSupportedLanguages} = useLanguages();
+const {
+  languages,
+  supportedLanguages,
+  getLanguages,
+  getSupportedLanguages,
+  updateSupportedLanguages
+} = useLanguages()
 useSeoMeta({
-  title: 'Languages',
+  title: 'Languages'
 })
 
 definePageMeta({
-    layout: 'default',
+  layout: 'default'
 })
 
 onMounted(() => {
   if (!languages.value.length && !supportedLanguages.value.length) {
-    getLanguages();
-    getSupportedLanguages();
+    getLanguages()
+    getSupportedLanguages()
   }
 })
 
@@ -26,16 +32,16 @@ const handleSave = async () => {
     support: item.support
   }))
 
-  await updateSupportedLanguages(updatedItems);
-  await getLanguages();
-  await getSupportedLanguages();
- 
+  await updateSupportedLanguages(updatedItems)
+  await getLanguages()
+  await getSupportedLanguages()
+
   selects.length = 0
 }
 
 const handleCancel = async () => {
-  await getLanguages();
-  await getSupportedLanguages();
+  await getLanguages()
+  await getSupportedLanguages()
   selects.length = 0
 }
 </script>

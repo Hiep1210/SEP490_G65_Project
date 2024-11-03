@@ -8,7 +8,13 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Table, TableHeader, TableRow, TableCell, TableBody } from '@/components/ui/table'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody
+} from '@/components/ui/table'
 import type { Issue } from '~/types/issues'
 import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
@@ -24,8 +30,9 @@ const isOpen = ref(props.open)
 const isEditing = ref(false)
 const isStatusEditing = ref(false)
 const previousStatus = ref('')
-const titleStatusConfirm = "Change status"
-const descriptionStatusConfirm = "If you change status to CANCEL the issue you can not reopen it. If you not skip this note. "
+const titleStatusConfirm = 'Change status'
+const descriptionStatusConfirm =
+  'If you change status to CANCEL the issue you can not reopen it. If you not skip this note. '
 const isConfirmDialogOpen = ref(false)
 onMounted(() => {
   if (!assignList.value.length) {
@@ -33,7 +40,6 @@ onMounted(() => {
   }
   console.log({ assignList })
 })
-
 
 const getBadgeClass = (status: string) => {
   switch (status) {
@@ -131,25 +137,38 @@ watch(
                 <ul class="flex flex-col gap-1 mb-2">
                   <li v-for="status in statuses" :key="status">
                     <label class="inline-flex items-center">
-                      <input v-model="issue.status" type="radio" :value="status" class="mr-2" >
+                      <input
+                        v-model="issue.status"
+                        type="radio"
+                        :value="status"
+                        class="mr-2"
+                      />
                       {{ status }}
                     </label>
                   </li>
                 </ul>
                 <div class="flex justify-end gap-2">
-                  <Button class="bg-gray-500 text-white" @click="cancelStatusUpdate">Cancel</Button>
+                  <Button
+                    class="bg-gray-500 text-white"
+                    @click="cancelStatusUpdate"
+                    >Cancel</Button
+                  >
                   <Button @click="openConfirmDialog">Save</Button>
                 </div>
               </template>
               <template v-else>
-                <Badge :class="getBadgeClass(issue.status)">{{ issue.status }}</Badge>
-                <p class="cursor-pointer text-cyan-700 italic" @click="startStatusEditing">
+                <Badge :class="getBadgeClass(issue.status)">{{
+                  issue.status
+                }}</Badge>
+                <p
+                  class="cursor-pointer text-cyan-700 italic"
+                  @click="startStatusEditing"
+                >
                   Update status
                 </p>
               </template>
             </TableCell>
           </TableRow>
-          
         </Table>
       </div>
       <div class="p-3 rounded-xl border-2 border-stone-300">
@@ -159,7 +178,10 @@ watch(
               <TableCell class="font-semibold">Issue name:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <input v-model="issue.issueName" class="border border-cyan-700 rounded p-1 w-full" >
+                  <input
+                    v-model="issue.issueName"
+                    class="border border-cyan-700 rounded p-1 w-full"
+                  />
                 </template>
                 <template v-else>{{ issue.issueName }}</template>
               </TableCell>
@@ -170,7 +192,10 @@ watch(
               <TableCell class="font-semibold">Client name:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <input v-model="issue.clientName" class="border border-cyan-700 rounded p-1 w-full" >
+                  <input
+                    v-model="issue.clientName"
+                    class="border border-cyan-700 rounded p-1 w-full"
+                  />
                 </template>
                 <template v-else>{{ issue.clientName }}</template>
               </TableCell>
@@ -183,12 +208,15 @@ watch(
               <TableCell class="font-semibold">Updated date:</TableCell>
               <TableCell>{{ formatDate(issue.updatedAt) }}</TableCell>
             </TableRow>
-            
+
             <TableRow>
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <select v-model="issue.assigneeId" class="border border-cyan-700 rounded p-1 w-full">
+                  <select
+                    v-model="issue.assigneeId"
+                    class="border border-cyan-700 rounded p-1 w-full"
+                  >
                     <option
                       v-for="user in assignList"
                       :key="user.id"
@@ -222,18 +250,22 @@ watch(
         <p>{{ issue.issueAttachments }}</p>
       </div>
       <DialogFooter>
-        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel</Button>
-        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close</Button>
+        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog"
+          >Cancel</Button
+        >
+        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog"
+          >Close</Button
+        >
         <Button v-if="!isEditing" @click="enableEditing">Edit</Button>
         <Button v-if="isEditing" @click="emitUpdate">Update</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
   <IssuesConfirmDialog
-  :title="titleStatusConfirm"
-  :description="descriptionStatusConfirm"
-  :open="isConfirmDialogOpen"
-  @close="handleCancelStatus"
-  @confirm="handleConfirmStatus"
-/>
+    :title="titleStatusConfirm"
+    :description="descriptionStatusConfirm"
+    :open="isConfirmDialogOpen"
+    @close="handleCancelStatus"
+    @confirm="handleConfirmStatus"
+  />
 </template>

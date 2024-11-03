@@ -24,7 +24,6 @@ onMounted(() => {
 // Track dialog state
 const isDialogOpen = ref(false)
 
-
 // Handle creating a new discount
 const handleCreateDiscount = async (newDiscount: Discount) => {
   const newDiscountItem = {
@@ -36,8 +35,8 @@ const handleCreateDiscount = async (newDiscount: Discount) => {
   if (!newDiscount) return
   await createDiscount(newDiscountItem)
   await getDiscounts()
-  
-  closeDialog();
+
+  closeDialog()
 }
 
 // Handle dialog close

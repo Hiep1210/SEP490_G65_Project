@@ -15,7 +15,8 @@ export default {
 </script>
 
 <template>
-  <Breadcrumb>
+  <div />
+  <!-- <Breadcrumb>
     <BreadcrumbList>
       <BreadcrumbItem>
         <BreadcrumbLink>
@@ -33,5 +34,5 @@ export default {
         <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
       </BreadcrumbItem>
     </BreadcrumbList>
-  </Breadcrumb>
+  </Breadcrumb> -->
 </template>

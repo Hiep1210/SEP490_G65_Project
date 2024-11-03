@@ -15,29 +15,26 @@ import {
 } from '@/components/ui/carousel'
 import type { Issue } from '~/types/issues'
 
-
 const props = defineProps<{
   issues: Issue[]
-}>();
+}>()
 
 const acceptedIssues = (data: Issue[]) => {
-  return data.filter( 
-    item => item.status === "ACCEPTED"
-  )
+  return data.filter((item) => item.status === 'ACCEPTED')
 }
-const items = ref(props.issues) 
+const items = ref(props.issues)
 
 const showIssuesDialog = ref(false)
-const selectedData = ref();
+const selectedData = ref()
 const emit = defineEmits(['update'])
 
 const openIssuesDialog = (data: Issue) => {
-  selectedData.value = data;
-  showIssuesDialog.value = true;
+  selectedData.value = data
+  showIssuesDialog.value = true
 }
 const closeIssuesDialog = () => {
-  selectedData.value = '';
-  showIssuesDialog.value = false;
+  selectedData.value = ''
+  showIssuesDialog.value = false
 }
 
 const updateIssueInTable = (updatedIssue: Issue) => {
@@ -51,7 +48,6 @@ watch(
   },
   { deep: true }
 )
-
 </script>
 
 <template>
@@ -78,11 +74,11 @@ watch(
     <CarouselNext />
   </Carousel>
   <IssuesDialog
-  v-if="showIssuesDialog"
-  :row-data="selectedData"
-  :open="showIssuesDialog"
-  @close="closeIssuesDialog"
-  @update="updateIssueInTable"
+    v-if="showIssuesDialog"
+    :row-data="selectedData"
+    :open="showIssuesDialog"
+    @close="closeIssuesDialog"
+    @update="updateIssueInTable"
   />
 </template>
 

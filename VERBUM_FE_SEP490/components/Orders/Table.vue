@@ -5,7 +5,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
 import type { Order } from '~/types/order'
 import { ref } from 'vue'
@@ -22,7 +22,7 @@ const selectedOrders = ref<string[]>([])
 
 const toggleOrderSelection = (orderId: string) => {
   if (selectedOrders.value.includes(orderId)) {
-    selectedOrders.value = selectedOrders.value.filter(id => id !== orderId)
+    selectedOrders.value = selectedOrders.value.filter((id) => id !== orderId)
   } else {
     selectedOrders.value.push(orderId)
   }
@@ -30,7 +30,7 @@ const toggleOrderSelection = (orderId: string) => {
 
 const cancelSelectedOrders = () => {
   if (selectedOrders.value.length === 0) {
-    alert("Please select at least one order to cancel.")
+    alert('Please select at least one order to cancel.')
     return
   }
 
@@ -41,17 +41,17 @@ const cancelSelectedOrders = () => {
 
 const toggleAllOrders = (checked: boolean) => {
   if (checked) {
-    selectedOrders.value = props.orders.map(order => order.orderId)
+    selectedOrders.value = props.orders.map((order) => order.orderId)
   } else {
     selectedOrders.value = []
   }
 }
 
 const toDetails = (orderId: string) => {
-  useRouter().push("/orders/details/" + orderId)
+  useRouter().push('/orders/details/' + orderId)
 }
 const toCreate = () => {
-  useRouter().push("/orders/create")
+  useRouter().push('/orders/create')
 }
 </script>
 
@@ -59,7 +59,9 @@ const toCreate = () => {
   <div>
     <div class="flex justify-between space-x-4 pb-4">
       <Input placeholder="Search orders" />
-      <Button variant="outline" @click="cancelSelectedOrders">Cancel Orders</Button>
+      <Button variant="outline" @click="cancelSelectedOrders"
+        >Cancel Orders</Button
+      >
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
@@ -75,9 +77,10 @@ const toCreate = () => {
         <TableHeader>
           <TableRow>
             <TableHead class="w-[50px] text-center">
-              <Checkbox 
+              <Checkbox
                 :checked="selectedOrders.length === props.orders.length"
-                @update:checked="toggleAllOrders($event)" />
+                @update:checked="toggleAllOrders($event)"
+              />
             </TableHead>
             <TableHead class="w-[100px]">ID</TableHead>
             <TableHead>Name</TableHead>
@@ -86,11 +89,17 @@ const toCreate = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="order in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
+          <TableRow
+            v-for="order in props.orders"
+            :key="order.orderId"
+            @click="toDetails(order.orderId)"
+          >
             <TableCell class="text-center">
-              <Checkbox 
-                :value="order.orderId" :checked="selectedOrders.includes(order.orderId)"
-                @update:checked="toggleOrderSelection(order.orderId)" />
+              <Checkbox
+                :value="order.orderId"
+                :checked="selectedOrders.includes(order.orderId)"
+                @update:checked="toggleOrderSelection(order.orderId)"
+              />
             </TableCell>
             <TableCell class="font-medium">{{ order.orderId }}</TableCell>
             <TableCell>{{ order.orderName }}</TableCell>
@@ -99,9 +108,7 @@ const toCreate = () => {
               {{ formatDate(order.createdDate) }}
             </TableCell>
             <TableCell>
-              <Button variant="ghost" size="sm">
-                ...
-              </Button>
+              <Button variant="ghost" size="sm"> ... </Button>
             </TableCell>
           </TableRow>
         </TableBody>

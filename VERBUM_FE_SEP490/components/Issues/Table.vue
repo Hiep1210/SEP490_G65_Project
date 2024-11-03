@@ -9,8 +9,7 @@ import {
 } from '@/components/ui/table'
 // import mockIssues from '~/mock/issues'
 import { formatDistanceToNow } from 'date-fns'
-import type { Issue } from '~/types/issues';
-
+import type { Issue } from '~/types/issues'
 
 const getBadgeClass = (status: string) => {
   switch (status) {
@@ -28,25 +27,23 @@ const getBadgeClass = (status: string) => {
 }
 
 const showIssuesDialog = ref(false)
-const selectedData = ref();
+const selectedData = ref()
 const emit = defineEmits(['update', 'update-status'])
 
 const openIssuesDialog = (data: Issue) => {
-  selectedData.value = data;
-  showIssuesDialog.value = true;
+  selectedData.value = data
+  showIssuesDialog.value = true
 }
 const closeIssuesDialog = () => {
-  selectedData.value = '';
-  showIssuesDialog.value = false;
+  selectedData.value = ''
+  showIssuesDialog.value = false
 }
-
-
 
 const props = defineProps<{
   issues: Issue[]
-}>();
+}>()
 
-const issues = ref(props.issues);
+const issues = ref(props.issues)
 
 const updateIssueInTable = (updatedIssue: Issue) => {
   emit('update', updatedIssue)
@@ -55,7 +52,6 @@ const updateIssueInTable = (updatedIssue: Issue) => {
 
 const updateIssueStatus = (issuesId: string, status: string) => {
   emit('update-status', issuesId, status)
-
 }
 
 watch(
@@ -65,22 +61,26 @@ watch(
   },
   { deep: true }
 )
-
 </script>
 
 <template>
   <Table>
     <TableHeader>
       <TableRow>
-        <TableHead> Issue Name </TableHead>
+        <TableHead>Issue Name</TableHead>
         <TableHead>Created</TableHead>
         <TableHead>Updated</TableHead>
+        <TableHead>Order</TableHead>
         <TableHead>Status</TableHead>
         <TableHead>Reference Files</TableHead>
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow v-for="issue in issues" :key="issue.issueId" @click="openIssuesDialog(issue)">
+      <TableRow
+        v-for="issue in issues"
+        :key="issue.issueId"
+        @click="openIssuesDialog(issue)"
+      >
         <TableCell class="font-medium">
           {{ issue.issueName }}
         </TableCell>
@@ -93,6 +93,9 @@ watch(
           {{
             formatDistanceToNow(new Date(issue.updatedAt), { addSuffix: true })
           }}
+        </TableCell>
+        <TableCell class="font-medium">
+          {{ issue.orderName }}
         </TableCell>
         <TableCell>
           <Badge :class="getBadgeClass(issue.status)">{{ issue.status }}</Badge>
@@ -118,11 +121,11 @@ watch(
     </TableBody>
   </Table>
   <IssuesDialog
-  v-if="showIssuesDialog"
-  :row-data="selectedData"
-  :open="showIssuesDialog"
-  @close="closeIssuesDialog"
-  @update="updateIssueInTable"
-  @update-status="updateIssueStatus"
+    v-if="showIssuesDialog"
+    :row-data="selectedData"
+    :open="showIssuesDialog"
+    @close="closeIssuesDialog"
+    @update="updateIssueInTable"
+    @update-status="updateIssueStatus"
   />
 </template>

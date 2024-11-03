@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { House, FolderOpen, FileWarning, Book, User, ChartBar, DollarSign } from 'lucide-vue-next'
+import {
+  House,
+  FolderOpen,
+  FileWarning,
+  Book,
+  User,
+  ChartBar,
+  DollarSign
+} from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const auth = useAuthStore()
@@ -18,9 +26,7 @@ const roleMenuItems = {
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
     { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
   ],
-  STAFF: [
-    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
-  ],
+  STAFF: [{ navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }],
   LINGUIST: [
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
     { navName: 'Jobs', navLink: '/jobs', navIcon: FolderOpen }
@@ -33,9 +39,7 @@ const roleMenuItems = {
 
 type UserRole = keyof typeof roleMenuItems
 
-const navbarItems = [
-  { navName: 'Home', navLink: '/', navIcon: House }
-]
+const navbarItems = [{ navName: 'Home', navLink: '/', navIcon: House }]
 
 if (auth.user?.role) {
   const role = auth.user.role as UserRole
