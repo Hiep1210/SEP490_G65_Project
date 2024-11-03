@@ -101,7 +101,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPost("file")]
-        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
+        [Roles(UserRole.MANAGER, UserRole.CLIENT, UserRole.LINGUIST)]
         [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
