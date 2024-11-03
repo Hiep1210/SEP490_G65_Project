@@ -75,5 +75,27 @@ namespace verbum_service.Controllers
             await issueService.RecoverDeletedFiles(issueId, fileURl);
             return NoContent();
         }
+
+        [HttpPut("send-cancel-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendCancelResponse([FromBody] ResponseRequest request)
+        {
+            await issueService.UpdateIssueCancelResponse(request);
+            return NoContent();
+        }
+
+        [HttpPut("send-reject-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendRejectResponse([FromBody] ResponseRequest request)
+        {
+            await issueService.UpdateIssueRejectResponse(request);
+            return NoContent();
+        }
     }
 }
