@@ -201,5 +201,11 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             return mapper.Map<List<UploadOrderFileRequest>>(await context.OrderReferences.Where(x => !x.IsDeleted).ToListAsync());
         }
+
+        public async Task UpdateOrderCancelResponse(ResponseRequest request)
+        {
+            if (await context.Orders.Where(x => x.OrderId == request.Id)
+                               .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectReason, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
     }
 }
