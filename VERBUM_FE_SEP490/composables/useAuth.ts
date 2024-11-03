@@ -16,7 +16,7 @@ export const useAuth = () => {
 
   const login = async (credentials: any) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/auth/login`, {
+      const response = await fetch(`https://verbum-miwa.onrender.com/api/auth/login`, {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: { 'Content-Type': 'application/json' },
