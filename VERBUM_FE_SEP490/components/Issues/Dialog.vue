@@ -18,6 +18,7 @@ import {
 import type { Issue } from '~/types/issues'
 import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
+import {getIssueBadgeClass} from '@/utils/getBadgeClass'
 const { assignList, getAssignList } = useUsers()
 
 const props = defineProps<{
@@ -40,21 +41,6 @@ onMounted(() => {
   }
   console.log({ assignList })
 })
-
-const getBadgeClass = (status: string) => {
-  switch (status) {
-    case 'OPEN':
-      return 'bg-red-500 text-white'
-    case 'ACCEPTED':
-      return 'bg-yellow-500 text-black'
-    case 'RESOLVE':
-      return 'bg-green-500 text-black'
-    case 'CANCEL':
-      return 'bg-gray-500 text-white'
-    default:
-      return 'bg-gray-300 text-black'
-  }
-}
 
 const issue = ref(props.rowData)
 const statuses = ['CANCEL', 'OPEN', 'RESOLVED', 'ACCEPTED']
@@ -157,7 +143,7 @@ watch(
                 </div>
               </template>
               <template v-else>
-                <Badge :class="getBadgeClass(issue.status)">{{
+                <Badge :class="getIssueBadgeClass(issue.status)">{{
                   issue.status
                 }}</Badge>
                 <p

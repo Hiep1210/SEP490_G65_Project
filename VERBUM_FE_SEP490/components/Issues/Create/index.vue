@@ -10,8 +10,12 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { toTypedSchema } from '@vee-validate/zod'
-import { h, ref } from 'vue'
 import * as z from 'zod'
+import type { CreateIssuePayload } from '~/types/payload/createIssue';
+
+const route = useRoute()
+const orderId = route.params.id
+const {createIssue} = useIssues();
 
 const formSchema = toTypedSchema(
   z.object({
@@ -21,8 +25,16 @@ const formSchema = toTypedSchema(
   })
 )
 
-function onSubmit(values: any) {
-  console.log('Form submitted!', values)
+async function onSubmit(values: CreateIssuePayload) {
+  console.log(values);
+  const payload = {
+    ...values,
+    orderId: orderId,
+    issueAttachments: values.issueAttachments
+      .split(',')
+      .map((url: string) => ({ attachmentUrl: url.trim() })),
+  };
+  await createIssue(payload);
 }
 </script>
 
@@ -37,7 +49,7 @@ function onSubmit(values: any) {
       <DialogTrigger as-child>
         <Button variant="outline"> Create Issue </Button>
       </DialogTrigger>
-      <DialogContent class="max-w-[1000px]">
+      <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Create Issues</DialogTitle>
           <DialogDescription>
