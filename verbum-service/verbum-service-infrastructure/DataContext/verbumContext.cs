@@ -99,6 +99,9 @@ public partial class verbumContext : DbContext
                 .HasColumnType("character varying")
                 .HasColumnName("issue_name");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.RejectResponse)
+                .HasColumnType("character varying")
+                .HasColumnName("reject_response");
             entity.Property(e => e.Status)
                 .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED")
                 .HasColumnType("character varying")
