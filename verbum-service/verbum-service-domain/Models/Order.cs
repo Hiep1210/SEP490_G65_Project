@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace verbum_service_domain.Models;
 
 /// <summary>
-/// NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID
+/// NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID, COMPLETED, IN_REVIEW
 /// </summary>
 public partial class Order
 {

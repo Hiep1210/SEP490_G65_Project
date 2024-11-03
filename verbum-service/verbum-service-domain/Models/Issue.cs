@@ -26,7 +26,7 @@ public partial class Issue
 
     public Guid? AssigneeId { get; set; }
 
-    public string? RejectResponse { get; set; }
+    public string? CancelResponse { get; set; }
 
     public virtual User? Assignee { get; set; }
 

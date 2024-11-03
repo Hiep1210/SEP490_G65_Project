@@ -80,7 +80,7 @@ namespace verbum_service.Controllers
         [HttpPut("change-status")]
         [Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(ErrorObject), 400)] //if status is not accept or rejected
+        [ProducesResponseType(typeof(ErrorObject), 400)] 
         [ProducesResponseType(500)]
         public async Task<IActionResult> ChangeOrderStatus(Guid orderId, string orderStatus)
         {
