@@ -1,14 +1,14 @@
 import { format, addHours, formatDistanceToNow } from 'date-fns'
 
 const adjustToUserTimezone = (date: Date | string) => {
-  return addHours(new Date(date), 7);
-};
+  return addHours(new Date(date), 7)
+}
 
 export const formatDistanceToNowUserTimezone = (date: Date | string) => {
   return formatDistanceToNow(adjustToUserTimezone(date), {
     addSuffix: true
-  });
-};
+  })
+}
 
 export function formatDate(
   date: Date | string,

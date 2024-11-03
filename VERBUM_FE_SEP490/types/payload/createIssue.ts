@@ -1,5 +1,5 @@
 export interface CreateIssuePayload {
-    issueName: string
-    issueDescription: string
-    issueAttachments: string
-  }
+  issueName: string
+  issueDescription: string
+  issueAttachments: string
+}

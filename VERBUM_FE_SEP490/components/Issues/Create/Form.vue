@@ -105,7 +105,11 @@ watch(files, () => {
         Attach any files that are relevant to the issue you are having.
       </FormDescription>
       <FormControl>
-        <Button class="block" type="button" @click="open({ accept: '*', multiple: true })">
+        <Button
+          class="block"
+          type="button"
+          @click="open({ accept: '*', multiple: true })"
+        >
           Upload Files
         </Button>
         <Input
@@ -120,25 +124,23 @@ watch(files, () => {
         </CardHeader>
         <CardContent class="grid gap-3">
           <div
-              v-for="(file, index) in files"
-              :key="file.name"
-              class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
-            >
-              <span
-                class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"
-              />
-              <div class="flex flex-col gap-1">
+            v-for="(file, index) in files"
+            :key="file.name"
+            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
+          >
+            <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div class="flex flex-col gap-1">
+              <p class="text-sm font-medium leading-none">
+                {{ file.name }}
+              </p>
+              <div class="flex gap-5 max-w-sm">
+                <Progress v-model="uploadProgress[index]" />
                 <p class="text-sm font-medium leading-none">
-                  {{ file.name }}
+                  {{ uploadProgress[index] || 0 }}%
                 </p>
-                <div class="flex gap-5 max-w-sm">
-                  <Progress v-model="uploadProgress[index]" />
-                  <p class="text-sm font-medium leading-none">
-                    {{ uploadProgress[index] || 0 }}%
-                  </p>
-                </div>
               </div>
             </div>
+          </div>
         </CardContent>
       </Card>
       <FormMessage />

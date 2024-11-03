@@ -11,11 +11,11 @@ import {
 } from '@/components/ui/dialog'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import type { CreateIssuePayload } from '~/types/payload/createIssue';
+import type { CreateIssuePayload } from '~/types/payload/createIssue'
 
 const route = useRoute()
 const orderId = route.params.id
-const {createIssue} = useIssues();
+const { createIssue } = useIssues()
 
 const formSchema = toTypedSchema(
   z.object({
@@ -26,15 +26,15 @@ const formSchema = toTypedSchema(
 )
 
 async function onSubmit(values: CreateIssuePayload) {
-  console.log(values);
+  console.log(values)
   const payload = {
     ...values,
     orderId: orderId,
     issueAttachments: values.issueAttachments
       .split(',')
-      .map((url: string) => ({ attachmentUrl: url.trim() })),
-  };
-  await createIssue(payload);
+      .map((url: string) => ({ attachmentUrl: url.trim() }))
+  }
+  await createIssue(payload)
 }
 </script>
 

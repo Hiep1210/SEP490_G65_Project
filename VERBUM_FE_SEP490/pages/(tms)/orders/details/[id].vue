@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import { addHours } from 'date-fns'
 import { formatDistanceToNowUserTimezone } from '~/utils/date'
 import type { Issue } from '~/types/issues';
 
 const { order, getOrder, cancelOrder, acceptorDeclineOrder } = useOrders()
-const { issues, getIssuesByOrders, updateIssue, updateIssueStatus } =
+const { issues, getIssuesByOrders} =
   useIssues()
 const route = useRoute()
 const orderId = route.params.id
@@ -290,21 +289,20 @@ onMounted(async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow 
-                v-for="issue in issues" 
-                :key="issue.issueId"
-                @click="openIssuesDialog(issue)"
-                >
-                <TableCell>{{ issue.issueName }}</TableCell>
-                <TableCell>
-                    {{
-                        formatDistanceToNowUserTimezone(issue.createdAt)
-                    }}
-                </TableCell>
-                <TableCell>
-                    <Badge :class="getIssueBadgeClass(issue.status)">{{ issue.status }}</Badge>
-                </TableCell>
-              </TableRow>
+                <TableRow 
+                    v-for="issue in issues" 
+                    :key="issue.issueId"
+                    >
+                    <TableCell>{{ issue.issueName }}</TableCell>
+                    <TableCell>
+                        {{
+                            formatDistanceToNowUserTimezone(issue.createdAt)
+                        }}
+                    </TableCell>
+                    <TableCell>
+                        <Badge :class="getIssueBadgeClass(issue.status)">{{ issue.status }}</Badge>
+                    </TableCell>
+                </TableRow>
             </TableBody>
           </Table>
         </div>
@@ -315,8 +313,6 @@ onMounted(async () => {
           </p>
         </div>
       </div>
-
-      <IssuesDialog />
     </div>
   </div>
 </template>
