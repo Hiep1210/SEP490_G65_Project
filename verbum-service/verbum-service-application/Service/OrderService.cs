@@ -18,5 +18,6 @@ namespace verbum_service_application.Service
         Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request);
         Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles();
         Task UpdateOrderPrice(Guid orderId, decimal price);
+        Task UpdateOrderCancelResponse(ResponseRequest request);
     }
 }

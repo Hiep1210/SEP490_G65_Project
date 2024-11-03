@@ -130,5 +130,16 @@ namespace verbum_service.Controllers
             await orderService.RecoverDeletedFiles(orderId, fileURl);
             return NoContent();
         }
+
+        [HttpPut("send-cancel-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendCancelResponse([FromBody] ResponseRequest request)
+        {
+            await orderService.UpdateOrderCancelResponse(request);
+            return NoContent();
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace verbum_service_domain.DTO.Response
         public string? IssueDescription { get; set; }
 
         public string? AssigneeName { get; set; }
+        public string? CancelResponse { get; set; }
+        public string? RejectResponse { get; set; }
         public ICollection<UploadIssueAttachmentFiles> IssueAttachments { get; set; } = new List<UploadIssueAttachmentFiles>();
     }
 }
