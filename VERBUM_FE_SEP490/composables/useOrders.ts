@@ -179,9 +179,10 @@ export const useOrders = () => {
 
   const setOrderPrice = async (orderId: string, orderPrice: string) => {
     try {
-      await useAPI(`/order/price?orderId=${orderId}&price=${orderPrice}`, {
+      await useAPI(`/order/price`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, price: orderPrice }
       })
 
       toast({
@@ -196,6 +197,27 @@ export const useOrders = () => {
       console.error('Error updating Order price:', error)
     }
   }
+
+  const updateSuccessPayment = async (orderId: string, status: string) => {
+    try {
+      await useAPI(`/order/change-status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, orderStatus: status }
+      })
+
+      toast({
+        title: 'Your order is paid successfully!!',
+        description: `We are going to do your order. Thank you for choosing our service.`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating order status ',
+        description: 'An error occurred while updating the order status!!'
+      })
+      console.error('Error updating Order status:', error)
+    }
+  }
   return {
     isLoading,
     orders,
@@ -204,6 +226,7 @@ export const useOrders = () => {
     getOrder,
     cancelOrder,
     acceptorDeclineOrder,
-    setOrderPrice
+    setOrderPrice,
+    updateSuccessPayment
   }
 }

@@ -13,6 +13,7 @@ const isEditing = ref(false)
 const editedOrder = ref<Partial<Order> | null>(null)
 
 const openSetPricesDialog = ref(false)
+const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const tempPrice = ref<string >("0")
 
@@ -139,8 +140,8 @@ onMounted(async () => {
   }
 })
 
-const toPayment = () => {
-  useRouter().push('/payment')
+const handlePay = () => {
+  openPaymentDialog.value = true
 }
 
 const handleSetPrices = () => {
@@ -179,7 +180,7 @@ const confirmSetPrices = async () => {
               {{ order?.orderName }}
             </p>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT'">
-              <Button @click="toPayment">Pay </Button>
+              <Button @click="handlePay">Pay </Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
               <Button @click="handleSetPrices">Set prices </Button>
@@ -351,10 +352,16 @@ const confirmSetPrices = async () => {
       <!-- Confirm Dialog -->
       <ConfirmDialog
         :title="'Confirm Price Update'"
-        :description="'Are you sure you want to set the price?'"
+        :description="'Are you sure you want to update the price ?'"
         :open="openConfirmDialog"
         @close="openConfirmDialog = false"
         @confirm="confirmSetPrices"
+      />
+
+      <PaymentDialog
+        :order="order"
+        :open="openPaymentDialog"
+        @close="openPaymentDialog = false"
       />
     </div>
   </div>

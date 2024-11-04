@@ -2,9 +2,14 @@
 import { onMounted, ref } from 'vue';
 import { loadScript } from '@paypal/paypal-js';
 import type { PayPalScriptOptions, OnApproveActions, OnApproveData, PayPalNamespace } from '@paypal/paypal-js';
-
+import { useOrders } from '#imports';
 const paypalButton = ref<HTMLDivElement | null>(null);
-
+const {updateSuccessPayment} = useOrders();
+const props = defineProps<{
+    orderId: string,
+  price: string
+}>()
+const emit = defineEmits(['payment-success']);
 onMounted(async () => {
   if (paypalButton.value) {
     const options: PayPalScriptOptions = {
@@ -22,16 +27,18 @@ onMounted(async () => {
             purchase_units: [{
               amount: {
                 currency_code: "USD",
-                value: "10.00"  // Set dynamically if needed
+                value: props.price
               }
             }]
           });
         },
-        onApprove: (data: OnApproveData, actions: OnApproveActions) => {
+        onApprove: async(data: OnApproveData, actions: OnApproveActions) => {
           if (!actions.order) {
             console.error('Order is undefined');
             return Promise.reject('Order is undefined');
           }
+
+          await updateSuccessPayment(props.orderId, "PAID")
           
           return actions.order.capture().then((details) => {
             if (details?.payer?.name?.given_name) {
@@ -39,6 +46,7 @@ onMounted(async () => {
             } else {
               alert("Transaction completed.");
             }
+            emit('payment-success');
           });
         },
         onError: (err) => {
