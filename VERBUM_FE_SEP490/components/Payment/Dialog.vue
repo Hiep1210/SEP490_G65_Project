@@ -33,7 +33,7 @@ const closeDialog = () => {
 
 <template>
   <Dialog :open="isOpen" @click-outside="closeDialog" @close="closeDialog">
-    <DialogContent class="sm:max-w-[425px]">
+    <DialogContent class="h-screen overflow-y-scroll max-w-[425px]">
       <DialogHeader>
         <DialogTitle> Payment Detail </DialogTitle>
         <DialogDescription
