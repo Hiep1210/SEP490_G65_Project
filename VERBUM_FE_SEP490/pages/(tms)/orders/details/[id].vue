@@ -4,7 +4,7 @@ import { formatDistanceToNowUserTimezone } from '~/utils/date'
 import type { Issue } from '~/types/issues';
 
 const { order, getOrder, cancelOrder, acceptorDeclineOrder } = useOrders()
-const { issues, getIssuesByOrders} =
+const { issues, getIssues, updateIssue, getIssuesByOrders} =
   useIssues()
 const route = useRoute()
 const orderId = route.params.id
@@ -126,16 +126,10 @@ const languageList = ref<Language[]>([])
 const showIssuesDialog = ref(false)
 const selectedData = ref();
 
-const openIssuesDialog = (data: Issue) => {
-  selectedData.value = data;
-  showIssuesDialog.value = true;
+const handleUpdate = async (updateIssues: Issue) => {
+  await updateIssue(updateIssues)
+  await getIssues()
 }
-
-const closeIssuesDialog = () => {
-  selectedData.value = '';
-  showIssuesDialog.value = false;
-}
-
 
 onMounted(async () => {
   try {
@@ -294,32 +288,11 @@ onMounted(async () => {
           <IssuesCreate :order-id="orderId" />
         </div>
         <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                <TableRow 
-                    v-for="issue in issues" 
-                    :key="issue.issueId"
-                    @click="openIssuesDialog(issue)"
-                    >
-                    <TableCell>{{ issue.issueName }}</TableCell>
-                    <TableCell>
-                        {{
-                            formatDistanceToNowUserTimezone(issue.createdAt)
-                        }}
-                    </TableCell>
-                    <TableCell>
-                        <Badge :class="getIssueBadgeClass(issue.status)">{{ issue.status }}</Badge>
-                    </TableCell>
-                </TableRow>
-            </TableBody>
-          </Table>
+          <IssuesTable
+            :issues="issues"
+            :role="user?.role"
+            @update="handleUpdate"
+          />
         </div>
         <div v-else class="w-full h-full flex justify-center items-center">
           <p class="font-bold">

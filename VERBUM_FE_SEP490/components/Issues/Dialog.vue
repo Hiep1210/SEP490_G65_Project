@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted, defineEmits } from 'vue'
+import { ref, watch, onMounted, defineEmits, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -7,7 +7,8 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogDescription
 } from '@/components/ui/dialog'
 import {
   Table,
@@ -26,6 +27,7 @@ const { updateIssueStatus, sendCancelResponse } = useIssues()
 const props = defineProps<{
   open: boolean
   rowData: Issue
+  role: string
 }>()
 
 const emit = defineEmits(['close', 'update', 'update-status'])
@@ -48,7 +50,7 @@ onMounted(() => {
 })
 
 const issue = ref(props.rowData)
-const issueStatuses = ['CANCEL', 'OPEN', 'RESOLVED', 'ACCEPTED']
+const issueStatuses = ['OPEN', 'IN_PROGRESS', 'CANCEL', 'SUBMITTED', 'RESOLVED']
 const selectedStatus = ref(issue.value.status)
 const emitUpdate = () => {
   emit('update', issue.value)
@@ -85,6 +87,23 @@ const closeDialog = () => {
   isEditing.value = false
 }
 
+// Compute allowed statuses based on the role
+const filteredIssueStatuses = computed(() => {
+  console.log('role', props.role)
+  switch (props.role) {
+    case 'CLIENT':
+      return ['CANCEL']
+    case 'EDIT_MANAGER':
+    case 'EVALUATE_MANAGER':
+    case 'TRANSLATE_MANAGER':
+      return ['CANCEL', 'RESOLVED']
+    case 'LINGUIST':
+      return ['SUBMITTED', 'IN_PROGRESS']
+    default:
+      return issueStatuses
+  }
+})
+
 watch(
   () => props.open,
   (newVal) => {
@@ -99,27 +118,34 @@ watch(
 
 <template>
   <Dialog :open="isOpen" @click-outside="closeDialog" @close="closeDialog">
-    <DialogContent class="max-w-[1000px]">
+    <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
       <DialogHeader>
         <DialogTitle class="font-semibold text-4xl text-cyan-700">
           {{ issue.issueName }}
         </DialogTitle>
       </DialogHeader>
+
       <Select v-model="selectedStatus"
         @update:modelValue="(newStatus) => handleStatusChange(issue.issueId, issue.status, newStatus)">
-        <SelectTrigger class="max-w-fit border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden">
+        <SelectTrigger class="max-w-fit p-0 border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden">
           <SelectValue>
             <Badge :class="getIssueBadgeClass(selectedStatus)">{{ selectedStatus }}</Badge>
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem v-for="issueStatus in issueStatuses" :key="issueStatus" :value="issueStatus">
+            <SelectItem v-for="issueStatus in filteredIssueStatuses" :key="issueStatus" :value="issueStatus">
               <Badge :class="getIssueBadgeClass(issueStatus)">{{ issueStatus }}</Badge>
             </SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
+
+      <div v-if="issue.cancelResponse" class="p-3 rounded-xl border-2 border-stone-300">
+        <div class="font-semibold">Cancellation Reason:</div>
+        <p>{{ issue.cancelResponse }}</p>
+      </div>
+
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <Table>
           <TableHeader>
@@ -134,7 +160,7 @@ watch(
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
+            <TableRow v-if="role !== 'CLIENT'">
               <TableCell class="font-semibold">Created by:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
@@ -151,8 +177,7 @@ watch(
               <TableCell class="font-semibold">Updated date:</TableCell>
               <TableCell>{{ formatDate(issue.updatedAt) }}</TableCell>
             </TableRow>
-
-            <TableRow>
+            <TableRow v-if="role !== 'CLIENT'">
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
@@ -173,21 +198,24 @@ watch(
         <div class="font-semibold">Description:</div>
         <p>
           <template v-if="isEditing">
-            <textarea v-model="issue.issueDescription" class="border border-cyan-700 rounded p-1 w-full" />
+            <Textarea v-model="issue.issueDescription" class="border border-cyan-700 rounded p-1 w-full" />
           </template>
           <template v-else>{{ issue.issueDescription }}</template>
         </p>
       </div>
+
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Files:</div>
         <p>{{ issue.issueAttachments }}</p>
       </div>
+
       <DialogFooter>
         <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel</Button>
         <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close</Button>
-        <Button v-if="!isEditing" @click="enableEditing">Edit</Button>
+        <Button v-if="!isEditing && issue.status !== 'CANCEL'" @click="enableEditing">Edit</Button>
         <Button v-if="isEditing" @click="emitUpdate">Update</Button>
       </DialogFooter>
+
     </DialogContent>
   </Dialog>
   <IssuesConfirmDialog :title="titleStatusConfirm" :description="descriptionStatusConfirm" :open="isConfirmDialogOpen"
