@@ -79,20 +79,20 @@ const toCreate = () => {
                 :checked="selectedOrders.length === props.orders.length"
                 @update:checked="toggleAllOrders($event)" />
             </TableHead>
-            <TableHead class="w-[100px]">ID</TableHead>
+            <TableHead class="w-[100px]">#</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Status</TableHead>
             <TableHead class="text-center">Created At</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="order in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
+          <TableRow v-for="(order, index) in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
             <TableCell class="text-center">
               <Checkbox 
                 :value="order.orderId" :checked="selectedOrders.includes(order.orderId)"
                 @update:checked="toggleOrderSelection(order.orderId)" />
             </TableCell>
-            <TableCell class="font-medium">{{ order.orderId }}</TableCell>
+            <TableCell class="font-medium">{{ index + 1 }}</TableCell>
             <TableCell>{{ order.orderName }}</TableCell>
             <TableCell>{{ order.orderStatus }}</TableCell>
             <TableCell class="text-center">
