@@ -78,7 +78,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("change-status")]
-        [Roles(UserRole.STAFF, UserRole.CLIENT)]
+        //[Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)] 
         [ProducesResponseType(500)]
@@ -131,14 +131,14 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("send-cancel-response")]
+        [HttpPut("send-reject-response")]
         //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> SendCancelResponse([FromBody] ResponseRequest request)
+        public async Task<IActionResult> SendRejectResponse([FromBody] ResponseRequest request)
         {
-            await orderService.UpdateOrderCancelResponse(request);
+            await orderService.UpdateOrderRejectResponse(request);
             return NoContent();
         }
 

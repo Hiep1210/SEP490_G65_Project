@@ -8,6 +8,6 @@ namespace verbum_service_domain.Common
 {
     public enum JobStatus
     {
-        NEW, IN_PROGRESS, COMPLETED, ACCEPTED
+        NEW, IN_PROGRESS, SUBMITTED, APPROVED
     }
 }

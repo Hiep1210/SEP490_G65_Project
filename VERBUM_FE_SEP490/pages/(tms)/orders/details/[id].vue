@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue';
-import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue';
+import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
+import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 import type { Order } from '~/types/order'
 
-const { order, getOrder, cancelOrder, acceptorDeclineOrder, setOrderPrice } =
-  useOrders()
+const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -15,7 +14,7 @@ const editedOrder = ref<Partial<Order> | null>(null)
 const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
-const tempPrice = ref<string >("0")
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
@@ -139,7 +138,7 @@ onMounted(async () => {
     console.error('Failed to fetch language list:', error)
   }
 })
-const payStatus = ref("");
+const payStatus = ref('')
 const handlePay = (status: string) => {
   payStatus.value = status
   openPaymentDialog.value = true
@@ -147,7 +146,7 @@ const handlePay = (status: string) => {
 
 const handleSetPrices = () => {
   openSetPricesDialog.value = true
-  tempPrice.value = order.value?.orderPrice || "0"
+  tempPrice.value = order.value?.orderPrice || '0'
 }
 
 const confirmSetPrices = async () => {
@@ -194,15 +193,14 @@ const confirmSetPrices = async () => {
           <!-- Order Details -->
           <div class="flex flex-col space-y-1">
             <div class="grid grid-cols-2 gap-x-2 text-sm">
-              <span>ID: {{ order?.orderId }}</span>
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
+              <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ order.createdDate }}</span>
+              <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
               <span v-if="order.reference"
                 >Reference: {{ order.reference }}</span
               >
@@ -230,7 +228,7 @@ const confirmSetPrices = async () => {
                   :key="service"
                   class="font-bold"
                 >
-                  {{ service.substring(0, 3).toUpperCase() }}
+                  {{ service.substring(0, 2).toUpperCase() }}
                   <Checkbox
                     :id="`has${service}Service`"
                     v-model:checked="editedOrder[`has${service}Service`]"
@@ -288,24 +286,26 @@ const confirmSetPrices = async () => {
 
         <!-- Action Buttons -->
         <div class="flex space-x-2">
-          <template v-if="isEditing">
+          <template v-if="isEditing && role === 'CLIENT'">
             <Button @click="saveEdit">Save</Button>
             <Button variant="outline" @click="cancelEdit">Cancel</Button>
           </template>
-          <Button v-else @click="enableEdit">Edit Order</Button>
+          <Button v-else-if="role === 'CLIENT'" @click="enableEdit"
+            >Edit Order</Button
+          >
           <Button
             v-if="role === 'CLIENT'"
             variant="outline"
-            @click="cancelOrder"
+            @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button
           >
           <template v-if="role === 'STAFF'">
-            <Button @click="acceptorDeclineOrder(order.orderId, 'ACCEPTED')"
+            <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
             <Button
               variant="outline"
-              @click="acceptorDeclineOrder(order.orderId, 'REJECTED')"
+              @click="changeOrderStatus(order.orderId, 'REJECTED')"
               >Reject Order</Button
             >
           </template>
@@ -320,7 +320,7 @@ const confirmSetPrices = async () => {
         <OrdersDetailsTabs :order="order" />
       </div>
 
-      <!-- Smaller Issues List Section -->
+      <!-- Issues List Section -->
       <div v-if="issues" class="space-y-4">
         <div class="flex justify-between items-center p-3 border-b">
           <span class="text-lg font-semibold">Issues</span>
@@ -343,14 +343,18 @@ const confirmSetPrices = async () => {
           </Table>
         </div>
       </div>
-
       <!-- Set Prices Dialog -->
       <SetPricesDialog
         :order="order"
         :price="tempPrice"
         :open="openSetPricesDialog"
         @close="openSetPricesDialog = false"
-        @confirm="(newPrice) => { openConfirmDialog = true; tempPrice = newPrice }"
+        @confirm="
+          (newPrice) => {
+            openConfirmDialog = true
+            tempPrice = newPrice
+          }
+        "
       />
 
       <!-- Confirm Dialog -->
