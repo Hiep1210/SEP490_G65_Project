@@ -214,23 +214,23 @@ v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service"
 
                 <!-- Action Buttons -->
                 <div class="flex space-x-2">
-                    <template v-if="isEditing">
+                    <template v-if="isEditing && role === 'CLIENT'">
                         <Button @click="saveEdit">Save</Button>
                         <Button variant="outline" @click="cancelEdit">Cancel</Button>
                     </template>
-                    <Button v-else @click="enableEdit">Edit Order</Button>
+                    <Button v-else-if="role === 'CLIENT'" @click="enableEdit">Edit Order</Button>
                     <Button
-                            v-if="role === 'CLIENT'"
-                            variant="outline"
-                            @click="changeOrderStatus(order.orderId, 'CANCELLED')">Cancel Order</Button>
+                        v-if="role === 'CLIENT'"
+                        variant="outline"
+                        @click="changeOrderStatus(order.orderId, 'CANCELLED')">Cancel Order</Button>
                     <template v-if="role === 'STAFF'">
                         <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')">Accept Order</Button>
                         <Button variant="outline" @click="changeOrderStatus(order.orderId, 'REJECTED')">Reject Order</Button>
                     </template>
                     <Button
-                            v-if="role === 'CLIENT'"
-                            variant="outline"
-                            @click="openAddDiscount = true">Add Discount</Button>
+                        v-if="role === 'CLIENT'"
+                        variant="outline"
+                        @click="openAddDiscount = true">Add Discount</Button>
                 </div>
 
                 <OrdersDetailsTabs :order="order" />
