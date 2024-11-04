@@ -28,17 +28,6 @@ const toggleOrderSelection = (orderId: string) => {
   }
 }
 
-const cancelSelectedOrders = () => {
-  if (selectedOrders.value.length === 0) {
-    alert("Please select at least one order to cancel.")
-    return
-  }
-
-  alert(`Cancelling orders: ${selectedOrders.value.join(', ')}`)
-
-  selectedOrders.value = []
-}
-
 const toggleAllOrders = (checked: boolean) => {
   if (checked) {
     selectedOrders.value = props.orders.map(order => order.orderId)
@@ -59,7 +48,6 @@ const toCreate = () => {
   <div>
     <div class="flex justify-between space-x-4 pb-4">
       <Input placeholder="Search orders" />
-      <Button variant="outline" @click="cancelSelectedOrders">Cancel Orders</Button>
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
@@ -74,11 +62,6 @@ const toCreate = () => {
       <Table v-else>
         <TableHeader>
           <TableRow>
-            <TableHead class="w-[50px] text-center">
-              <Checkbox 
-                :checked="selectedOrders.length === props.orders.length"
-                @update:checked="toggleAllOrders($event)" />
-            </TableHead>
             <TableHead class="w-[100px]">#</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Status</TableHead>
@@ -87,21 +70,11 @@ const toCreate = () => {
         </TableHeader>
         <TableBody>
           <TableRow v-for="(order, index) in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
-            <TableCell class="text-center">
-              <Checkbox 
-                :value="order.orderId" :checked="selectedOrders.includes(order.orderId)"
-                @update:checked="toggleOrderSelection(order.orderId)" />
-            </TableCell>
             <TableCell class="font-medium">{{ index + 1 }}</TableCell>
             <TableCell>{{ order.orderName }}</TableCell>
             <TableCell>{{ order.orderStatus }}</TableCell>
             <TableCell class="text-center">
               {{ formatDate(order.createdDate) }}
-            </TableCell>
-            <TableCell>
-              <Button variant="ghost" size="sm">
-                ...
-              </Button>
             </TableCell>
           </TableRow>
         </TableBody>
