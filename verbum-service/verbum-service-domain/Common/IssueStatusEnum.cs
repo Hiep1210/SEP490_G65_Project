@@ -8,6 +8,6 @@ namespace verbum_service_domain.Common
 {
     public enum IssueStatusEnum
     {
-        CANCEL, OPEN, RESOLVED, ACCEPTED
+        CANCEL, OPEN, IN_PROGRESS, RESOLVED, ACCEPTED
     }
 }
