@@ -7,9 +7,13 @@ const paypalButton = ref<HTMLDivElement | null>(null);
 const {updateSuccessPayment} = useOrders();
 const props = defineProps<{
     orderId: string,
-  price: string
+  price: string,
+  status: string
 }>()
 const emit = defineEmits(['payment-success']);
+
+
+
 onMounted(async () => {
   if (paypalButton.value) {
     const options: PayPalScriptOptions = {
@@ -38,7 +42,7 @@ onMounted(async () => {
             return Promise.reject('Order is undefined');
           }
 
-          await updateSuccessPayment(props.orderId, "PAID")
+          await updateSuccessPayment(props.orderId, props.status)
           
           return actions.order.capture().then((details) => {
             if (details?.payer?.name?.given_name) {

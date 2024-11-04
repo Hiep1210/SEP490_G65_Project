@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const allStatus = ref<Status[]>([
   {
-    status: 'NEW',
+    status: 'ACCEPTED',
     class: 'bg-cyan-200 text-black',
     currentPage: 1,
     itemsPerPage: 5 // Set the number of items to show per page for each status

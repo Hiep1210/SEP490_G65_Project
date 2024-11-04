@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-// import { columns } from '~/components/Works/columns';
+import { columns } from '~/components/Works/columns';
 import { useWorks } from '~/composables/useWorks';
 useSeoMeta({
   title: 'Works',
@@ -22,9 +22,9 @@ onMounted(() => {
 
 <template>
   <div>
-    <!-- <WorksTable :columns="columns" :data="works"/> -->
+    <WorksTable :columns="columns" :data="works"/>
   
-    <WorksStatusColumn :data="works"/>
+    <!-- <WorksStatusColumn :data="works"/> -->
   </div>
 </template>
 
