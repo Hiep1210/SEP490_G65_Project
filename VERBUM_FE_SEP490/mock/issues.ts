@@ -106,4 +106,4 @@ const mockIssues: Issue[] = [
   }
 ]
 
-export default mockIssues
+export default mockIssues 

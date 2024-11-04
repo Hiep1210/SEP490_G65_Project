@@ -20,6 +20,10 @@ namespace verbum_service_infrastructure.Impl.Validation
         public async Task<List<string>> Validate(UpdateJobRequest request)
         {
             List<string> errors = new List<string>();
+            if (DateTime.Now >= request.DueDate)
+            {
+                errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "due date"));
+            }
             if (!Enum.IsDefined(typeof(JobStatus), request.Status))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "job status"));

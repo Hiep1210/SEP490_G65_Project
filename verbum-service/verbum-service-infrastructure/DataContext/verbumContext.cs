@@ -30,6 +30,8 @@ public partial class verbumContext : DbContext
 
     public virtual DbSet<Rating> Ratings { get; set; }
 
+    public virtual DbSet<Receipt> Receipts { get; set; }
+
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public virtual DbSet<Revelancy> Revelancies { get; set; }
@@ -83,6 +85,9 @@ public partial class verbumContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("issue_id");
             entity.Property(e => e.AssigneeId).HasColumnName("assignee_id");
+            entity.Property(e => e.CancelResponse)
+                .HasColumnType("character varying")
+                .HasColumnName("cancel_response");
             entity.Property(e => e.ClientId).HasColumnName("client_id");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")
@@ -94,6 +99,9 @@ public partial class verbumContext : DbContext
                 .HasColumnType("character varying")
                 .HasColumnName("issue_name");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.RejectResponse)
+                .HasColumnType("character varying")
+                .HasColumnName("reject_response");
             entity.Property(e => e.Status)
                 .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED")
                 .HasColumnType("character varying")
@@ -155,7 +163,7 @@ public partial class verbumContext : DbContext
                 .HasColumnName("due_date");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Status)
-                .HasComment("NEW, IN_PROGRESS, COMPLETED")
+                .HasComment("NEW, IN_PROGRESS, COMPLETED, ACCEPTED")
                 .HasColumnName("status");
             entity.Property(e => e.TargetLanguageId)
                 .HasColumnType("character varying")
@@ -210,7 +218,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("order_pk");
 
-            entity.ToTable("order", tb => tb.HasComment("NEW, ACCEPTED, REJECTED, CANCELED, DEPOSITED, PAID"));
+            entity.ToTable("order", tb => tb.HasComment("NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID, COMPLETED, IN_REVIEW"));
 
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()
@@ -223,7 +231,6 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.DueDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("due_date");
-            entity.Property(e => e.HasDiscount).HasColumnName("has_discount");
             entity.Property(e => e.HasEditService)
                 .HasDefaultValue(false)
                 .HasColumnName("has_edit_service");
@@ -236,10 +243,17 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.OrderName)
                 .HasColumnType("character varying")
                 .HasColumnName("order_name");
+            entity.Property(e => e.OrderNote)
+                .HasComment("255 char")
+                .HasColumnType("character varying")
+                .HasColumnName("order_note");
             entity.Property(e => e.OrderPrice).HasColumnName("order_price");
             entity.Property(e => e.OrderStatus)
                 .HasColumnType("character varying")
                 .HasColumnName("order_status");
+            entity.Property(e => e.RejectReason)
+                .HasColumnType("character varying")
+                .HasColumnName("reject_reason");
             entity.Property(e => e.SourceLanguageId)
                 .HasColumnType("character varying")
                 .HasColumnName("source_language_id");
@@ -305,6 +319,27 @@ public partial class verbumContext : DbContext
                 .HasConstraintName("rating_order_fk");
         });
 
+        modelBuilder.Entity<Receipt>(entity =>
+        {
+            entity.HasKey(e => e.ReceiptId).HasName("receipt_pk");
+
+            entity.ToTable("receipt");
+
+            entity.Property(e => e.ReceiptId)
+                .ValueGeneratedNever()
+                .HasColumnName("receipt_id");
+            entity.Property(e => e.Amount).HasColumnName("amount");
+            entity.Property(e => e.DepositeOrPayment).HasColumnName("deposite_or_payment");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.PayDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("pay_date");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Receipts)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("receipt_order_fk");
+        });
+
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(e => e.TokenId).HasName("refreshtoken_pk");
@@ -339,6 +374,9 @@ public partial class verbumContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("revelancy_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.ServiceCode)
+                .HasColumnType("character varying")
+                .HasColumnName("service_code");
             entity.Property(e => e.SourceLanguageId)
                 .HasColumnType("character varying")
                 .HasColumnName("source_language_id");

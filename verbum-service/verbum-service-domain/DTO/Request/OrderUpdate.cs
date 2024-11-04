@@ -9,6 +9,7 @@
         public bool TranslateService { get; set; }
         public bool EditService { get; set; }
         public bool EvaluateService { get; set; }
+        public string? OrderNote { get; set; }
         public DateTime? DueDate { get; set; }
         public Guid? DiscountId { get; set; }
     }

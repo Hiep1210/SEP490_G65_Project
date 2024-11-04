@@ -110,6 +110,8 @@ namespace verbum_service_infrastructure.Impl.Service
             int records = await context.Orders
                 .Where(x => x.OrderId == request.OrderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
+                                        .SetProperty(u => u.OrderStatus, OrderStatus.NEW.ToString())
+                                        .SetProperty(u => u.OrderNote, request.OrderNote)
                                         .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
                                         .SetProperty(u => u.DueDate, request.DueDate)
                                         .SetProperty(u => u.HasTranslateService, request.TranslateService)
@@ -120,9 +122,12 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateOrderPrice(Guid orderId, decimal price)
         {
-            int records = await context.Orders
-                .Where(x => x.OrderId == orderId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderPrice, price));
+            Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
+
+            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price * (order.Discount.DiscountPercent.GetValueOrDefault()/100);
+
+            order.OrderPrice = price;
+            int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
@@ -147,6 +152,12 @@ namespace verbum_service_infrastructure.Impl.Service
                 || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
+            }
+            if(OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
+            {
+                await context.Orders
+                .Where(x => x.OrderId == orderId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectReason, (string?)null));
             }
             int records = await context.Orders
                 .Where(x => x.OrderId == orderId)
@@ -199,6 +210,62 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles()
         {
             return mapper.Map<List<UploadOrderFileRequest>>(await context.OrderReferences.Where(x => !x.IsDeleted).ToListAsync());
+        }
+
+        public async Task UpdateOrderCancelResponse(ResponseRequest request)
+        {
+            if (await context.Orders.Where(x => x.OrderId == request.Id)
+                               .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectReason, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task CreateRevelancy(Guid orderId)
+        {
+            using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    List<Work> works = context.Works
+                .Include(w => w.Order)
+                .Include(w => w.Categories)
+                .Include(w => w.Jobs)
+                .ThenInclude(w => w.Assignees).ToList();
+                    List<Revelancy> list = new List<Revelancy>();
+                    foreach (Work work in works)
+                    {
+                        foreach (Job job in work.Jobs)
+                        {
+                            foreach (User assignee in job.Assignees)
+                            {
+                                foreach (Category category in work.Categories)
+                                {
+                                    Revelancy revelancy = new Revelancy
+                                    {
+                                        RevelancyId = Guid.NewGuid(),
+                                        UserId = assignee.Id,
+                                        SourceLanguageId = work.Order.SourceLanguageId,
+                                        TargetLanguageId = job.TargetLanguageId,
+                                        ServiceCode = work.ServiceCode,
+                                        CategoryId = category.CategoryId
+                                    };
+
+                                    list.Add(revelancy);
+                                    //context.Revelancies.Add(revelancy);
+                                }
+                            }
+                        }
+                    }
+
+                    int count = list.Count;
+                    //await context.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch(Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            
         }
     }
 }
