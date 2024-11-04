@@ -10,7 +10,7 @@ public partial class Job
     public string Name { get; set; } = null!;
 
     /// <summary>
-    /// NEW, IN_PROGRESS, COMPLETED
+    /// NEW, IN_PROGRESS, COMPLETED, ACCEPTED
     /// </summary>
     public string Status { get; set; } = null!;
 

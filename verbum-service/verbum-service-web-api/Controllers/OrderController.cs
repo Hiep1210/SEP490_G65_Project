@@ -80,9 +80,9 @@ namespace verbum_service.Controllers
         [HttpPut("change-status")]
         [Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(ErrorObject), 400)] //if status is not accept or rejected
+        [ProducesResponseType(typeof(ErrorObject), 400)] 
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ChangeOrderStatus(Guid orderId, string orderStatus)
+        public async Task<IActionResult> ChangeOrderStatus([Required]Guid orderId, [Required]string orderStatus)
         {
             await orderService.ChangeOrderStatus(orderId, orderStatus);
             return NoContent();
@@ -101,7 +101,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPost("file")]
-        [Roles(UserRole.MANAGER, UserRole.CLIENT)]
+        [Roles(UserRole.MANAGER, UserRole.CLIENT, UserRole.LINGUIST)]
         [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -129,6 +129,27 @@ namespace verbum_service.Controllers
         {
             await orderService.RecoverDeletedFiles(orderId, fileURl);
             return NoContent();
+        }
+
+        [HttpPut("send-cancel-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendCancelResponse([FromBody] ResponseRequest request)
+        {
+            await orderService.UpdateOrderCancelResponse(request);
+            return NoContent();
+        }
+
+        [HttpPost("revelancy")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> Revelancy(Guid orderId)
+        {
+            await orderService.CreateRevelancy(orderId);
+            return StatusCode(201);
         }
     }
 }

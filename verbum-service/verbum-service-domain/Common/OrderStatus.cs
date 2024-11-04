@@ -7,7 +7,9 @@
         REJECTED,
         CANCELLED,
         IN_PROGRESS,
-        PAID
+        PAID,
+        COMPLETED,
+        IN_REVIEW
     }
     public static class OrderStatusExtensions
     {
@@ -16,6 +18,7 @@
             return status == OrderStatus.NEW.ToString() ||
                    status == OrderStatus.ACCEPTED.ToString() ||
                    status == OrderStatus.IN_PROGRESS.ToString() ||
+                   status == OrderStatus.IN_REVIEW.ToString() ||
                    status == OrderStatus.PAID.ToString();
         }
     }
