@@ -122,9 +122,12 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateOrderPrice(Guid orderId, decimal price)
         {
-            int records = await context.Orders
-                .Where(x => x.OrderId == orderId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderPrice, price));
+            Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
+
+            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price * (order.Discount.DiscountPercent.GetValueOrDefault()/100);
+
+            order.OrderPrice = price;
+            int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
