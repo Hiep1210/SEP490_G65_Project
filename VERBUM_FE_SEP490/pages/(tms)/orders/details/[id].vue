@@ -137,7 +137,7 @@ onMounted(async () => {
             <div class="space-y-4">
                 <div class="container p-4 space-y-2 orderDetails border rounded-md">
                     <p class="text-[2rem] font-semibold">{{ order?.orderName }}</p>
-                    
+
                     <!-- Order Details -->
                     <div class="flex flex-col space-y-1">
                         <div class="grid grid-cols-2 gap-x-2 text-sm">
@@ -145,7 +145,7 @@ onMounted(async () => {
                             <span class="text-gray-500">Status: {{ order?.orderStatus }}</span>
                             <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
                             <span v-if="order.discountId">Discount: {{ order.discountId }}</span>
-                            <span>Created: {{ order.createdDate }}</span>
+                            <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
                             <span v-if="order.reference">Reference: {{ order.reference }}</span>
                         </div>
 
@@ -161,9 +161,13 @@ onMounted(async () => {
                                       class="font-bold">{{ service }}</span>
                             </template>
                             <template v-else-if="editedOrder">
-                                <span v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service" class="font-bold">
-                                    {{ service.substring(0, 3).toUpperCase() }}
-                                    <Checkbox :id="`has${service}Service`" v-model:checked="editedOrder[`has${service}Service`]" />
+                                <span
+v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service"
+                                    class="font-bold">
+                                    {{ service.substring(0, 2).toUpperCase() }}
+                                    <Checkbox
+:id="`has${service}Service`"
+                                        v-model:checked="editedOrder[`has${service}Service`]" />
                                 </span>
                             </template>
                         </div>
@@ -193,17 +197,15 @@ onMounted(async () => {
                             </template>
                             <template v-else>
                                 <OrdersDetailsLanguageSelector
-                                    :language-list="languageList"
+:language-list="languageList"
                                     :selected-languages="editedOrder?.sourceLanguageId || ''"
-                                    :original-languages="order?.sourceLanguageId || ''"
-                                    :is-source-language="true"
+                                    :original-languages="order?.sourceLanguageId || ''" :is-source-language="true"
                                     @update:selected-languages="changeSourceLanguage" />
                                 <LucideArrowBigRight />
                                 <OrdersDetailsLanguageSelector
-                                    :language-list="languageList"
+:language-list="languageList"
                                     :selected-languages="editedOrder?.targetLanguageId || []"
-                                    :original-languages="order?.targetLanguageId || []"
-                                    :is-source-language="false"
+                                    :original-languages="order?.targetLanguageId || []" :is-source-language="false"
                                     @update:selected-languages="changeTargetLanguage" />
                             </template>
                         </div>

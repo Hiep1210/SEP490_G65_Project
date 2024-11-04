@@ -15,6 +15,8 @@ public partial class Revelancy
 
     public int? CategoryId { get; set; }
 
+    public string? ServiceCode { get; set; }
+
     public virtual Category? Category { get; set; }
 
     public virtual Language? SourceLanguage { get; set; }

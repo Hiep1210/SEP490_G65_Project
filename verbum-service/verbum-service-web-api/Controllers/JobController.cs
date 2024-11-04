@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using verbum_service.Filter;
 using verbum_service_application.Service;
+using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
@@ -20,6 +21,7 @@ namespace verbum_service.Controllers
         private readonly JobService jobService;
         [HttpGet("get-all")]
         [EnableQuery]
+        [Roles(UserRole.LINGUIST, UserRole.MANAGER)]
         [ProducesResponseType(typeof(List<JobInfoResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]

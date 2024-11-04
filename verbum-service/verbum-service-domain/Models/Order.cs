@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace verbum_service_domain.Models;
 
 /// <summary>
-/// NEW, ACCEPTED, REJECTED, CANCELED, DEPOSITED, PAID
+/// NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID, COMPLETED, IN_REVIEW
 /// </summary>
 public partial class Order
 {
@@ -20,8 +20,6 @@ public partial class Order
 
     public decimal? OrderPrice { get; set; }
 
-    public bool? HasDiscount { get; set; }
-
     public Guid? DiscountId { get; set; }
 
     public bool HasTranslateService { get; set; }
@@ -34,6 +32,13 @@ public partial class Order
 
     public string? OrderName { get; set; }
 
+    public string? RejectReason { get; set; }
+
+    /// <summary>
+    /// 255 char
+    /// </summary>
+    public string? OrderNote { get; set; }
+
     public virtual User Client { get; set; } = null!;
 
     public virtual Discount? Discount { get; set; }
@@ -43,6 +48,8 @@ public partial class Order
     public virtual ICollection<OrderReference> OrderReferences { get; set; } = new List<OrderReference>();
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+
+    public virtual ICollection<Receipt> Receipts { get; set; } = new List<Receipt>();
 
     public virtual Language SourceLanguage { get; set; } = null!;
 

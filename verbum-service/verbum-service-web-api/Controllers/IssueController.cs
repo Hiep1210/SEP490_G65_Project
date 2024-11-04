@@ -1,5 +1,6 @@
 ﻿using Lombok.NET;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
@@ -23,6 +24,7 @@ namespace verbum_service.Controllers
         private readonly CreateIssueWorkflow createIssueWorkflow;
         private readonly UpdateIssueWorkflow updateIssueWorkflow;
         [HttpGet]
+        [EnableQuery]
         [Roles(UserRole.MANAGER, UserRole.LINGUIST, UserRole.CLIENT)]
         [ProducesResponseType(typeof(List<IssueResponse>), 200)]
         [ProducesResponseType(204)]
@@ -73,6 +75,28 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> RecoverDeletedFiles(Guid issueId, string fileURl)
         {
             await issueService.RecoverDeletedFiles(issueId, fileURl);
+            return NoContent();
+        }
+
+        [HttpPut("send-cancel-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendCancelResponse([FromBody] ResponseRequest request)
+        {
+            await issueService.UpdateIssueCancelResponse(request);
+            return NoContent();
+        }
+
+        [HttpPut("send-reject-response")]
+        //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendRejectResponse([FromBody] ResponseRequest request)
+        {
+            await issueService.UpdateIssueRejectResponse(request);
             return NoContent();
         }
     }

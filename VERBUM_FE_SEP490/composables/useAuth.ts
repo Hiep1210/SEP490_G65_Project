@@ -13,10 +13,10 @@ export const useAuth = () => {
   let refreshInterval: number | null = null
 
   const router = useRouter()
-
+  const config = useRuntimeConfig()
   const login = async (credentials: any) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/auth/login`, {
+      const response = await fetch(`${config.public.baseUrl}/api/auth/login`, {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +63,7 @@ export const useAuth = () => {
   }
 
   const signup = async (credentials: any) => {
-    const response = await fetch(`http://localhost:8000/api/auth/signup`, {
+    const response = await fetch(`${config.public.baseUrl}/api/auth/signup`, {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: { 'Content-Type': 'application/json' }
@@ -95,7 +95,7 @@ export const useAuth = () => {
   }
 
   const googleAuth = async () => {
-    window.open('http://localhost:8000/api/auth/google-login')
+    window.open(`${config.public.baseUrl}/auth/google-login`)
   }
   // Refresh token silently
   const silentTokenRefresh = async () => {
@@ -105,7 +105,7 @@ export const useAuth = () => {
     }
 
     const response = await fetch(
-      'http://localhost:8000/api/auth/refresh-token',
+      `${config.public.baseUrl}/auth/refresh-token`,
       {
         method: 'POST',
         credentials: 'include'
