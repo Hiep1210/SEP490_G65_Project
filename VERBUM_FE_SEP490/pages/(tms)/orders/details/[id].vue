@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order';
 
-const { order, getOrder, cancelOrder, acceptorDeclineOrder } = useOrders();
+const { order, getOrder, changeOrderStatus } = useOrders();
 const route = useRoute();
 const orderId = route.params.id;
 const { user } = useAuthStore()
@@ -153,11 +153,12 @@ onMounted(async () => {
                         <div class="flex items-center space-x-3">
                             <span>Service:</span>
                             <template v-if="!isEditing">
-                                <span
-v-for="service in ['TR', 'ED', 'EV']" v-show="order?.hasTranslateService && service === 'TR' ||
-                                    order?.hasEditService && service === 'ED' ||
-                                    order?.hasEvaluateService && service === 'EV'" :key="service" class="font-bold">{{
-                                    service }}</span>
+                                <span 
+                                        v-for="service in ['TRN', 'EDIT', 'EVL']"
+                                        v-show="order?.hasTranslateService && service === 'TRN' ||
+                                        order?.hasEditService && service === 'EDIT' ||
+                                        order?.hasEvaluateService && service === 'EVL'" :key="service"
+                                      class="font-bold">{{ service }}</span>
                             </template>
                             <template v-else-if="editedOrder">
                                 <span
@@ -176,8 +177,10 @@ v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service"
                             <span>Due date:</span>
                             <span v-if="!isEditing">{{ order.dueDate }}</span>
                             <input
-v-else-if="editedOrder" v-model="editedOrder.dueDate" type="date"
-                                class="border rounded p-1">
+                                   v-else-if="editedOrder"
+                                   v-model="editedOrder.dueDate"
+                                   type="date"
+                                   class="border rounded p-1">
                         </div>
 
                         <!-- Language Selection -->
@@ -186,8 +189,10 @@ v-else-if="editedOrder" v-model="editedOrder.dueDate" type="date"
                                 <Badge variant="default">{{ order?.sourceLanguageId }}</Badge>
                                 <LucideArrowBigRight />
                                 <div class="flex gap-1">
-                                    <Badge v-for="lang in order?.targetLanguageId" :key="lang" variant="secondary">{{
-                                        lang }}</Badge>
+                                    <Badge 
+                                           v-for="lang in order?.targetLanguageId"
+                                           :key="lang"
+                                           variant="secondary">{{ lang }}</Badge>
                                 </div>
                             </template>
                             <template v-else>
@@ -213,21 +218,25 @@ v-else-if="editedOrder" v-model="editedOrder.dueDate" type="date"
                         <Button @click="saveEdit">Save</Button>
                         <Button variant="outline" @click="cancelEdit">Cancel</Button>
                     </template>
-                    <Button v-if="!isEditing && role === 'CLIENT'" @click="enableEdit">Edit Order</Button>
-                    <Button v-if="role === 'CLIENT'" variant="outline" @click="cancelOrder">Cancel Order</Button>
+                    <Button v-else @click="enableEdit">Edit Order</Button>
+                    <Button
+                            v-if="role === 'CLIENT'"
+                            variant="outline"
+                            @click="changeOrderStatus(order.orderId, 'CANCELLED')">Cancel Order</Button>
                     <template v-if="role === 'STAFF'">
-                        <Button @click="acceptorDeclineOrder(order.orderId, 'ACCEPTED')">Accept Order</Button>
-                        <Button variant="outline" @click="acceptorDeclineOrder(order.orderId, 'REJECTED')">Reject
-                            Order</Button>
+                        <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')">Accept Order</Button>
+                        <Button variant="outline" @click="changeOrderStatus(order.orderId, 'REJECTED')">Reject Order</Button>
                     </template>
-                    <Button v-if="role === 'CLIENT'" variant="outline" @click="openAddDiscount = true">Add
-                        Discount</Button>
+                    <Button
+                            v-if="role === 'CLIENT'"
+                            variant="outline"
+                            @click="openAddDiscount = true">Add Discount</Button>
                 </div>
 
                 <OrdersDetailsTabs :order="order" />
             </div>
 
-            <!-- Smaller Issues List Section -->
+            <!-- Issues List Section -->
             <div v-if="issues" class="space-y-4">
                 <div class="flex justify-between items-center p-3 border-b">
                     <span class="text-lg font-semibold">Issues</span>
