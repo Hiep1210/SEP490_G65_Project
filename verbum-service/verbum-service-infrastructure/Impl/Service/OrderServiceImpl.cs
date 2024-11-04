@@ -111,6 +111,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 .Where(x => x.OrderId == request.OrderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderName, request.OrderName)
                                         .SetProperty(u => u.OrderStatus, OrderStatus.NEW.ToString())
+                                        .SetProperty(u => u.OrderNote, request.OrderNote)
                                         .SetProperty(u => u.SourceLanguageId, request.SourceLanguageId)
                                         .SetProperty(u => u.DueDate, request.DueDate)
                                         .SetProperty(u => u.HasTranslateService, request.TranslateService)

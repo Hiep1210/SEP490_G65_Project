@@ -66,7 +66,7 @@ namespace verbum_service_infrastructure.Impl.Service
             {
                 case UserRole.TRANSLATE_MANAGER:
                     orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
                         .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
                         .Where(w => w.ServiceCode == "TL")
                         .ToListAsync();

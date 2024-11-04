@@ -42,7 +42,7 @@ namespace verbum_service_infrastructure.Impl.Service
                         ReferenceFileUrl = fileURL,
                         Tag = tag,
                         IsDeleted = false
-                    });
+                    }).ToList();
                     context.OrderReferences.AddRange(references);
                     await context.SaveChangesAsync();
                 }
