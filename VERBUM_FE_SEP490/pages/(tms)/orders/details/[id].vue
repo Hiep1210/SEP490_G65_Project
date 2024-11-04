@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order';
 
-const { order, getOrder, cancelOrder, acceptorDeclineOrder } = useOrders();
+const { order, getOrder, changeOrderStatus } = useOrders();
 const route = useRoute();
 const orderId = route.params.id;
 const { user } = useAuthStore()
@@ -137,7 +137,7 @@ onMounted(async () => {
             <div class="space-y-4">
                 <div class="container p-4 space-y-2 orderDetails border rounded-md">
                     <p class="text-[2rem] font-semibold">{{ order?.orderName }}</p>
-                    
+
                     <!-- Order Details -->
                     <div class="flex flex-col space-y-1">
                         <div class="grid grid-cols-2 gap-x-2 text-sm">
@@ -145,7 +145,7 @@ onMounted(async () => {
                             <span class="text-gray-500">Status: {{ order?.orderStatus }}</span>
                             <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
                             <span v-if="order.discountId">Discount: {{ order.discountId }}</span>
-                            <span>Created: {{ order.createdDate }}</span>
+                            <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
                             <span v-if="order.reference">Reference: {{ order.reference }}</span>
                         </div>
 
@@ -153,16 +153,21 @@ onMounted(async () => {
                         <div class="flex items-center space-x-3">
                             <span>Service:</span>
                             <template v-if="!isEditing">
-                                <span v-for="service in ['TRN', 'EDIT', 'EVL']" :key="service"
-                                      v-show="order?.hasTranslateService && service === 'TRN' ||
-                                             order?.hasEditService && service === 'EDIT' ||
-                                             order?.hasEvaluateService && service === 'EVL'"
+                                <span 
+                                        v-for="service in ['TRN', 'EDIT', 'EVL']"
+                                        v-show="order?.hasTranslateService && service === 'TRN' ||
+                                        order?.hasEditService && service === 'EDIT' ||
+                                        order?.hasEvaluateService && service === 'EVL'" :key="service"
                                       class="font-bold">{{ service }}</span>
                             </template>
                             <template v-else-if="editedOrder">
-                                <span v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service" class="font-bold">
-                                    {{ service.substring(0, 3).toUpperCase() }}
-                                    <Checkbox :id="`has${service}Service`" v-model:checked="editedOrder[`has${service}Service`]" />
+                                <span
+v-for="service in ['Translate', 'Edit', 'Evaluate']" :key="service"
+                                    class="font-bold">
+                                    {{ service.substring(0, 2).toUpperCase() }}
+                                    <Checkbox
+:id="`has${service}Service`"
+                                        v-model:checked="editedOrder[`has${service}Service`]" />
                                 </span>
                             </template>
                         </div>
@@ -171,7 +176,8 @@ onMounted(async () => {
                         <div class="flex items-center space-x-2">
                             <span>Due date:</span>
                             <span v-if="!isEditing">{{ order.dueDate }}</span>
-                            <input v-else-if="editedOrder"
+                            <input
+                                   v-else-if="editedOrder"
                                    v-model="editedOrder.dueDate"
                                    type="date"
                                    class="border rounded p-1">
@@ -183,24 +189,23 @@ onMounted(async () => {
                                 <Badge variant="default">{{ order?.sourceLanguageId }}</Badge>
                                 <LucideArrowBigRight />
                                 <div class="flex gap-1">
-                                    <Badge v-for="lang in order?.targetLanguageId"
+                                    <Badge 
+                                           v-for="lang in order?.targetLanguageId"
                                            :key="lang"
                                            variant="secondary">{{ lang }}</Badge>
                                 </div>
                             </template>
                             <template v-else>
                                 <OrdersDetailsLanguageSelector
-                                    :language-list="languageList"
+:language-list="languageList"
                                     :selected-languages="editedOrder?.sourceLanguageId || ''"
-                                    :original-languages="order?.sourceLanguageId || ''"
-                                    :is-source-language="true"
+                                    :original-languages="order?.sourceLanguageId || ''" :is-source-language="true"
                                     @update:selected-languages="changeSourceLanguage" />
                                 <LucideArrowBigRight />
                                 <OrdersDetailsLanguageSelector
-                                    :language-list="languageList"
+:language-list="languageList"
                                     :selected-languages="editedOrder?.targetLanguageId || []"
-                                    :original-languages="order?.targetLanguageId || []"
-                                    :is-source-language="false"
+                                    :original-languages="order?.targetLanguageId || []" :is-source-language="false"
                                     @update:selected-languages="changeTargetLanguage" />
                             </template>
                         </div>
@@ -209,27 +214,29 @@ onMounted(async () => {
 
                 <!-- Action Buttons -->
                 <div class="flex space-x-2">
-                    <template v-if="isEditing">
+                    <template v-if="isEditing && role === 'CLIENT'">
                         <Button @click="saveEdit">Save</Button>
                         <Button variant="outline" @click="cancelEdit">Cancel</Button>
                     </template>
-                    <Button v-else @click="enableEdit">Edit Order</Button>
-                    <Button v-if="role === 'CLIENT'"
-                            variant="outline"
-                            @click="cancelOrder">Cancel Order</Button>
+                    <Button v-else-if="role === 'CLIENT'" @click="enableEdit">Edit Order</Button>
+                    <Button
+                        v-if="role === 'CLIENT'"
+                        variant="outline"
+                        @click="changeOrderStatus(order.orderId, 'CANCELLED')">Cancel Order</Button>
                     <template v-if="role === 'STAFF'">
-                        <Button @click="acceptorDeclineOrder(order.orderId, 'ACCEPTED')">Accept Order</Button>
-                        <Button variant="outline" @click="acceptorDeclineOrder(order.orderId, 'REJECTED')">Reject Order</Button>
+                        <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')">Accept Order</Button>
+                        <Button variant="outline" @click="changeOrderStatus(order.orderId, 'REJECTED')">Reject Order</Button>
                     </template>
-                    <Button v-if="role === 'CLIENT'"
-                            variant="outline"
-                            @click="openAddDiscount = true">Add Discount</Button>
+                    <Button
+                        v-if="role === 'CLIENT'"
+                        variant="outline"
+                        @click="openAddDiscount = true">Add Discount</Button>
                 </div>
 
                 <OrdersDetailsTabs :order="order" />
             </div>
 
-            <!-- Smaller Issues List Section -->
+            <!-- Issues List Section -->
             <div v-if="issues" class="space-y-4">
                 <div class="flex justify-between items-center p-3 border-b">
                     <span class="text-lg font-semibold">Issues</span>

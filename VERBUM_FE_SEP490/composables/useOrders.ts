@@ -77,22 +77,9 @@ export const useOrders = () => {
 
         const modifiedOrder = {
           ...orderData.value,
-          translationFileUrls:
-            orderData.value.translationFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
-          referenceFileUrls:
-            orderData.value.referenceFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
-          deliverableFileUrls:
-            orderData.value.deliverableFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
           createdDate: trimDateTime(orderData.value.createdDate),
           dueDate: trimDateTime(orderData.value.dueDate)
         }
-
         order.value = modifiedOrder
       }
     } catch (error) {
@@ -106,21 +93,10 @@ export const useOrders = () => {
     }
   }
 
-  const cancelOrder = async (id: string) => {
+  const changeOrderStatus = async (id: string, status: string) => {
     isLoading.value = true
     try {
-      await useAPI('/order/cancel', { method: 'PUT', credentials: 'include', params: { orderId: id } })
-    } catch (error) {
-      console.error('Failed to cancel order:', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const acceptorDeclineOrder = async (id: string, status: string) => {
-    isLoading.value = true
-    try {
-      await useAPI('/order/acceptordecline', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
+      await useAPI('/order/change-status', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
 
       if (status === 'ACCEPTED' && order.value) {
         const payload = {
@@ -159,5 +135,5 @@ export const useOrders = () => {
     }
   }
 
-  return { isLoading, orders, order, getOrders, getOrder, cancelOrder, acceptorDeclineOrder }
+  return { isLoading, orders, order, getOrders, getOrder, changeOrderStatus }
 }

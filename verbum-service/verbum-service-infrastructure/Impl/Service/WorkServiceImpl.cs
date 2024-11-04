@@ -66,7 +66,7 @@ namespace verbum_service_infrastructure.Impl.Service
             {
                 case UserRole.TRANSLATE_MANAGER:
                     orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
                         .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
                         .Where(w => w.ServiceCode == "TL")
                         .ToListAsync();
@@ -94,11 +94,6 @@ namespace verbum_service_infrastructure.Impl.Service
             }
             List<WorkResponse> list = mapper.Map<List<WorkResponse>>(orders);
             return list;
-        }
-
-        public Task<OrderDetailsResponse> GetOrderDetails(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<List<Guid>> GetWorkIdsListByOrderId(Guid orderId)
@@ -145,6 +140,8 @@ namespace verbum_service_infrastructure.Impl.Service
             }
             else
             {
+                var general = context.Categories.Where(c => c.CategoryId == 6).ToList();
+
                 var works = serviceCodes.Select(serviceCode => new Work
                 {
                     WorkId = Guid.NewGuid(),
@@ -152,7 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
                     WorkName = request.OrderName,
                     ServiceCode = serviceCode,
                     CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
-                    DueDate = request.DueDate
+                    DueDate = request.DueDate,
+                    Categories = general
                 }).ToList();
 
                 var workIds = works.Select(w => w.WorkId).ToList();
