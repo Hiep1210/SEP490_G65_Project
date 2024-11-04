@@ -22,11 +22,9 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<CategoryInfoResponse>> GetAllCategory()
         {
-            List<Category> listCategory = await context.Categories.ToListAsync();
-            List<Category> listCategory2 = await context.Categories
-                .OrderByDescending(c => context.Revelancies.Count(r => r.CategoryId == c.CategoryId))
-                .ToListAsync();
-            if (listCategory == null)
+            List<Category> listCategory2 = await context.Categories.ToListAsync();
+            
+            if (listCategory2 == null)
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Category"));
             }

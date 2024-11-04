@@ -9,7 +9,6 @@ namespace verbum_service_application.Service
         Task<List<WorkResponse>> GetAllWork();
         Task CreateWork(Work work);
         Task UpdateWork(WorkUpdate request);
-        Task<OrderDetailsResponse> GetOrderDetails(Guid id);
         Task AddRange(Guid orderId,DateTime? dueDate,List<string> serviceCodes);
         Task AddWorkCategory(Guid workId, List<int> categoryIds);
         Task<List<Guid>> GetWorkIdsListByOrderId(Guid orderId);

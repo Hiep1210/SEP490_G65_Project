@@ -96,11 +96,6 @@ namespace verbum_service_infrastructure.Impl.Service
             return list;
         }
 
-        public Task<OrderDetailsResponse> GetOrderDetails(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Guid>> GetWorkIdsListByOrderId(Guid orderId)
         {
             List<Guid> list = await context.Works

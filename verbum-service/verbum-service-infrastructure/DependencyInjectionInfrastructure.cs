@@ -54,6 +54,7 @@ namespace VNH.Infrastructure
             services.AddScoped<DiscountService, DiscountServiceImpl>();
             services.AddScoped<RatingService, RatingServiceImpl>();
             services.AddScoped<JobService, JobServiceImpl>();
+            services.AddScoped<ReceiptService, ReceiptServiceImpl>();
 
             //workflow dependency
             services.AddScoped<CreateUserWorkflow>();
