@@ -19,8 +19,10 @@ const props = defineProps<{
   issues: Issue[]
 }>()
 
+const activeIssueStatuses = ['OPEN']
+
 const acceptedIssues = (data: Issue[]) => {
-  return data.filter((item) => item.status === 'ACCEPTED')
+  return data.filter((item) => activeIssueStatuses.includes(item.status))
 }
 const items = ref(props.issues)
 
@@ -53,19 +55,18 @@ watch(
 <template>
   <Carousel class="w-full max-w-[80vw] px-5">
     <CarouselContent>
-      <CarouselItem
-        v-for="item in acceptedIssues(items)"
-        :key="item.issueId"
-        class="md:basis-1/2 lg:basis-1/3"
-        @click="openIssuesDialog(item)"
-      >
+      <CarouselItem v-for="item in acceptedIssues(items)" :key="item.issueId" class="md:basis-1/2 lg:basis-1/3"
+        @click="openIssuesDialog(item)">
         <Card>
           <CardHeader>
             <CardTitle>{{ item.issueName }}</CardTitle>
             <CardDescription>{{ item.issueDescription }}</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Badge>{{ item.issueAttachments.length }} attachments</Badge>
+            <div class="flex gap-3">
+              <Badge :class="getIssueBadgeClass(item.status)">{{ item.status }}</Badge>
+              <Badge>{{ item.issueAttachments.length }} attachments</Badge>
+            </div>
           </CardFooter>
         </Card>
       </CarouselItem>
@@ -73,13 +74,8 @@ watch(
     <CarouselPrevious />
     <CarouselNext />
   </Carousel>
-  <IssuesDialog
-    v-if="showIssuesDialog"
-    :row-data="selectedData"
-    :open="showIssuesDialog"
-    @close="closeIssuesDialog"
-    @update="updateIssueInTable"
-  />
+  <IssuesDialog v-if="showIssuesDialog" :row-data="selectedData" :open="showIssuesDialog" @close="closeIssuesDialog"
+    @update="updateIssueInTable" />
 </template>
 
 <style></style>

@@ -4,8 +4,8 @@ export const getIssueBadgeClass = (status: string) => {
       return 'bg-red-500 text-white'
     case 'ACCEPTED':
       return 'bg-yellow-500 text-black'
-    case 'RESOLVE':
-      return 'bg-green-500 text-black'
+    case 'RESOLVED':
+      return 'bg-green-500 text-white'
     case 'CANCEL':
       return 'bg-gray-500 text-white'
     default:

@@ -123,6 +123,20 @@ interface Language {
 }
 const languageList = ref<Language[]>([])
 
+const showIssuesDialog = ref(false)
+const selectedData = ref();
+
+const openIssuesDialog = (data: Issue) => {
+  selectedData.value = data;
+  showIssuesDialog.value = true;
+}
+
+const closeIssuesDialog = () => {
+  selectedData.value = '';
+  showIssuesDialog.value = false;
+}
+
+
 onMounted(async () => {
   try {
     const { data } = await useAPI('/lang')
@@ -292,6 +306,7 @@ onMounted(async () => {
                 <TableRow 
                     v-for="issue in issues" 
                     :key="issue.issueId"
+                    @click="openIssuesDialog(issue)"
                     >
                     <TableCell>{{ issue.issueName }}</TableCell>
                     <TableCell>

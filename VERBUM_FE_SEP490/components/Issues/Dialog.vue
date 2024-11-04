@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, defineEmits } from 'vue'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
 import { getIssueBadgeClass } from '@/utils/getBadgeClass'
 const { assignList, getAssignList } = useUsers()
+const { updateIssueStatus, sendCancelResponse } = useIssues()
 
 const props = defineProps<{
   open: boolean
@@ -33,8 +35,11 @@ const isStatusEditing = ref(false)
 const previousStatus = ref('')
 const titleStatusConfirm = 'Change status'
 const descriptionStatusConfirm =
-  'If you change status to CANCEL the issue you can not reopen it. If you not skip this note. '
+  'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
 const isConfirmDialogOpen = ref(false)
+const isCancelDialogOpen = ref(false)
+const reasonForCancellation = ref('')
+
 onMounted(() => {
   if (!assignList.value.length) {
     getAssignList()
@@ -44,30 +49,35 @@ onMounted(() => {
 
 const issue = ref(props.rowData)
 const issueStatuses = ['CANCEL', 'OPEN', 'RESOLVED', 'ACCEPTED']
-
+const selectedStatus = ref(issue.value.status)
 const emitUpdate = () => {
   emit('update', issue.value)
   isEditing.value = false
-}
-
-const emitUpdateStatus = () => {
-  emit('update-status', issue.value.issueId, issue.value.status)
-  isStatusEditing.value = false
 }
 
 const enableEditing = () => {
   isEditing.value = true
 }
 
-const handleConfirmStatus = () => {
-  emitUpdateStatus()
-  isConfirmDialogOpen.value = false // Close the confirmation dialog
+const handleConfirmStatus = async () => {
+  await sendCancelResponse(issue.value.issueId, reasonForCancellation.value)
+  isCancelDialogOpen.value = false
 }
 
 const handleCancelStatus = () => {
-  // Revert the status change when Cancel is clicked
-  issue.value.status = previousStatus.value
-  isConfirmDialogOpen.value = false // Close the confirmation dialog
+  selectedStatus.value = previousStatus.value
+  isCancelDialogOpen.value = false
+  reasonForCancellation.value = ''
+}
+
+const handleStatusChange = async (issuesId: string, oldStatus: string, newStatus: string) => {
+  if (newStatus === 'CANCEL') {
+    isCancelDialogOpen.value = true
+    previousStatus.value = oldStatus
+  } else {
+    await updateIssueStatus(issuesId, newStatus)
+    issue.value.status = newStatus
+  }
 }
 
 const closeDialog = () => {
@@ -95,16 +105,16 @@ watch(
           {{ issue.issueName }}
         </DialogTitle>
       </DialogHeader>
-      <Select>
-        <SelectTrigger class="w-[180px]">
-          <SelectValue />
+      <Select v-model="selectedStatus"
+        @update:modelValue="(newStatus) => handleStatusChange(issue.issueId, issue.status, newStatus)">
+        <SelectTrigger class="max-w-fit border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden">
+          <SelectValue>
+            <Badge :class="getIssueBadgeClass(selectedStatus)">{{ selectedStatus }}</Badge>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem
-            v-for="issueStatus in issueStatuses"
-                :key="issueStatus"
-                :value="issueStatus"> 
+            <SelectItem v-for="issueStatus in issueStatuses" :key="issueStatus" :value="issueStatus">
               <Badge :class="getIssueBadgeClass(issueStatus)">{{ issueStatus }}</Badge>
             </SelectItem>
           </SelectGroup>
@@ -117,10 +127,7 @@ watch(
               <TableCell class="font-semibold">Issue name:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <Input
-                    v-model="issue.issueName"
-                    class="border border-cyan-700 rounded p-1 w-full"
-                  />
+                  <Input v-model="issue.issueName" class="rounded p-1 w-full" />
                 </template>
                 <template v-else>{{ issue.issueName }}</template>
               </TableCell>
@@ -128,13 +135,10 @@ watch(
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell class="font-semibold">Client name:</TableCell>
+              <TableCell class="font-semibold">Created by:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <Input
-                    v-model="issue.clientName"
-                    class="border border-cyan-700 rounded p-1 w-full"
-                  />
+                  <Input v-model="issue.clientName" class="border border-cyan-700 rounded p-1 w-full" />
                 </template>
                 <template v-else>{{ issue.clientName }}</template>
               </TableCell>
@@ -152,15 +156,8 @@ watch(
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <select
-                    v-model="issue.assigneeId"
-                    class="border border-cyan-700 rounded p-1 w-full"
-                  >
-                    <option
-                      v-for="user in assignList"
-                      :key="user.id"
-                      :value="user.id"
-                    >
+                  <select v-model="issue.assigneeId" class="border border-cyan-700 rounded p-1 w-full">
+                    <option v-for="user in assignList" :key="user.id" :value="user.id">
                       {{ user.name }}
                     </option>
                   </select>
@@ -176,10 +173,7 @@ watch(
         <div class="font-semibold">Description:</div>
         <p>
           <template v-if="isEditing">
-            <textarea
-              v-model="issue.issueDescription"
-              class="border border-cyan-700 rounded p-1 w-full"
-            />
+            <textarea v-model="issue.issueDescription" class="border border-cyan-700 rounded p-1 w-full" />
           </template>
           <template v-else>{{ issue.issueDescription }}</template>
         </p>
@@ -189,22 +183,28 @@ watch(
         <p>{{ issue.issueAttachments }}</p>
       </div>
       <DialogFooter>
-        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog"
-          >Cancel</Button
-        >
-        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog"
-          >Close</Button
-        >
+        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel</Button>
+        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close</Button>
         <Button v-if="!isEditing" @click="enableEditing">Edit</Button>
         <Button v-if="isEditing" @click="emitUpdate">Update</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
-  <IssuesConfirmDialog
-    :title="titleStatusConfirm"
-    :description="descriptionStatusConfirm"
-    :open="isConfirmDialogOpen"
-    @close="handleCancelStatus"
-    @confirm="handleConfirmStatus"
-  />
+  <IssuesConfirmDialog :title="titleStatusConfirm" :description="descriptionStatusConfirm" :open="isConfirmDialogOpen"
+    @close="handleCancelStatus" @confirm="handleConfirmStatus" />
+  <Dialog :open="isCancelDialogOpen" @close="handleCancelStatus">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Provide Cancellation Reason</DialogTitle>
+      </DialogHeader>
+      <Input v-model="reasonForCancellation" placeholder="Enter reason for cancellation" class="w-full" />
+      <DialogDescription class="text-red-500 font-semibold">
+        {{ descriptionStatusConfirm }}
+      </DialogDescription>
+      <DialogFooter>
+        <Button class="bg-gray-500" @click="handleCancelStatus">Cancel</Button>
+        <Button class="bg-red-500" @click="handleConfirmStatus">Confirm</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
