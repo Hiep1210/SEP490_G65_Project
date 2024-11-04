@@ -140,6 +140,8 @@ namespace verbum_service_infrastructure.Impl.Service
             }
             else
             {
+                var general = context.Categories.Where(c => c.CategoryId == 6).ToList();
+
                 var works = serviceCodes.Select(serviceCode => new Work
                 {
                     WorkId = Guid.NewGuid(),
@@ -147,7 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
                     WorkName = request.OrderName,
                     ServiceCode = serviceCode,
                     CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
-                    DueDate = request.DueDate
+                    DueDate = request.DueDate,
+                    Categories = general
                 }).ToList();
 
                 var workIds = works.Select(w => w.WorkId).ToList();

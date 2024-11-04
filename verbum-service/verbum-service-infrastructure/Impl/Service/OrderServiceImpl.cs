@@ -217,5 +217,55 @@ namespace verbum_service_infrastructure.Impl.Service
             if (await context.Orders.Where(x => x.OrderId == request.Id)
                                .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectReason, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
+
+        public async Task CreateRevelancy(Guid orderId)
+        {
+            using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    List<Work> works = context.Works
+                .Include(w => w.Order)
+                .Include(w => w.Categories)
+                .Include(w => w.Jobs)
+                .ThenInclude(w => w.Assignees).ToList();
+                    List<Revelancy> list = new List<Revelancy>();
+                    foreach (Work work in works)
+                    {
+                        foreach (Job job in work.Jobs)
+                        {
+                            foreach (User assignee in job.Assignees)
+                            {
+                                foreach (Category category in work.Categories)
+                                {
+                                    Revelancy revelancy = new Revelancy
+                                    {
+                                        RevelancyId = Guid.NewGuid(),
+                                        UserId = assignee.Id,
+                                        SourceLanguageId = work.Order.SourceLanguageId,
+                                        TargetLanguageId = job.TargetLanguageId,
+                                        ServiceCode = work.ServiceCode,
+                                        CategoryId = category.CategoryId
+                                    };
+
+                                    list.Add(revelancy);
+                                    //context.Revelancies.Add(revelancy);
+                                }
+                            }
+                        }
+                    }
+
+                    int count = list.Count;
+                    //await context.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch(Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            
+        }
     }
 }

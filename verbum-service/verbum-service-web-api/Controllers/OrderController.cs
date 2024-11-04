@@ -141,5 +141,15 @@ namespace verbum_service.Controllers
             await orderService.UpdateOrderCancelResponse(request);
             return NoContent();
         }
+
+        [HttpPost("revelancy")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> Revelancy(Guid orderId)
+        {
+            await orderService.CreateRevelancy(orderId);
+            return StatusCode(201);
+        }
     }
 }
