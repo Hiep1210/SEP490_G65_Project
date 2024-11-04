@@ -77,18 +77,6 @@ export const useOrders = () => {
 
         const modifiedOrder = {
           ...orderData.value,
-          // translationFileUrls:
-          //   orderData.value.translationFileUrls
-          //     ?.map(getFileNameFromUrl)
-          //     .filter((file): file is string => file !== null) || [],
-          // referenceFileUrls:
-          //   orderData.value.referenceFileUrls
-          //     ?.map(getFileNameFromUrl)
-          //     .filter((file): file is string => file !== null) || [],
-          // deliverableFileUrls:
-          //   orderData.value.deliverableFileUrls
-          //     ?.map(getFileNameFromUrl)
-          //     .filter((file): file is string => file !== null) || [],
           createdDate: trimDateTime(orderData.value.createdDate),
           dueDate: trimDateTime(orderData.value.dueDate)
         }
