@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@nuxt/image": "^1.7.0",
+    "@paypal/paypal-js": "^8.1.2",
     "@pinia/nuxt": "^0.5.4",
     "@unovis/ts": "^1.4.4",
     "@unovis/vue": "^1.4.4",

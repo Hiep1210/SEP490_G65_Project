@@ -109,7 +109,11 @@ export const useOrders = () => {
   const cancelOrder = async (id: string) => {
     isLoading.value = true
     try {
-      await useAPI('/order/cancel', { method: 'PUT', credentials: 'include', params: { orderId: id } })
+      await useAPI('/order/cancel', {
+        method: 'PUT',
+        credentials: 'include',
+        params: { orderId: id }
+      })
     } catch (error) {
       console.error('Failed to cancel order:', error)
     } finally {
@@ -120,19 +124,26 @@ export const useOrders = () => {
   const acceptorDeclineOrder = async (id: string, status: string) => {
     isLoading.value = true
     try {
-      await useAPI('/order/acceptordecline', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
+      await useAPI('/order/acceptordecline', {
+        method: 'PUT',
+        credentials: 'include',
+        params: { orderId: id, orderStatus: status }
+      })
 
       if (status === 'ACCEPTED' && order.value) {
         const payload = {
           orderId: order.value.orderId,
           orderName: order.value.orderName,
-          dueDate: order.value.dueDate ? new Date(order.value.dueDate).toISOString().replace('Z', '') : null,
+          dueDate: order.value.dueDate
+            ? new Date(order.value.dueDate).toISOString().replace('Z', '')
+            : null,
           hasTranslateService: order.value.hasTranslateService,
           hasEditService: order.value.hasEditService,
-          hasEvaluateService: order.value.hasEvaluateService,
+          hasEvaluateService: order.value.hasEvaluateService
         }
         const { data: guidResponse } = await useAPI<string[]>('work/generate', {
-          method: 'POST', credentials: 'include',
+          method: 'POST',
+          credentials: 'include',
           body: JSON.stringify(payload),
           headers: { 'Content-Type': 'application/json' }
         })
@@ -141,23 +152,58 @@ export const useOrders = () => {
           const payload2 = {
             workIds: guidResponse.value,
             documentURLs: order.value.translationFileUrls,
-            targetLanguageIds: order.value.targetLanguageId,
+            targetLanguageIds: order.value.targetLanguageId
           }
           await useAPI('job/add', {
-            method: 'POST', credentials: 'include',
+            method: 'POST',
+            credentials: 'include',
             body: JSON.stringify(payload2),
             headers: { 'Content-Type': 'application/json' }
           })
         }
       }
-      toast({ title: 'Success', description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully` })
+      toast({
+        title: 'Success',
+        description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully`
+      })
     } catch (error) {
       console.error(`Failed to ${status} order:`, error)
-      toast({ title: 'Error', description: `Failed to ${status} order. Please try again later.` })
+      toast({
+        title: 'Error',
+        description: `Failed to ${status} order. Please try again later.`
+      })
     } finally {
       isLoading.value = false
     }
   }
 
-  return { isLoading, orders, order, getOrders, getOrder, cancelOrder, acceptorDeclineOrder }
+  const setOrderPrice = async (orderId: string, orderPrice: string) => {
+    try {
+      await useAPI(`/order/price?orderId=${orderId}&price=${orderPrice}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      toast({
+        title: 'Order price updated !!',
+        description: `Order price has been updated!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating Order price',
+        description: 'An error occurred while updating the Order price!!'
+      })
+      console.error('Error updating Order price:', error)
+    }
+  }
+  return {
+    isLoading,
+    orders,
+    order,
+    getOrders,
+    getOrder,
+    cancelOrder,
+    acceptorDeclineOrder,
+    setOrderPrice
+  }
 }
