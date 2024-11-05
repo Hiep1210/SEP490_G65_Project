@@ -147,12 +147,12 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            if(OrderStatus.NEW.ToString().Equals(orderStatus) 
-                || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
-                || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
-            {
-                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
-            }
+            //if(OrderStatus.NEW.ToString().Equals(orderStatus) 
+            //    || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
+            //    || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
+            //{
+            //    throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
+            //}
             if(OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
             {
                 await context.Orders
