@@ -285,7 +285,7 @@ onMounted(async () => {
       <div class="space-y-4 border rounded-md">
         <div class="flex justify-between items-center p-3 border-b">
           <span class="text-lg font-semibold">Issues</span>
-          <IssuesCreate :order-id="orderId" />
+          <IssuesCreate v-if="role === 'CLIENT'" :order-id="orderId" />
         </div>
         <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
           <IssuesTable

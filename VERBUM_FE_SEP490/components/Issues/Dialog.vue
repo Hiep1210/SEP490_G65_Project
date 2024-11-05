@@ -63,6 +63,7 @@ const enableEditing = () => {
 
 const handleConfirmStatus = async () => {
   await sendCancelResponse(issue.value.issueId, reasonForCancellation.value)
+  await updateIssueStatus(issue.value.issueId, 'CANCEL')
   isCancelDialogOpen.value = false
 }
 
