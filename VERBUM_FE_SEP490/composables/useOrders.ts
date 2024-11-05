@@ -102,13 +102,16 @@ export const useOrders = () => {
         const payload = {
           orderId: order.value.orderId,
           orderName: order.value.orderName,
-          dueDate: order.value.dueDate ? new Date(order.value.dueDate).toISOString().replace('Z', '') : null,
+          dueDate: order.value.dueDate
+            ? new Date(order.value.dueDate).toISOString().replace('Z', '')
+            : null,
           hasTranslateService: order.value.hasTranslateService,
           hasEditService: order.value.hasEditService,
-          hasEvaluateService: order.value.hasEvaluateService,
+          hasEvaluateService: order.value.hasEvaluateService
         }
         const { data: guidResponse } = await useAPI<string[]>('work/generate', {
-          method: 'POST', credentials: 'include',
+          method: 'POST',
+          credentials: 'include',
           body: JSON.stringify(payload),
           headers: { 'Content-Type': 'application/json' }
         })
@@ -117,23 +120,80 @@ export const useOrders = () => {
           const payload2 = {
             workIds: guidResponse.value,
             documentURLs: order.value.translationFileUrls,
-            targetLanguageIds: order.value.targetLanguageId,
+            targetLanguageIds: order.value.targetLanguageId
           }
           await useAPI('job/add', {
-            method: 'POST', credentials: 'include',
+            method: 'POST',
+            credentials: 'include',
             body: JSON.stringify(payload2),
             headers: { 'Content-Type': 'application/json' }
           })
         }
       }
-      toast({ title: 'Success', description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully` })
+      toast({
+        title: 'Success',
+        description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully`
+      })
     } catch (error) {
       console.error(`Failed to ${status} order:`, error)
-      toast({ title: 'Error', description: `Failed to ${status} order. Please try again later.` })
+      toast({
+        title: 'Error',
+        description: `Failed to ${status} order. Please try again later.`
+      })
     } finally {
       isLoading.value = false
     }
   }
 
-  return { isLoading, orders, order, getOrders, getOrder, changeOrderStatus }
+  const setOrderPrice = async (orderId: string, orderPrice: string) => {
+    try {
+      await useAPI(`/order/price`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, price: orderPrice }
+      })
+
+      toast({
+        title: 'Order price updated !!',
+        description: `Order price has been updated!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating Order price',
+        description: 'An error occurred while updating the Order price!!'
+      })
+      console.error('Error updating Order price:', error)
+    }
+  }
+
+  const updateSuccessPayment = async (orderId: string, status: string) => {
+    try {
+      await useAPI(`/order/change-status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, orderStatus: status }
+      })
+
+      toast({
+        title: 'Your order is paid successfully!!',
+        description: `We are going to do your order. Thank you for choosing our service.`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating order status ',
+        description: 'An error occurred while updating the order status!!'
+      })
+      console.error('Error updating Order status:', error)
+    }
+  }
+  return {
+    isLoading,
+    orders,
+    order,
+    getOrders,
+    getOrder,
+    changeOrderStatus,
+    setOrderPrice,
+    updateSuccessPayment
+  }
 }
