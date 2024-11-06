@@ -85,6 +85,9 @@ public partial class verbumContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("issue_id");
             entity.Property(e => e.AssigneeId).HasColumnName("assignee_id");
+            entity.Property(e => e.CancelResponse)
+                .HasColumnType("character varying")
+                .HasColumnName("cancel_response");
             entity.Property(e => e.ClientId).HasColumnName("client_id");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")
@@ -100,7 +103,7 @@ public partial class verbumContext : DbContext
                 .HasColumnType("character varying")
                 .HasColumnName("reject_response");
             entity.Property(e => e.Status)
-                .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED")
+                .HasComment("CANCEL, OPEN, SUBMITTED, RESOLVED")
                 .HasColumnType("character varying")
                 .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
@@ -160,7 +163,7 @@ public partial class verbumContext : DbContext
                 .HasColumnName("due_date");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Status)
-                .HasComment("NEW, IN_PROGRESS, COMPLETED")
+                .HasComment("NEW, IN_PROGRESS, SUBMITTED, RESOLVED")
                 .HasColumnName("status");
             entity.Property(e => e.TargetLanguageId)
                 .HasColumnType("character varying")
@@ -215,7 +218,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("order_pk");
 
-            entity.ToTable("order", tb => tb.HasComment("NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID"));
+            entity.ToTable("order", tb => tb.HasComment("NEW, RESOLVED, REJECTED, CANCELED, IN_PROGRESS, DELIVERED, SUBMITTED, IN_REVIEW"));
 
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()

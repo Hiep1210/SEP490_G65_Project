@@ -77,22 +77,9 @@ export const useOrders = () => {
 
         const modifiedOrder = {
           ...orderData.value,
-          translationFileUrls:
-            orderData.value.translationFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
-          referenceFileUrls:
-            orderData.value.referenceFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
-          deliverableFileUrls:
-            orderData.value.deliverableFileUrls
-              ?.map(getFileNameFromUrl)
-              .filter((file): file is string => file !== null) || [],
           createdDate: trimDateTime(orderData.value.createdDate),
           dueDate: trimDateTime(orderData.value.dueDate)
         }
-
         order.value = modifiedOrder
       }
     } catch (error) {
@@ -106,29 +93,10 @@ export const useOrders = () => {
     }
   }
 
-  const cancelOrder = async (id: string) => {
+  const changeOrderStatus = async (id: string, status: string) => {
     isLoading.value = true
     try {
-      await useAPI('/order/cancel', {
-        method: 'PUT',
-        credentials: 'include',
-        params: { orderId: id }
-      })
-    } catch (error) {
-      console.error('Failed to cancel order:', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const acceptorDeclineOrder = async (id: string, status: string) => {
-    isLoading.value = true
-    try {
-      await useAPI('/order/acceptordecline', {
-        method: 'PUT',
-        credentials: 'include',
-        params: { orderId: id, orderStatus: status }
-      })
+      await useAPI('/order/change-status', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
 
       if (status === 'ACCEPTED' && order.value) {
         const payload = {
@@ -177,13 +145,55 @@ export const useOrders = () => {
     }
   }
 
+  const setOrderPrice = async (orderId: string, orderPrice: string) => {
+    try {
+      await useAPI(`/order/price`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, price: orderPrice }
+      })
+
+      toast({
+        title: 'Order price updated !!',
+        description: `Order price has been updated!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating Order price',
+        description: 'An error occurred while updating the Order price!!'
+      })
+      console.error('Error updating Order price:', error)
+    }
+  }
+
+  const updateSuccessPayment = async (orderId: string, status: string) => {
+    try {
+      await useAPI(`/order/change-status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        params: { orderId: orderId, orderStatus: status }
+      })
+
+      toast({
+        title: 'Your order is paid successfully!!',
+        description: `We are going to do your order. Thank you for choosing our service.`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating order status ',
+        description: 'An error occurred while updating the order status!!'
+      })
+      console.error('Error updating Order status:', error)
+    }
+  }
   return {
     isLoading,
     orders,
     order,
     getOrders,
     getOrder,
-    cancelOrder,
-    acceptorDeclineOrder
+    changeOrderStatus,
+    setOrderPrice,
+    updateSuccessPayment
   }
 }

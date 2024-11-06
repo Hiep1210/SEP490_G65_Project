@@ -65,6 +65,18 @@ namespace verbum_service_infrastructure.Impl.Service
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
+        public async Task UpdateIssueCancelResponse(ResponseRequest request)
+        {
+            if (await context.Issues.Where(x => x.IssueId == request.Id)
+                .ExecuteUpdateAsync(o => o.SetProperty(x => x.CancelResponse, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task UpdateIssueRejectResponse(ResponseRequest request)
+        {
+            if (await context.Issues.Where(x => x.IssueId == request.Id)
+                .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectResponse, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
         public async Task UpdateIssueStatus(Guid issueId, string status)
         {
             if (!Enum.IsDefined(typeof(IssueStatusEnum), status)
@@ -100,7 +112,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.Client).ToListAsync();
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.Client).Include(x => x.Order).ToListAsync();
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:

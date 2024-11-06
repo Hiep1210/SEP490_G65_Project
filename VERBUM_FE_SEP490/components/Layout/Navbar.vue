@@ -31,9 +31,10 @@ const roleMenuItems = {
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
     { navName: 'Jobs', navLink: '/jobs', navIcon: FolderOpen }
   ],
-  CENTER_DIRECTOR: [
+  DIRECTOR: [
     { navName: 'Statistics', navLink: '/statistics', navIcon: ChartBar },
-    { navName: 'Prices', navLink: '/prices', navIcon: DollarSign }
+    { navName: 'Prices', navLink: '/prices', navIcon: DollarSign },
+    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
   ]
 } as const
 

@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import { formatDistanceToNowUserTimezone } from '~/utils/date'
-import type { Issue } from '~/types/issues';
+import type { Issue } from '~/types/issues'
+import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
+import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 
-const { order, getOrder, cancelOrder, acceptorDeclineOrder } = useOrders()
-const { issues, getIssues, updateIssue, getIssuesByOrders} =
-  useIssues()
+const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
+
+const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
 const role = user?.role
 const isEditing = ref(false)
 const editedOrder = ref<Partial<Order> | null>(null)
+
+const openSetPricesDialog = ref(false)
+const openPaymentDialog = ref(false)
+const openConfirmDialog = ref(false)
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
@@ -124,7 +130,7 @@ interface Language {
 const languageList = ref<Language[]>([])
 
 const showIssuesDialog = ref(false)
-const selectedData = ref();
+const selectedData = ref()
 
 const handleUpdate = async (updateIssues: Issue) => {
   await updateIssue(updateIssues)
@@ -139,6 +145,32 @@ onMounted(async () => {
     console.error('Failed to fetch language list:', error)
   }
 })
+const payStatus = ref('')
+const handlePay = (status: string) => {
+  payStatus.value = status
+  openPaymentDialog.value = true
+}
+
+const handleSetPrices = () => {
+  openSetPricesDialog.value = true
+  tempPrice.value = order.value?.orderPrice || '0'
+}
+
+const confirmSetPrices = async () => {
+  try {
+    if (tempPrice.value !== null && order.value?.orderId) {
+      // Make an API call to update the price
+      console.log(tempPrice.value)
+      await setOrderPrice(order.value?.orderId, tempPrice.value)
+      // Update the local order price after successful API call
+      order.value!.orderPrice = tempPrice.value
+      openConfirmDialog.value = false // Close the confirmation dialog
+      openSetPricesDialog.value = false // Close the Set Prices dialog
+    }
+  } catch (error) {
+    console.error('Failed to set price:', error) // Log error if API call fails
+  }
+}
 </script>
 
 <template>
@@ -150,12 +182,24 @@ onMounted(async () => {
       <!-- Order Information and File URLs Section -->
       <div class="space-y-4">
         <div class="container p-4 space-y-2 orderDetails border rounded-md">
-          <p class="text-[2rem] font-semibold">{{ order?.orderName }}</p>
+          <div class="flex">
+            <p class="text-[2rem] font-semibold flex-auto">
+              {{ order?.orderName }}
+            </p>
+            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT'">
+              <Button @click="handlePay('IN_PROGRESS')">Deposit </Button>
+            </div>
+            <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT'">
+              <Button @click="handlePay('DELIVERED')">Paying Remaining </Button>
+            </div>
+            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
+              <Button @click="handleSetPrices">Set prices </Button>
+            </div>
+          </div>
 
           <!-- Order Details -->
           <div class="flex flex-col space-y-1">
             <div class="grid grid-cols-2 gap-x-2 text-sm">
-              <span>ID: {{ order?.orderId }}</span>
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
@@ -163,7 +207,7 @@ onMounted(async () => {
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ order.createdDate }}</span>
+              <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
               <span v-if="order.reference"
                 >Reference: {{ order.reference }}</span
               >
@@ -191,7 +235,7 @@ onMounted(async () => {
                   :key="service"
                   class="font-bold"
                 >
-                  {{ service.substring(0, 3).toUpperCase() }}
+                  {{ service.substring(0, 2).toUpperCase() }}
                   <Checkbox
                     :id="`has${service}Service`"
                     v-model:checked="editedOrder[`has${service}Service`]"
@@ -249,24 +293,26 @@ onMounted(async () => {
 
         <!-- Action Buttons -->
         <div class="flex space-x-2">
-          <template v-if="isEditing">
+          <template v-if="isEditing && role === 'CLIENT'">
             <Button @click="saveEdit">Save</Button>
             <Button variant="outline" @click="cancelEdit">Cancel</Button>
           </template>
-          <Button v-else @click="enableEdit">Edit Order</Button>
+          <Button v-else-if="role === 'CLIENT'" @click="enableEdit"
+            >Edit Order</Button
+          >
           <Button
             v-if="role === 'CLIENT'"
             variant="outline"
-            @click="cancelOrder"
+            @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button
           >
           <template v-if="role === 'STAFF'">
-            <Button @click="acceptorDeclineOrder(order.orderId, 'ACCEPTED')"
+            <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
             <Button
               variant="outline"
-              @click="acceptorDeclineOrder(order.orderId, 'REJECTED')"
+              @click="changeOrderStatus(order.orderId, 'REJECTED')"
               >Reject Order</Button
             >
           </template>
@@ -301,6 +347,59 @@ onMounted(async () => {
           </p>
         </div>
       </div>
+      <!-- Issues List Section -->
+      <div v-if="issues" class="space-y-4">
+        <div class="flex justify-between items-center p-3 border-b">
+          <span class="text-lg font-semibold">Issues</span>
+          <Button variant="outline" size="sm">Add Issue</Button>
+        </div>
+        <div class="border rounded-md h-[15rem] overflow-auto p-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Title</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="issue in issues" :key="issue.issueId">
+                <TableCell>{{ issue.issueId }}</TableCell>
+                <TableCell>{{ issue.issueName }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <!-- Set Prices Dialog -->
+      <SetPricesDialog
+        :order="order"
+        :price="tempPrice"
+        :open="openSetPricesDialog"
+        @close="openSetPricesDialog = false"
+        @confirm="
+          (newPrice) => {
+            openConfirmDialog = true
+            tempPrice = newPrice
+          }
+        "
+      />
+
+      <!-- Confirm Dialog -->
+      <ConfirmDialog
+        :title="'Confirm Price Update'"
+        :description="'Are you sure you want to update the price ?'"
+        :open="openConfirmDialog"
+        @close="openConfirmDialog = false"
+        @confirm="confirmSetPrices"
+      />
+
+      <PaymentDialog
+        :order="order"
+        :status="payStatus"
+        :open="openPaymentDialog"
+        @close="openPaymentDialog = false"
+      />
     </div>
   </div>
 </template>

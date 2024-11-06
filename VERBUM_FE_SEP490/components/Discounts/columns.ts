@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { ColumnDef } from '@tanstack/vue-table'
-import type { Discount } from '~/types/discount'
-import Checkbox from '../ui/checkbox/Checkbox.vue'
-import { Button } from '../ui/button'
-import DropdownMenu from '../ui/dropdown-menu/DropdownMenu.vue'
-import DropdownRowAction from './DropdownRowAction.vue'
+import type { ColumnDef } from "@tanstack/vue-table";
+import type { Discount } from "~/types/discount";
+import Checkbox from "../ui/checkbox/Checkbox.vue";
+import DropdownRowAction from "./DropdownRowAction.vue";
 
 export const columns: ColumnDef<Discount>[] = [
   {

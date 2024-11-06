@@ -7,7 +7,7 @@
         public bool HasTranslateService { get; set; }
         public bool HasEditService { get; set; }
         public bool HasEvaluateService { get; set; }
-        public string? Reference { get; set; }
+        public string? OrderNote { get; set; }
         public List<string> TranslationFileURL { get; set; } //url input and upload files urls
         public List<string>? ReferenceFileURLs { get; set; } //url input and upload files urls
         public DateTime? DueDate { get; set; }

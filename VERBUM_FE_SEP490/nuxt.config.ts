@@ -10,6 +10,11 @@ export default defineNuxtConfig({
     },
     plugins: [nodePolyfills()]
   },
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.NUXT_BASE_URL
+    }
+  },
   modules: [
     [
       '@pinia/nuxt',

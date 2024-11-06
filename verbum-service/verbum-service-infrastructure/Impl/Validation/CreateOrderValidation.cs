@@ -41,6 +41,10 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "Translation File"));
             }
+            if(request.OrderNote.Length >  255)
+            {
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "OrderNote can not be over 255 characters"));
+            }
         }
 
         private async Task ValidateExist(OrderCreate request, List<string> alerts)
