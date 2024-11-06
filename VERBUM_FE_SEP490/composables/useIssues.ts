@@ -6,7 +6,7 @@ const { toast } = useToast()
 export const useIssues = () => {
   const isLoading = ref(false)
   const issues = ref<Issue[]>([])
-
+  const role = useAuthStore().user?.role
   const getIssues = async () => {
     try {
       const { data: issuesData } = await useAPI<Issue[]>('/issue', {
@@ -34,6 +34,7 @@ export const useIssues = () => {
 
   const getIssuesByOrders = async (orderId: string) => {
     try {
+      if (role === 'CLIENT') {
       const { data: issuesData } = await useAPI<Issue[]>(
         `/issue?$filter=orderId eq ${orderId}`,
         {
@@ -48,6 +49,7 @@ export const useIssues = () => {
         issues.value = []
       } else {
         issues.value = issuesData.value
+        }
       }
     } catch (error) {
       toast({
