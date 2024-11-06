@@ -5,7 +5,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
 import type { Order } from '~/types/order'
 import { ref } from 'vue'
@@ -22,7 +22,7 @@ const selectedOrders = ref<string[]>([])
 
 const toggleOrderSelection = (orderId: string) => {
   if (selectedOrders.value.includes(orderId)) {
-    selectedOrders.value = selectedOrders.value.filter(id => id !== orderId)
+    selectedOrders.value = selectedOrders.value.filter((id) => id !== orderId)
   } else {
     selectedOrders.value.push(orderId)
   }
@@ -30,17 +30,17 @@ const toggleOrderSelection = (orderId: string) => {
 
 const toggleAllOrders = (checked: boolean) => {
   if (checked) {
-    selectedOrders.value = props.orders.map(order => order.orderId)
+    selectedOrders.value = props.orders.map((order) => order.orderId)
   } else {
     selectedOrders.value = []
   }
 }
 
 const toDetails = (orderId: string) => {
-  useRouter().push("/orders/details/" + orderId)
+  useRouter().push('/orders/details/' + orderId)
 }
 const toCreate = () => {
-  useRouter().push("/orders/create")
+  useRouter().push('/orders/create')
 }
 </script>
 

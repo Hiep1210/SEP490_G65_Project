@@ -9,19 +9,19 @@ definePageMeta({
 const { orders, getOrders } = useOrders()
 
 onMounted(() => {
-    if (!orders.value.length) {
-        getOrders()
-    }
+  if (!orders.value.length) {
+    getOrders()
+  }
 })
 
-watch(orders, newOrders => {
-    console.log('newOrders', newOrders)
+watch(orders, (newOrders) => {
+  console.log('newOrders', newOrders)
 })
 provide('orders', orders)
 </script>
 
 <template>
-    <ClientOnly>
-        <LazyOrdersTable :orders="orders" />
-    </ClientOnly>
+  <ClientOnly>
+    <LazyOrdersTable :orders="orders" />
+  </ClientOnly>
 </template>

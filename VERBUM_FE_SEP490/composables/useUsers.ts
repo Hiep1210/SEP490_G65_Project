@@ -15,9 +15,12 @@ export const useUsers = () => {
   const isLoading = ref(false)
   const getAssignList = async () => {
     try {
-      const { data: assignListData } = await useAPI<User[]>('/user/assign-list', {
-        method: 'GET'
-      })
+      const { data: assignListData } = await useAPI<User[]>(
+        '/user/assign-list',
+        {
+          method: 'GET'
+        }
+      )
       if (!assignListData?.value || assignListData.value.length === 0) {
         toast({
           title: 'No assignList found!',

@@ -43,7 +43,6 @@ watch(
   { deep: true }
 )
 
-
 // Search queries
 const searchAvailableQuery = ref('')
 const searchSelectedQuery = ref('')
@@ -136,7 +135,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search available..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      >
+      />
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li
@@ -181,7 +180,7 @@ const moveSelectedToAvailableList = () => {
         type="text"
         placeholder="Search selected..."
         class="border p-2 mb-2 w-full rounded-2xl"
-      >
+      />
 
       <ul class="border p-4 h-96 overflow-y-auto rounded-2xl">
         <li

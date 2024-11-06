@@ -11,8 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { Discount } from '~/types/discount'
-import { useDiscounts } from '~/composables/useDiscount';
-
+import { useDiscounts } from '~/composables/useDiscount'
 
 const props = defineProps<{
   open: boolean
@@ -23,7 +22,7 @@ const emit = defineEmits(['close', 'update']) // Emit update event
 const isOpen = ref(props.open)
 const name = ref(props.rowData.discountName)
 const percent = ref(props.rowData.discountPercent)
-const { updateDiscount, getDiscounts} = useDiscounts()
+const { updateDiscount, getDiscounts } = useDiscounts()
 
 watch(
   () => props.open,
@@ -32,18 +31,16 @@ watch(
   }
 )
 
-
 const updateDiscountItem = async () => {
   const updateDiscountItem = {
-  discountId: props.rowData.discountId,
-  discountName: name.value,
-  discountPercent: percent.value,
-  isUpdate: true
-}
-  await updateDiscount(updateDiscountItem);
-  await getDiscounts();
-  closeDialog();
-  
+    discountId: props.rowData.discountId,
+    discountName: name.value,
+    discountPercent: percent.value,
+    isUpdate: true
+  }
+  await updateDiscount(updateDiscountItem)
+  await getDiscounts()
+  closeDialog()
 }
 
 const closeDialog = () => {

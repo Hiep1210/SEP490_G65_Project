@@ -61,40 +61,40 @@ export const useDiscounts = () => {
 
   const createDiscount = async (discount: Discount) => {
     try {
-        await useAPI('/discount', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(discount)
-        })
-        toast({
-            title: 'Discount created!!',
-            description: `Discount ${discount.discountName} has been created`
-        })
-    }catch (error) {
-        toast({
-            title: 'Error adding discount',
-            description: 'An error occurred while adding the discount.'
-          })
-          console.error('Error adding discount:', error)
+      await useAPI('/discount', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(discount)
+      })
+      toast({
+        title: 'Discount created!!',
+        description: `Discount ${discount.discountName} has been created`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error adding discount',
+        description: 'An error occurred while adding the discount.'
+      })
+      console.error('Error adding discount:', error)
     }
   }
 
   const deleteDiscount = async (id: string) => {
     try {
-        await useAPI(`discount?discountId=${id}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        toast({
-            title: 'Category deleted',
-            description: `Category with ID ${id} has been deleted`
-        })
+      await useAPI(`discount?discountId=${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      toast({
+        title: 'Category deleted',
+        description: `Category with ID ${id} has been deleted`
+      })
     } catch (error) {
-        toast({
-            title: 'Error deleting discount',
-            description: 'An error occurred while deleting the discount.'
-          })
-          console.error('Error deleting discount:', error)
+      toast({
+        title: 'Error deleting discount',
+        description: 'An error occurred while deleting the discount.'
+      })
+      console.error('Error deleting discount:', error)
     }
   }
 

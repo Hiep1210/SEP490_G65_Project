@@ -11,8 +11,10 @@ export type Issue = {
   status: string
   clientName: string
   orderId: string
+  orderName: string
   issueDescription: string
   assigneeName: string
   assigneeId: string
   issueAttachments: IssueAttachment[]
+  cancelResponse: string
 }

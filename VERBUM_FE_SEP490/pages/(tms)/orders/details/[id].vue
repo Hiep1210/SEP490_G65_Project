@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { Order } from '~/types/order'
+import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import type { Order } from '~/types/order'
+
+const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
 
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
@@ -18,6 +21,9 @@ const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
+  if (!issues.value.length) {
+    getIssuesByOrders(orderId)
+  }
 })
 
 // Enter edit mode
@@ -116,19 +122,20 @@ const changeTargetLanguage = (languageIds: string[]) => {
   }
 }
 
-const issues = [
-  { id: 1, title: 'Issue 1' },
-  { id: 2, title: 'Issue 2' },
-  { id: 3, title: 'Issue 3' },
-  { id: 4, title: 'Issue 4' },
-  { id: 5, title: 'Issue 5' }
-]
 interface Language {
   languageId: string
   languageName: string
   support: boolean
 }
 const languageList = ref<Language[]>([])
+
+const showIssuesDialog = ref(false)
+const selectedData = ref()
+
+const handleUpdate = async (updateIssues: Issue) => {
+  await updateIssue(updateIssues)
+  await getIssues()
+}
 
 onMounted(async () => {
   try {
@@ -246,7 +253,7 @@ const confirmSetPrices = async () => {
                 v-model="editedOrder.dueDate"
                 type="date"
                 class="border rounded p-1"
-              >
+              />
             </div>
 
             <!-- Language Selection -->
@@ -320,6 +327,26 @@ const confirmSetPrices = async () => {
         <OrdersDetailsTabs :order="order" />
       </div>
 
+      <!-- Smaller Issues List Section -->
+      <div class="space-y-4 border rounded-md">
+        <div class="flex justify-between items-center p-3 border-b">
+          <span class="text-lg font-semibold">Issues</span>
+          <IssuesCreate v-if="role === 'CLIENT'" :order-id="orderId" />
+        </div>
+        <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
+          <IssuesTable
+            :issues="issues"
+            :role="user?.role"
+            @update="handleUpdate"
+          />
+        </div>
+        <div v-else class="w-full h-full flex justify-center items-center">
+          <p class="font-bold">
+            Have issues with the order?
+            <span class="text-primary">Let us know.</span>
+          </p>
+        </div>
+      </div>
       <!-- Issues List Section -->
       <div v-if="issues" class="space-y-4">
         <div class="flex justify-between items-center p-3 border-b">
@@ -335,14 +362,15 @@ const confirmSetPrices = async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="issue in issues" :key="issue.id">
-                <TableCell>{{ issue.id }}</TableCell>
-                <TableCell>{{ issue.title }}</TableCell>
+              <TableRow v-for="issue in issues" :key="issue.issueId">
+                <TableCell>{{ issue.issueId }}</TableCell>
+                <TableCell>{{ issue.issueName }}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </div>
       </div>
+
       <!-- Set Prices Dialog -->
       <SetPricesDialog
         :order="order"

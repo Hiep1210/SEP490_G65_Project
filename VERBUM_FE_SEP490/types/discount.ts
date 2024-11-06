@@ -1,5 +1,5 @@
 export interface Discount {
-    discountId: string
-    discountName: string
-    discountPercent: number
+  discountId: string
+  discountName: string
+  discountPercent: number
 }

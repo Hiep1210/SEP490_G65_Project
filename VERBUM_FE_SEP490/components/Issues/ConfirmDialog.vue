@@ -43,7 +43,9 @@ const closeDialog = () => {
         />
       </DialogHeader>
       <DialogFooter>
-        <Button class="bg-slate-500 hover:bg-slate-600" @click="$emit('close')">Cancel</Button>
+        <Button class="bg-slate-500 hover:bg-slate-600" @click="$emit('close')"
+          >Cancel</Button
+        >
         <Button @click="$emit('confirm')">Confirm</Button>
       </DialogFooter>
     </DialogContent>

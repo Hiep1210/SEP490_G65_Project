@@ -12,15 +12,12 @@ const authStore = useCookie('AuthStore')
 const access_token = useCookie('access_token')
 const refresh_token = useCookie('refresh_token')
 
-
 const handleLogout = () => {
   authStore.value = ''
   access_token.value = ''
   refresh_token.value = ''
   window.location.reload()
 }
-
-
 </script>
 
 <template>

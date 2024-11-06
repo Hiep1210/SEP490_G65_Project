@@ -1,84 +1,85 @@
 <script setup lang="ts">
-
 interface Language {
-  languageId: string;
-  languageName: string;
-  support: boolean;
+  languageId: string
+  languageName: string
+  support: boolean
 }
 
 interface LanguageSelectorProps {
-  languageList: Language[];
-  selectedLanguages: string[] | string;
-  originalLanguages: string[] | string;
-  isSourceLanguage: boolean;
+  languageList: Language[]
+  selectedLanguages: string[] | string
+  originalLanguages: string[] | string
+  isSourceLanguage: boolean
 }
 
-const props = defineProps<LanguageSelectorProps>();
-const emit = defineEmits(['update:selected-languages']);
+const props = defineProps<LanguageSelectorProps>()
+const emit = defineEmits(['update:selected-languages'])
 
-const isOpen = ref(false);
-const searchQuery = ref("");
-const dropdownRef = ref<HTMLElement | null>(null);
+const isOpen = ref(false)
+const searchQuery = ref('')
+const dropdownRef = ref<HTMLElement | null>(null)
 
-const selectedLanguagesArray = computed(() => 
-  Array.isArray(props.selectedLanguages) 
-    ? props.selectedLanguages 
-    : props.selectedLanguages ? [props.selectedLanguages] : []
-);
+const selectedLanguagesArray = computed(() =>
+  Array.isArray(props.selectedLanguages)
+    ? props.selectedLanguages
+    : props.selectedLanguages
+      ? [props.selectedLanguages]
+      : []
+)
 
 onMounted(() => {
-  document.addEventListener("mousedown", handleClickOutside);
-});
+  document.addEventListener('mousedown', handleClickOutside)
+})
 
 onBeforeUnmount(() => {
-  document.removeEventListener("mousedown", handleClickOutside);
-});
+  document.removeEventListener('mousedown', handleClickOutside)
+})
 
 function handleClickOutside(event: MouseEvent) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    isOpen.value = false;
+    isOpen.value = false
   }
 }
 
 function toggleDropdown() {
-  isOpen.value = !isOpen.value;
+  isOpen.value = !isOpen.value
 }
 
 function handleLanguageSelect(languageId: string) {
   if (props.isSourceLanguage) {
-    emit("update:selected-languages", languageId);
+    emit('update:selected-languages', languageId)
   } else {
-    const currentSelection = [...selectedLanguagesArray.value];
-    const index = currentSelection.indexOf(languageId);
-    
+    const currentSelection = [...selectedLanguagesArray.value]
+    const index = currentSelection.indexOf(languageId)
+
     if (index > -1) {
-      currentSelection.splice(index, 1);
+      currentSelection.splice(index, 1)
     } else {
-      currentSelection.push(languageId);
+      currentSelection.push(languageId)
     }
-    
-    emit("update:selected-languages", currentSelection);
+
+    emit('update:selected-languages', currentSelection)
   }
-  
 
   if (props.isSourceLanguage) {
-    isOpen.value = false;
+    isOpen.value = false
   }
 }
-
 
 const isSelected = (languageId: string) =>
   props.isSourceLanguage
     ? props.selectedLanguages === languageId
-    : selectedLanguagesArray.value.includes(languageId);
+    : selectedLanguagesArray.value.includes(languageId)
 
 const filteredLanguages = computed(() =>
   props.languageList.filter(
     (lang) =>
-      lang.languageName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      lang.languageName
+        .toLowerCase()
+        .includes(searchQuery.value.toLowerCase()) ||
       lang.languageId.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
-);
+)
 </script>
 
 <template>
@@ -92,11 +93,11 @@ const filteredLanguages = computed(() =>
     >
       <span>
         <template v-if="props.isSourceLanguage">
-            {{ props.selectedLanguages || 'Select Source Language' }}
+          {{ props.selectedLanguages || 'Select Source Language' }}
         </template>
         <template v-else>
           <span v-if="selectedLanguagesArray.length">
-            {{ selectedLanguagesArray.join(", ") }}
+            {{ selectedLanguagesArray.join(', ') }}
           </span>
           <span v-else>Select Target Language</span>
         </template>
@@ -114,7 +115,7 @@ const filteredLanguages = computed(() =>
           placeholder="Search languages..."
           class="w-full border border-gray-300 rounded-md px-3 py-2"
           aria-label="Search languages"
-        >
+        />
       </div>
       <div role="listbox" title="language-list" class="max-h-20 overflow-auto">
         <div
