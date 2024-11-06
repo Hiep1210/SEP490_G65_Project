@@ -37,21 +37,21 @@ namespace verbum_service_infrastructure.Impl.Service
                     foreach (Guid workId in request.WorkIds)
                     {
                         Work work = await context.Works.FirstOrDefaultAsync(w => w.WorkId == workId);
-                        foreach (CreateJobFileUpload fileUpload in request.UploadFiles)
+                        foreach (string docUrl in request.DocumentUrls)
                         {
                             foreach (string targetLangId in request.TargetLanguageIds)
                             {
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + fileUpload.DocumentUrl.Split("/")[^1].Split(".docx")[0],
+                                    Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + docUrl.Split("/")[^1].Split(".docx")[0],
                                     Status = JobStatus.NEW.ToString(),
                                     DueDate = work.DueDate,
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
-                                    WordCount = fileUpload.WordCount,
+                                    WordCount = 0,
                                     WorkId = workId,
-                                    DocumentUrl = fileUpload.DocumentUrl,
+                                    DocumentUrl = docUrl,
                                     TargetLanguageId = targetLangId
                                 };
                                 context.Jobs.Add(job);
