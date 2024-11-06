@@ -347,29 +347,6 @@ const confirmSetPrices = async () => {
           </p>
         </div>
       </div>
-      <!-- Issues List Section -->
-      <div v-if="issues" class="space-y-4">
-        <div class="flex justify-between items-center p-3 border-b">
-          <span class="text-lg font-semibold">Issues</span>
-          <Button variant="outline" size="sm">Add Issue</Button>
-        </div>
-        <div class="border rounded-md h-[15rem] overflow-auto p-2">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Title</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="issue in issues" :key="issue.issueId">
-                <TableCell>{{ issue.issueId }}</TableCell>
-                <TableCell>{{ issue.issueName }}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </div>
 
       <!-- Set Prices Dialog -->
       <SetPricesDialog
