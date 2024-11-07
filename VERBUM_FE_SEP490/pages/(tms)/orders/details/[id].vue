@@ -5,7 +5,7 @@ import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 
 const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
-
+const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
@@ -24,6 +24,7 @@ onMounted(() => {
   if (!issues.value.length) {
     getIssuesByOrders(orderId)
   }
+  getSupportedLanguages()
 })
 
 // Enter edit mode
@@ -353,6 +354,7 @@ const confirmSetPrices = async () => {
         :order="order"
         :price="tempPrice"
         :open="openSetPricesDialog"
+        :supported-language="supportedLanguages"
         @close="openSetPricesDialog = false"
         @confirm="
           (newPrice) => {
