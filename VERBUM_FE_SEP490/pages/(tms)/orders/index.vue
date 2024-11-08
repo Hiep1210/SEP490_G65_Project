@@ -13,11 +13,6 @@ onMounted(() => {
     getOrders()
   }
 })
-
-watch(orders, (newOrders) => {
-  console.log('newOrders', newOrders)
-})
-provide('orders', orders)
 </script>
 
 <template>
