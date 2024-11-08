@@ -85,7 +85,7 @@ const filteredLanguages = computed(() =>
 <template>
   <div ref="dropdownRef" class="relative">
     <div
-      class="flex items-center justify-between border border-gray-300 rounded-md px-3 py-3 cursor-pointer"
+      class="flex items-center justify-between border border-gray-300 rounded-md px-1 py-1 cursor-pointer"
       aria-haspopup="listbox"
       :aria-expanded="isOpen ? 'true' : 'false'"
       aria-controls="language-list"
@@ -109,7 +109,7 @@ const filteredLanguages = computed(() =>
       class="absolute mt-1 w-[16rem] border border-gray-300 bg-white shadow-lg rounded-md z-10 overflow-y-auto"
     >
       <div class="p-2">
-        <input
+        <Input
           v-model="searchQuery"
           type="text"
           placeholder="Search languages..."
