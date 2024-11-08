@@ -8,7 +8,6 @@ import {
   TableRow
 } from '@/components/ui/table'
 import type { Order } from '~/types/order'
-import { ref } from 'vue'
 
 const props = defineProps<{
   orders: Order[]
@@ -16,24 +15,6 @@ const props = defineProps<{
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString()
-}
-
-const selectedOrders = ref<string[]>([])
-
-const toggleOrderSelection = (orderId: string) => {
-  if (selectedOrders.value.includes(orderId)) {
-    selectedOrders.value = selectedOrders.value.filter((id) => id !== orderId)
-  } else {
-    selectedOrders.value.push(orderId)
-  }
-}
-
-const toggleAllOrders = (checked: boolean) => {
-  if (checked) {
-    selectedOrders.value = props.orders.map((order) => order.orderId)
-  } else {
-    selectedOrders.value = []
-  }
 }
 
 const toDetails = (orderId: string) => {
@@ -74,7 +55,7 @@ const toCreate = () => {
             <TableCell>{{ order.orderName }}</TableCell>
             <TableCell>{{ order.orderStatus }}</TableCell>
             <TableCell class="text-center">
-              {{ formatDate(order.createdDate) }}
+              {{ formatDate(order.createdDate ?? '') }}
             </TableCell>
           </TableRow>
         </TableBody>
