@@ -22,7 +22,7 @@ const tempPrice = ref<string>('0')
 onMounted(() => {
   getOrder(orderId)
   if (!issues.value.length) {
-    getIssuesByOrders(orderId)
+    getIssuesByOrders(orderId as string)
   }
 })
 
@@ -248,7 +248,7 @@ const confirmSetPrices = async () => {
             <div class="flex items-center space-x-2">
               <span>Due date:</span>
               <span v-if="!isEditing">{{ order.dueDate }}</span>
-              <input
+              <Input
                 v-else-if="editedOrder"
                 v-model="editedOrder.dueDate"
                 type="date"
@@ -297,24 +297,20 @@ const confirmSetPrices = async () => {
             <Button @click="saveEdit">Save</Button>
             <Button variant="outline" @click="cancelEdit">Cancel</Button>
           </template>
-          <Button v-else-if="role === 'CLIENT'" @click="enableEdit"
+          <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
             >Edit Order</Button
           >
           <Button
-            v-if="role === 'CLIENT'"
+            v-if="role === 'CLIENT' && order.orderStatus === 'NEW'"
             variant="outline"
             @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button
           >
           <template v-if="role === 'STAFF'">
-            <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
+            <Button v-if="order.orderStatus === 'NEW'" @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
-            <Button
-              variant="outline"
-              @click="changeOrderStatus(order.orderId, 'REJECTED')"
-              >Reject Order</Button
-            >
+            <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
           <Button
             v-if="role === 'CLIENT'"
