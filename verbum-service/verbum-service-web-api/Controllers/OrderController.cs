@@ -26,10 +26,10 @@ namespace verbum_service.Controllers
         [HttpGet("get-all")]
         [EnableQuery]
         [Authorize]
-        [ProducesResponseType(typeof(List<OrderResponse>), 200)]
+        [ProducesResponseType(typeof(List<OrderDetailsResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAllOrder()
+        public async Task<IActionResult> Get()
         {
             return ResponseFilter.OkOrNoContent(await orderService.GetAllOrder(), this);
         }

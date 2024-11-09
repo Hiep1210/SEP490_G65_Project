@@ -25,6 +25,8 @@ namespace verbum_service
 
             ODataConventionModelBuilder mdBuilder = new ODataConventionModelBuilder();
             mdBuilder.EntitySet<CategoryInfoResponse>("Category");
+            mdBuilder.EntitySet<OrderDetailsResponse>("Order");
+            mdBuilder.EntitySet<WorkResponse>("Work");
             // Add services to the container.
 
             builder.Services.AddControllers().AddOData(opt => opt
