@@ -39,15 +39,17 @@ const emit = defineEmits<{
 }>()
 
 const currentPage = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(8)
 const totalOrders = ref(0)
 const fetchOrders = async () => {
   const response = await ordersRepo.getOrders(currentPage.value, pageSize.value)
   emit('update:orders', response)
-  totalOrders.value = response.length
+  totalOrders.value = response['@odata.count']
 }
 
-watch([currentPage, pageSize], fetchOrders, { immediate: true })
+watch([currentPage, pageSize], fetchOrders, { immediate: true})
+
+const totalPages = computed(() => totalOrders.value ? Math.ceil(totalOrders.value / pageSize.value) : 1)
 </script>
 
 <template>
@@ -89,7 +91,7 @@ watch([currentPage, pageSize], fetchOrders, { immediate: true })
 
     <div class="pagination flex items-center justify-center space-x-4 mt-4">
       <Button variant="outline" :disabled="currentPage === 1" @click="currentPage--">Previous</Button>
-      <span>Page {{ currentPage }} of {{ Math.ceil(totalOrders / pageSize) }}</span>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
       <Button variant="outline" :disabled="currentPage * pageSize >= totalOrders" @click="currentPage++">Next</Button>
     </div>
   </div>

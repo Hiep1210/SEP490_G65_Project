@@ -8,11 +8,11 @@ definePageMeta({
 
 const { orders, getOrders } = useOrders()
 
-onMounted(() => {
-  if (!orders.value.length) {
-    getOrders(1)
-  }
-})
+// onMounted(() => {
+//   if (!orders.value.length) {
+//     getOrders()
+//   }
+// })
 
 </script>
 
