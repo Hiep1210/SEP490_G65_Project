@@ -16,10 +16,6 @@ export const useOrders = () => {
       const { data: ordersData } = await useAPI<Order[]>('/order/get-all', {
         method: 'GET',
         credentials: 'include',
-        // params: {
-        //   $top: 8, // Number of items per page
-        //   $skip: (page - 1) * 8 // Calculate the number of items to skip
-        // }
       })
 
       if (!ordersData?.value || ordersData.value.length === 0) {

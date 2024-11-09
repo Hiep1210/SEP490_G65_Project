@@ -43,13 +43,15 @@ const pageSize = ref(8)
 const totalOrders = ref(0)
 const fetchOrders = async () => {
   const response = await ordersRepo.getOrders(currentPage.value, pageSize.value)
+  const count = await ordersRepo.getOrdersCount()
+  totalOrders.value = count.length
   emit('update:orders', response)
-  totalOrders.value = response['@odata.count']
 }
 
-watch([currentPage, pageSize], fetchOrders, { immediate: true})
+watch([currentPage, pageSize], fetchOrders, { immediate: true })
 
 const totalPages = computed(() => totalOrders.value ? Math.ceil(totalOrders.value / pageSize.value) : 1)
+
 </script>
 
 <template>

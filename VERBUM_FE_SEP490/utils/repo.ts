@@ -6,7 +6,10 @@ export const repo = <T>(fetch: $Fetch<T, NitroFetchRequest>) => ({
     return fetch<Language[]>(`/lang`)
   },
   async getOrders(page: number, pageSize: number): Promise<Order[]> {
-    return fetch<Order[]>(`/order/get-all?$skip=${(page - 1) * pageSize}&$top=${pageSize}&$count=true`)
+    return fetch<Order[]>(`/order/get-all?$skip=${(page - 1) * pageSize}&$top=${pageSize}`)
+  },
+  async getOrdersCount(): Promise<Order[]> {
+    return fetch<Order[]>(`/order/get-all`)
   },
   async searchOrders(value: string): Promise<Order[]> {
     return fetch<Order[]>(`/order/get-all?$filter=contains(orderName, '${value}')`)
