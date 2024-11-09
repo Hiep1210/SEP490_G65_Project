@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace verbum_service_domain.Models;
 
 /// <summary>
-/// TRANSLATION, REFERENCES, DELIVERABLES
+/// TRANSLATION, REFERENCES
 /// </summary>
 public partial class OrderReference
 {

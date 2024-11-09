@@ -20,7 +20,7 @@ namespace verbum_service_infrastructure.Impl.Validation
         public async Task<List<string>> Validate(CreateIssueRequest request)
         {
             List<string> errors = new List<string>();
-            if(ObjectUtils.IsEmpty(request.IssueName) || ObjectUtils.IsEmpty(request.IssueDescription) || ObjectUtils.IsEmpty(request.OrderId))
+            if(ObjectUtils.IsEmpty(request.IssueName) || ObjectUtils.IsEmpty(request.IssueDescription) || ObjectUtils.IsEmpty(request.DeliverableUrl))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "missing fields"));
             }
