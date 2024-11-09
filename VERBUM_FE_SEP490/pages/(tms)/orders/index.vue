@@ -10,13 +10,14 @@ const { orders, getOrders } = useOrders()
 
 onMounted(() => {
   if (!orders.value.length) {
-    getOrders()
+    getOrders(1)
   }
 })
+
 </script>
 
 <template>
   <ClientOnly>
-    <LazyOrdersTable :orders="orders" />
+    <LazyOrdersTable :orders="orders" @update:orders="orders = $event" />
   </ClientOnly>
 </template>

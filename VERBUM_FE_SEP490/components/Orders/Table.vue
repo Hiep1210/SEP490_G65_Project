@@ -8,6 +8,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import type { Order } from '~/types/order'
+import { repo } from '~/utils/repo'
 
 const props = defineProps<{
   orders: Order[]
@@ -23,12 +24,36 @@ const toDetails = (orderId: string) => {
 const toCreate = () => {
   useRouter().push('/orders/create')
 }
+
+const searchValue = ref('')
+
+const ordersRepo = repo(useNuxtApp().$api)
+
+const searchOrders = async (value: string) => {
+  const orders = await ordersRepo.searchOrders(value)
+  emit('update:orders', orders)
+}
+
+const emit = defineEmits<{
+  'update:orders': [orders: Order[]]
+}>()
+
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalOrders = ref(0)
+const fetchOrders = async () => {
+  const response = await ordersRepo.getOrders(currentPage.value, pageSize.value)
+  emit('update:orders', response)
+  totalOrders.value = response.length
+}
+
+watch([currentPage, pageSize], fetchOrders, { immediate: true })
 </script>
 
 <template>
   <div>
     <div class="flex justify-between space-x-4 pb-4">
-      <Input placeholder="Search orders" />
+      <Input v-model="searchValue" placeholder="Search orders" @keydown.enter="searchOrders(searchValue)" />
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
@@ -60,6 +85,12 @@ const toCreate = () => {
           </TableRow>
         </TableBody>
       </Table>
+    </div>
+
+    <div class="pagination flex items-center justify-center space-x-4 mt-4">
+      <Button variant="outline" :disabled="currentPage === 1" @click="currentPage--">Previous</Button>
+      <span>Page {{ currentPage }} of {{ Math.ceil(totalOrders / pageSize) }}</span>
+      <Button variant="outline" :disabled="currentPage * pageSize >= totalOrders" @click="currentPage++">Next</Button>
     </div>
   </div>
 </template>
