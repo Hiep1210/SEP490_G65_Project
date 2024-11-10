@@ -8,38 +8,52 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import type { Rating } from '~/composables/useRating';
 
-const props = defineProps<{ open: boolean }>()
+const props = defineProps<{ 
+  open: boolean,
+  orderId: string
+ }>()
 const emit = defineEmits(['close', 'submit'])
 
+const {createRating} = useRating();
 const isOpen = ref(props.open)
 const currentSection = ref(1) // Track current section (1, 2, or 3)
-
-const ratingQuestion = [
+const rating : Rating = {
+  orderId : props.orderId,
+  inTime : 0,
+  expectation: 0,
+  issueResolved: 0,
+  moreThought: ''
+}
+const ratingQuestion: { question: string; category: string; key: keyof Rating }[] = [
   {
     question: 'Was the service done in time?',
-    category: 'Service Quality'
+    category: 'Service Quality',
+    key: 'inTime'
   },
   {
     question: `Was the translation's quality up to expectations?`,
-    category: 'Service Quality'
+    category: 'Service Quality',
+    key: 'expectation'
   },
   {
     question: `Were all of your issues with the translation resolved?`,
-    category: 'Service Quality'
+    category: 'Service Quality',
+    key: 'issueResolved'
   },
-  {
-    question: `Were all of your questions answered?`,
-    category: 'Customer Support'
-  },
-  {
-    question: `Did you enjoy interacting with our staff?`,
-    category: 'Customer Support'
-  },
-  {
-    question: `Did you receive fast responses?`,
-    category: 'Customer Support'
-  }
+  // {
+  //   question: `Were all of your questions answered?`,
+  //   category: 'Customer Support'
+  // },
+  // {
+  //   question: `Did you enjoy interacting with our staff?`,
+  //   category: 'Customer Support'
+  // },
+  // {
+  //   question: `Did you receive fast responses?`,
+  //   category: 'Customer Support'
+  // }
 ]
 
 const feedback = ref('')
@@ -57,14 +71,20 @@ const closeDialog = () => {
 }
 
 const nextSection = () => {
-  if (currentSection.value < 3) currentSection.value += 1
+  if (currentSection.value < 2) currentSection.value += 1
 }
 
 const prevSection = () => {
   if (currentSection.value > 1) currentSection.value -= 1
 }
 
-const submitFeedback = () => {
+const updateRating = (key: keyof Rating, value: number) => {
+  (rating[key] as number) = value;
+};
+
+const submitFeedback = async() => {
+  rating.moreThought = feedback.value;
+await(createRating(rating))
   emit('submit', feedback.value)
   closeDialog()
 }
@@ -85,18 +105,23 @@ const submitFeedback = () => {
         <div v-if="currentSection === 1">
           <p class="font-semibold text-xl text-cyan-600">Service Quality</p>
           <div v-for="ques in ratingQuestion" :key="ques.question">
-            <RatingQuestion v-if="ques.category === 'Service Quality'" :question="ques.question" />
+            <RatingQuestion 
+            v-if="ques.category === 'Service Quality'" 
+            :question="ques.question" 
+            :rating="rating[ques.key] as number"
+              @update-rating="updateRating(ques.key, $event)"
+            />
           </div>
         </div>
 
-        <div v-if="currentSection === 2">
+        <!-- <div v-if="currentSection === 2">
           <p class="font-semibold text-xl text-cyan-600">Customer Support</p>
           <div v-for="ques in ratingQuestion" :key="ques.question">
             <RatingQuestion v-if="ques.category === 'Customer Support'" :question="ques.question" />
           </div>
-        </div>
+        </div> -->
 
-        <div v-if="currentSection === 3">
+        <div v-if="currentSection === 2">
             <p class="mb-2">Do you have any additional feedback or suggestions for us to improve our service?</p>
           <textarea
             v-model="feedback"
@@ -106,11 +131,11 @@ const submitFeedback = () => {
           />
         </div>
       </div>
-
+      <hr>
       <DialogFooter class="flex justify-end space-x-2 mt-4">
           <Button v-if="currentSection > 1" @click="prevSection">Previous</Button>
-          <Button v-if="currentSection < 3" @click="nextSection">Next</Button>
-          <Button v-if="currentSection === 3" @click="submitFeedback">Submit</Button>
+          <Button v-if="currentSection < 2" @click="nextSection">Next</Button>
+          <Button v-if="currentSection === 2" @click="submitFeedback">Submit</Button>
           <Button variant="ghost" @click="closeDialog">Cancel</Button>
       </DialogFooter>
     </DialogContent>

@@ -30,19 +30,6 @@ watch(
 const deleteDiscountItem = async () => {
   await deleteDiscount(props.rowData.discountId)
   closeDialog()
-  // try {
-  //   await $fetch(`http://localhost:8000/api/discount?discountId=${props.rowData.discountId}`, {
-  //     method: 'DELETE',
-  //     headers: {
-  //       Authorization: `Bearer ${token.value}`,
-  //     },
-  //   });
-  //   emit('delete', props.rowData);
-  //   closeDialog();
-  // } catch (error) {
-  //   console.error('Failed to delete discount:', error);
-  //   alert('Failed to delete discount. Please try again.');
-  // }
 }
 
 const closeDialog = () => {

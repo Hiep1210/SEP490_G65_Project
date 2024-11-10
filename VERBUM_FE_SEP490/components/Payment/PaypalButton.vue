@@ -60,7 +60,6 @@ onMounted(async () => {
               })
             }
             emit('payment-success');
-            window.location.reload();
           });
         },
         onError: (err) => {

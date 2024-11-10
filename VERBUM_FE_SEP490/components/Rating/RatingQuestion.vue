@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-defineProps<{
-  question: string
-}>()
-const rating = ref(0)
+const props = defineProps<{ question: string; rating: number }>();
+const emit = defineEmits(['update-rating']);
+const rating = ref(props.rating);
+
+const updateRating = (value: number) => {
+  rating.value = value;
+  emit('update-rating', value); // Emit the new rating value to the parent
+};
 </script>
 <template>
   <div>
@@ -17,7 +21,7 @@ const rating = ref(0)
           'text-3xl focus:outline-none',
           rating >= star ? 'text-yellow-400' : 'text-gray-300'
         ]"
-        @click="rating = star"
+        @click="updateRating(star)"
       >
         ★
       </button>
