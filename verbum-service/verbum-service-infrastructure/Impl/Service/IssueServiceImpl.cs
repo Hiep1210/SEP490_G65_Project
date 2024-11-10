@@ -140,7 +140,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ToListAsync();
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ThenInclude(x => x.Work).ToListAsync();
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
