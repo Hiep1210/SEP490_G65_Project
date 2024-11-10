@@ -1,3 +1,6 @@
+import { useToast } from "~/components/ui/toast"
+const { toast } = useToast()
+
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const access_token = useCookie('access_token')
@@ -25,6 +28,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (confirm('You are not authorized to access this resource.')) {
             router.back()
           }
+        })
+      }
+      if (response.status === 404) {
+        await nuxtApp.runWithContext(() => {
+          toast({
+            title: 'Not Found',
+            description: 'The resource you are looking for does not exist.',
+            variant: 'destructive'
+          })
         })
       }
     }

@@ -72,6 +72,9 @@ public partial class verbumContext : DbContext
 
             entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.ClientId).HasColumnName("client_id");
+            entity.Property(e => e.IsDeposit)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deposit");
             entity.Property(e => e.Orderid).HasColumnName("orderid");
         });
 
@@ -147,7 +150,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => new { e.IssueId, e.AttachmentUrl }).HasName("issue_attachments_pk");
 
-            entity.ToTable("issue_attachments");
+            entity.ToTable("issue_attachments", tb => tb.HasComment("tag lưu file solution và reference file: SOLUTION, ATTACHMENT"));
 
             entity.Property(e => e.IssueId).HasColumnName("issue_id");
             entity.Property(e => e.AttachmentUrl)
@@ -156,6 +159,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.Tag)
+                .HasColumnType("character varying")
+                .HasColumnName("tag");
 
             entity.HasOne(d => d.Issue).WithMany(p => p.IssueAttachments)
                 .HasForeignKey(d => d.IssueId)
@@ -167,6 +173,8 @@ public partial class verbumContext : DbContext
             entity.HasKey(e => e.Id).HasName("job_pkey");
 
             entity.ToTable("job", tb => tb.HasComment("chưa assign:NEW\r\n\r\nasign linguists: IN_PROGRESS\r\n \r\nlinguist làm xong: SUBMITTED\r\n\r\nSM review ok: APPROVED\r\nSM reject: IN_PROGRESS\r\n\r\nclient tạo issue thì tạo thêm 1 job mới ở sevice cuối cùng(TL-> ED -> EV)"));
+
+            entity.HasIndex(e => e.DocumentUrl, "job_document_url_idx");
 
             entity.HasIndex(e => e.DeliverableUrl, "job_unique").IsUnique();
 
@@ -446,6 +454,7 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.ServiceName)
                 .HasColumnType("character varying")
                 .HasColumnName("service_name");
+            entity.Property(e => e.ServiceOrder).HasColumnName("service_order");
             entity.Property(e => e.ServicePrice).HasColumnName("service_price");
         });
 

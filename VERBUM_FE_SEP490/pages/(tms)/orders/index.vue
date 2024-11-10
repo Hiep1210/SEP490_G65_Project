@@ -8,20 +8,17 @@ definePageMeta({
 
 const { orders, getOrders } = useOrders()
 
-onMounted(() => {
+onMounted(async () => {
   if (!orders.value.length) {
-    getOrders()
+    await getOrders()
   }
 })
 
-watch(orders, (newOrders) => {
-  console.log('newOrders', newOrders)
-})
-provide('orders', orders)
+
 </script>
 
 <template>
   <ClientOnly>
-    <LazyOrdersTable :orders="orders" />
+    <LazyOrdersTable :orders="orders" @update:orders="orders = $event" />
   </ClientOnly>
 </template>

@@ -5,6 +5,7 @@ import { useToast } from '~/components/ui/toast'
 const { toast } = useToast()
 
 export const useOrders = () => {
+  const router = useRouter()
   const isLoading = ref(false)
   const orders = ref<Order[]>([])
   const order = ref<Order | null>(null)
@@ -14,7 +15,7 @@ export const useOrders = () => {
     try {
       const { data: ordersData } = await useAPI<Order[]>('/order/get-all', {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include',
       })
 
       if (!ordersData?.value || ordersData.value.length === 0) {
@@ -54,33 +55,7 @@ export const useOrders = () => {
         navigateTo('/orders')
         order.value = null
       } else {
-        // Helper function to safely extract filename from a Firebase URL
-        const getFileNameFromUrl = (
-          url: string | undefined | null
-        ): string | null => {
-          if (
-            typeof url === 'string' &&
-            url.includes('uploads') &&
-            url.includes('?alt=media')
-          ) {
-            const decodedUrl = decodeURIComponent(url)
-            const match = decodedUrl.match(/uploads\/(.+?)\?alt=media/)
-            return match ? match[1] : null
-          }
-          return null
-        }
-
-        // Helper function to trim off the date and time from a date string
-        const trimDateTime = (date: string | undefined): string | undefined => {
-          return date ? date.split(' ')[0] : undefined
-        }
-
-        const modifiedOrder = {
-          ...orderData.value,
-          createdDate: trimDateTime(orderData.value.createdDate),
-          dueDate: trimDateTime(orderData.value.dueDate)
-        }
-        order.value = modifiedOrder
+        order.value = orderData.value
       }
     } catch (error) {
       console.error('Failed to fetch order details:', error)
@@ -92,6 +67,7 @@ export const useOrders = () => {
       isLoading.value = false
     }
   }
+
 
   const changeOrderStatus = async (id: string, status: string) => {
     isLoading.value = true
@@ -132,13 +108,39 @@ export const useOrders = () => {
       }
       toast({
         title: 'Success',
-        description: `Order ${status === 'ACCEPTED' ? 'accepted' : 'rejected'} successfully`
+        description: `Status changed successfully`
       })
+      router.push('/orders')
     } catch (error) {
-      console.error(`Failed to ${status} order:`, error)
+      console.error(`Failed to change status:`, error)
       toast({
         title: 'Error',
-        description: `Failed to ${status} order. Please try again later.`
+        description: `Failed to change status. Please try again later.`
+      })
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const sendRejectOrder = async (id: string, reason: string) => {
+    isLoading.value = true
+    try {
+      const payload = {
+        id,
+        responseContent: reason
+      }
+      await useAPI('/order/change-status', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: 'REJECTED' } })
+      await useAPI('/order/send-reject-response', { method: 'PUT', credentials: 'include', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } })
+      toast({
+        title: 'Success',
+        description: `Order rejected successfully`
+      })
+      router.push('/orders')
+    } catch (error) {
+      console.error('Failed to send reject order:', error)
+      toast({
+        title: 'Error',
+        description: `Failed to reject order. Please try again later.`
       })
     } finally {
       isLoading.value = false
@@ -193,6 +195,7 @@ export const useOrders = () => {
     getOrders,
     getOrder,
     changeOrderStatus,
+    sendRejectOrder,
     setOrderPrice,
     updateSuccessPayment
   }
