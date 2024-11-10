@@ -28,7 +28,7 @@
           >
             There are no deliverables, try refreshing the page
           </div>
-          <div v-else>{{ getFirebaseFileName(job.deliverableUrl) }}</div>
+          <div v-else class="p-2">{{ getFirebaseFileName(job.deliverableUrl) }}</div>
         </div>
       </TabsContent>
     </Tabs>

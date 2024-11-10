@@ -52,7 +52,7 @@ const filteredJobStatuses = computed(() => {
       </DialogDescription>
       <DialogFooter>
         <template v-if="props.role?.includes('MANAGER')">
-          <JobsAssignDialog />
+          <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" />
           <Button variant="outline">Set Deadline</Button>
         </template>
         <template v-else>
@@ -60,10 +60,5 @@ const filteredJobStatuses = computed(() => {
         </template>
       </DialogFooter>
     </DialogContent>
-
   </Dialog>
 </template>
-
-<style>
-
-</style>
