@@ -53,12 +53,12 @@ const handlePageChange = (page: number) => {
 <template>
   <div>
     <!-- Search and Filter UI -->
-    <div class="flex gap-4 mb-4 justify-end">
+    <div class="flex gap-4 mb-4">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search by work name"
-         class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+         class="border w-1/3 px-4 py-2 rounded-xl  text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
       >
 
       <select v-model="statusFilter" class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
@@ -75,7 +75,7 @@ const handlePageChange = (page: number) => {
 
     <!-- Pagination Controls -->
     <div class="flex justify-between items-center mt-4">
-      <button :disabled="currentPage === 1" class="border px-4 py-2" @click="handlePageChange(currentPage - 1)">
+      <button :disabled="currentPage === 1" class="border px-4 py-2 rounded-xl" @click="handlePageChange(currentPage - 1)">
          Previous
       </button>
 
@@ -83,7 +83,7 @@ const handlePageChange = (page: number) => {
 
       <button
         :disabled="currentPage === totalPages"
-        class="border px-4 py-2"
+        class="border px-4 py-2 rounded-xl"
         @click="handlePageChange(currentPage + 1)"
       >
         Next
