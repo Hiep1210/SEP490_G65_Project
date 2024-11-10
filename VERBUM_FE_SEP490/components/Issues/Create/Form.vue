@@ -17,6 +17,15 @@ import {
   getDownloadURL,
   uploadBytesResumable
 } from 'firebase/storage'
+import type { JobDeliverables } from '~/types/jobDeliverables'
+import { getFirebaseFileName } from '~/utils/getFirebaseFileName'
+
+const props = defineProps({
+  jobDeliverables: {
+    type: Array,
+    default: () => []
+  }
+})
 
 const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
@@ -63,6 +72,25 @@ watch(files, () => {
     uploadFiles()
   }
 })
+
+const getElementsWithHighestServiceOrder = (
+  jobDeliverables: JobDeliverables[]
+): JobDeliverables[] => {
+  let maxServiceOrder = -Infinity
+  const result: JobDeliverables[] = []
+
+  for (const item of jobDeliverables) {
+    if (item.serviceOrder > maxServiceOrder) {
+      maxServiceOrder = item.serviceOrder
+      result.length = 0
+      result.push(item)
+    } else if (item.serviceOrder === maxServiceOrder) {
+      result.push(item)
+    }
+  }
+
+  return result
+}
 </script>
 
 <template>
@@ -82,18 +110,23 @@ watch(files, () => {
 
   <FormField v-slot="{ componentField }" name="deliverableUrl">
     <FormItem>
-      <FormLabel>Title</FormLabel>
+      <FormLabel>File having issues</FormLabel>
       <Select v-bind="componentField">
         <FormControl>
           <SelectTrigger>
-            <SelectValue placeholder="Select a verified email to display" />
+            <SelectValue placeholder="Select a file that having issues" />
           </SelectTrigger>
         </FormControl>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="m@example.com"> m@example.com </SelectItem>
-            <SelectItem value="m@google.com"> m@google.com </SelectItem>
-            <SelectItem value="m@support.com"> m@support.com </SelectItem>
+            <SelectItem
+              v-for="item in getElementsWithHighestServiceOrder(
+                props.jobDeliverables
+              )"
+              :value="String(item.deliverableUrl)"
+            >
+              {{ getFirebaseFileName(item.deliverableFileUrl) }}
+            </SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

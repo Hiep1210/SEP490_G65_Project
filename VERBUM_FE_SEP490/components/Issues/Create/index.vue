@@ -18,7 +18,7 @@ const orderId = route.params.id
 const { createIssue } = useIssues()
 
 const props = defineProps({
-  orderDeliverables: {
+  jobDeliverables: {
     type: Array,
     default: () => []
   }}
@@ -27,7 +27,7 @@ const props = defineProps({
 const formSchema = toTypedSchema(
   z.object({
     issueName: z.string().min(2).max(50),
-    deliverableUrl: z.string(),
+    deliverableUrl: z.string().min(1, { message: 'Required' }),
     issueDescription: z.string().min(10).max(255),
     issueAttachments: z.string().min(1)
   })
@@ -44,6 +44,9 @@ async function onSubmit(values: CreateIssuePayload) {
   }
   await createIssue(payload)
 }
+
+console.log('create issues index', props.jobDeliverables)
+
 </script>
 
 <template>
@@ -66,13 +69,13 @@ async function onSubmit(values: CreateIssuePayload) {
         </DialogHeader>
 
         <form @submit="submitForm">
-          <IssuesCreateForm/>
+          <IssuesCreateForm :job-deliverables="props.jobDeliverables"/>
         </form>
 
         <DialogFooter>
-          <DialogClose as-child>
+<!--          <DialogClose as-child>-->
             <Button type="submit" form="dialogForm"> Create </Button>
-          </DialogClose>
+<!--          </DialogClose>-->
         </DialogFooter>
       </DialogContent>
     </Dialog>

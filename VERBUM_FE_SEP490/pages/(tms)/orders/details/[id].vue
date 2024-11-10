@@ -8,7 +8,6 @@ import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 
 const { toast } = useToast()
-const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
 
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
@@ -328,7 +327,7 @@ const confirmSetPrices = async () => {
       <!-- Smaller Issues List Section -->
       <div v-if="order.orderStatus === ORDER_NEW" class="flex-1 space-y-4 border rounded-md">
         <OrdersIssues
-          :order-deliverables="order.deliverableFileUrls"
+          :job-deliverables="order.jobDeliverables"
           :order-id="orderId"
           :role="role"
           :user="user"

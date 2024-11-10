@@ -4,6 +4,10 @@ import { onMounted } from 'vue'
 const { issues, getIssuesByOrders, updateIssue } = useIssues()
 
 const props = defineProps({
+  jobDeliverables: {
+    type: Array,
+    default: () => {}
+  },
   orderId: {
     type: String,
     default: ''
@@ -36,9 +40,9 @@ onMounted(() => {
   <div class="h-full">
     <div class="flex justify-between items-center p-3 border-b">
       <span class="text-lg font-semibold">Issues</span>
-      <IssuesCreate v-if="props.role === 'CLIENT'" :order-id="props.orderId" />
+      <IssuesCreate v-if="props.role === 'CLIENT'" :order-id="props.orderId" :job-deliverables="jobDeliverables" />
     </div>
-    <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
+    <div v-if="issues" class="h-[15rem] overflow-auto p-2">
       <IssuesTable :issues="issues" :role="props.role" @update="handleUpdate" />
     </div>
     <div v-else class="w-full h-full flex justify-center items-center">
