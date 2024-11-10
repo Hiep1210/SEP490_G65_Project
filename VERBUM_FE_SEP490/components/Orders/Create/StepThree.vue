@@ -2,24 +2,39 @@
 import { useFileDialog } from '@vueuse/core'
 import { ref, watch, computed } from 'vue'
 import { cn } from '@/lib/utils'
-import { ref as storageRef, getDownloadURL } from 'firebase/storage'
+import { ref as storageRef, getDownloadURL, uploadBytesResumable } from 'firebase/storage'
 
 const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
+const uploadProgress = ref<number[]>([])
 
 const downloadUrlsString = computed(() => downloadUrls.value.join(','))
 
 async function uploadFiles() {
   if (files.value?.length) {
-    const promises = Array.from(files.value).map(async (file) => {
-      const fileRef = storageRef(storage, `uploads/${file.name}`)
-      const { upload } = useStorageFile(fileRef)
+    const promises = Array.from(files.value).map(
+      (file, index) =>
+        new Promise<string>((resolve, reject) => {
+          const fileRef = storageRef(storage, `uploads/${file.name}`)
+          const uploadTask = uploadBytesResumable(fileRef, file)
 
-      await upload(file)
-
-      const url = await getDownloadURL(fileRef)
-      return url
-    })
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              uploadProgress.value[index] = Math.round(progress)
+            },
+            (error) => {
+              reject(error)
+            },
+            async () => {
+              const url = await getDownloadURL(fileRef)
+              resolve(url)
+            }
+          )
+        })
+    )
 
     const urls = await Promise.all(promises)
     downloadUrls.value = [...downloadUrls.value, ...urls]
@@ -71,19 +86,21 @@ watch(files, () => {
         <CardHeader>
           <CardDescription>Uploaded files</CardDescription>
         </CardHeader>
-        <CardContent class="grid gap-4">
-          <div>
-            <div
-              v-for="file in files"
-              :key="file.name"
-              class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
-            >
-              <span
-                class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"
-              />
-              <div class="space-y-1">
+        <CardContent class="grid gap-3">
+          <div
+            v-for="(file, index) in files"
+            :key="file.name"
+            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
+          >
+            <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div class="flex flex-col gap-1">
+              <p class="text-sm font-medium leading-none">
+                {{ file.name }}
+              </p>
+              <div class="flex gap-5 max-w-sm">
+                <Progress v-model="uploadProgress[index]" />
                 <p class="text-sm font-medium leading-none">
-                  {{ file.name }}
+                  {{ uploadProgress[index] || 0 }}%
                 </p>
               </div>
             </div>

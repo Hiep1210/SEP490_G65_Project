@@ -1,15 +1,19 @@
-<script setup>
+<script lang="ts" setup>
 import { onMounted } from 'vue'
 
 const { issues, getIssuesByOrders, updateIssue } = useIssues()
 
 const props = defineProps({
+  orderDeliverables: {
+    type: Array,
+    default: () => []
+  },
   orderId: {
-    type: string,
+    type: String,
     default: ''
   },
   role: {
-    type: string,
+    type: String,
     default: ''
   },
   user: {
@@ -36,7 +40,7 @@ onMounted(() => {
   <div class="h-full">
     <div class="flex justify-between items-center p-3 border-b">
       <span class="text-lg font-semibold">Issues</span>
-      <IssuesCreate v-if="props.role === 'CLIENT'" :order-id="props.orderId" />
+      <IssuesCreate v-if="props.role === 'CLIENT'" :order-id="props.orderId" :order-deliverables="props.orderDeliverables"/>
     </div>
     <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
       <IssuesTable :issues="issues" :role="props.role" @update="handleUpdate" />
