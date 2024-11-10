@@ -350,7 +350,7 @@ const confirmSetPrices = async () => {
       </div>
 
       <!-- Set Prices Dialog -->
-      <SetPricesDialog
+      <!-- <SetPricesDialog
         :order="order"
         :price="tempPrice"
         :open="openSetPricesDialog"
@@ -362,7 +362,7 @@ const confirmSetPrices = async () => {
             tempPrice = newPrice
           }
         "
-      />
+      /> -->
 
       <!-- Confirm Dialog -->
       <ConfirmDialog
@@ -378,6 +378,10 @@ const confirmSetPrices = async () => {
         :status="payStatus"
         :open="openPaymentDialog"
         @close="openPaymentDialog = false"
+      />
+
+      <RatingDialog
+          :open="openSetPricesDialog"
       />
     </div>
   </div>
