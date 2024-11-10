@@ -27,7 +27,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.Name))
                 .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(src => src.Assignee.Name))
                 .ForMember(dest => dest.IssueAttachments, opt => opt.MapFrom(src => src.IssueAttachments.Where(a => !a.IsDeleted)))
-                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Order.OrderName))
+                .ForMember(dest => dest.DocumentUrl, opt => opt.MapFrom(src => src.Job.DocumentUrl))
                 .ReverseMap();
             CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
             CreateMap<IssueAttachment, UpdateIssueAttachmentFile>().ReverseMap();
@@ -40,7 +40,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
                 .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
                 .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "DELIVERABLES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.DeliverableFileUrls, opt => opt.MapFrom(src => src.Works.SelectMany(x => x.Jobs).Select(x => x.DeliverableUrl).ToList()))
                 .ForMember(dest => dest.DeleteddFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.IsDeleted == true).Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
             CreateMap<Work, WorkResponse>()

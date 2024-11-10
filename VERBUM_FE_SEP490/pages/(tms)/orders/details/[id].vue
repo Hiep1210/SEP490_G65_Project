@@ -3,7 +3,10 @@ import type { Order } from '~/types/order'
 import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
+import { useToast } from '~/components/ui/toast'
+import { format } from 'date-fns'
 
+const { toast } = useToast()
 const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
@@ -22,7 +25,7 @@ const tempPrice = ref<string>('0')
 onMounted(() => {
   getOrder(orderId)
   if (!issues.value.length) {
-    getIssuesByOrders(orderId)
+    getIssuesByOrders(orderId as string)
   }
   getSupportedLanguages()
 })
@@ -62,7 +65,7 @@ const saveEdit = async () => {
       const payload = {
         ...editedOrder.value,
         dueDate: editedOrder.value.dueDate
-          ? new Date(editedOrder.value.dueDate).toLocaleDateString('sv')
+          ? format(new Date(editedOrder.value.dueDate), 'yyyy-MM-dd')
           : null,
         targetLanguageIdList: editedOrder.value?.targetLanguageId,
         translateService: editedOrder.value?.hasTranslateService,
@@ -70,15 +73,22 @@ const saveEdit = async () => {
         evaluateService: editedOrder.value?.hasEvaluateService,
         discountId: editedOrder.value?.discountId
       }
-      await useAPI(`/order/update`, {
+      const { status } = await useAPI(`/order/update`, {
         method: 'PUT',
         body: JSON.stringify(payload),
         headers: {
           'Content-Type': 'application/json'
         }
       })
-    } else {
-      throw new Error('No edited order found')
+      if (status.value === 'success') {
+        toast({
+          title: 'Success',
+          description: `Order updated successfully`
+        })
+        window.location.reload()
+      }
+      } else {
+        throw new Error('No edited order found')
     }
 
     if (order.value) {
@@ -138,10 +148,12 @@ const handleUpdate = async (updateIssues: Issue) => {
   await getIssues()
 }
 
+const orderRepo = repo(useNuxtApp().$api)
+
 onMounted(async () => {
   try {
-    const { data } = await useAPI('/lang')
-    languageList.value = data.value as Language[]
+    const data = await orderRepo.getLanguages()
+    languageList.value = data
   } catch (error) {
     console.error('Failed to fetch language list:', error)
   }
@@ -248,12 +260,12 @@ const confirmSetPrices = async () => {
             <!-- Due Date -->
             <div class="flex items-center space-x-2">
               <span>Due date:</span>
-              <span v-if="!isEditing">{{ order.dueDate }}</span>
-              <input
+              <span v-if="!isEditing">{{ order.dueDate?.split(' ')[0] }}</span>
+              <Input
                 v-else-if="editedOrder"
                 v-model="editedOrder.dueDate"
                 type="date"
-                class="border rounded p-1"
+                class="border rounded p-1 w-fit"
               />
             </div>
 
@@ -298,24 +310,20 @@ const confirmSetPrices = async () => {
             <Button @click="saveEdit">Save</Button>
             <Button variant="outline" @click="cancelEdit">Cancel</Button>
           </template>
-          <Button v-else-if="role === 'CLIENT'" @click="enableEdit"
+          <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
             >Edit Order</Button
           >
           <Button
-            v-if="role === 'CLIENT'"
+            v-if="role === 'CLIENT' && order.orderStatus === 'NEW'"
             variant="outline"
             @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button
           >
           <template v-if="role === 'STAFF'">
-            <Button @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
+            <Button v-if="order.orderStatus === 'NEW'" @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
-            <Button
-              variant="outline"
-              @click="changeOrderStatus(order.orderId, 'REJECTED')"
-              >Reject Order</Button
-            >
+            <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
           <Button
             v-if="role === 'CLIENT'"

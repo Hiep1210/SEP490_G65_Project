@@ -26,10 +26,10 @@ namespace verbum_service.Controllers
         [HttpGet("get-all")]
         [EnableQuery]
         [Authorize]
-        [ProducesResponseType(typeof(List<OrderResponse>), 200)]
+        [ProducesResponseType(typeof(List<OrderDetailsResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAllOrder()
+        public async Task<IActionResult> Get()
         {
             return ResponseFilter.OkOrNoContent(await orderService.GetAllOrder(), this);
         }
@@ -78,13 +78,23 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("change-status")]
-        //[Roles(UserRole.STAFF, UserRole.CLIENT)]
+        [Roles(UserRole.STAFF, UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)] 
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ChangeOrderStatus([Required]Guid orderId, [Required]string orderStatus)
+        public async Task<IActionResult> ChangeOrderStatus([FromQuery][Required]Guid orderId, [FromQuery][Required]string orderStatus)
         {
             await orderService.ChangeOrderStatus(orderId, orderStatus);
+            return NoContent();
+        }
+
+        [HttpPut("confirm-payment")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> ConfirmPayment([Required] Guid clientId, [Required] Guid transactionId)
+        {
+            await orderService.ConfirmPayment(clientId, transactionId);
             return NoContent();
         }
 

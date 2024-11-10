@@ -37,9 +37,12 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "You need to order at least 1 service"));
             }
-            if (request.OrderNote.Length > 255)
+            if (ObjectUtils.IsNotEmpty(request.OrderNote))
             {
-                alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "OrderNote can not be over 255 characters"));
+                if (request.OrderNote.Length > 255)
+                {
+                    alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "OrderNote can not be over 255 characters"));
+                }
             }
         }
 

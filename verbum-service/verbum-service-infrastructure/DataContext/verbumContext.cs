@@ -14,6 +14,8 @@ public partial class verbumContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<ClientTransaction> ClientTransactions { get; set; }
+
     public virtual DbSet<Discount> Discounts { get; set; }
 
     public virtual DbSet<Issue> Issues { get; set; }
@@ -60,6 +62,19 @@ public partial class verbumContext : DbContext
                 .HasColumnName("category_name");
         });
 
+        modelBuilder.Entity<ClientTransaction>(entity =>
+        {
+            entity.HasKey(e => new { e.TransactionId, e.ClientId }).HasName("client_transaction_pk");
+
+            entity.ToTable("client_transaction");
+
+            entity.HasIndex(e => e.Orderid, "client_transaction_unique").IsUnique();
+
+            entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
+            entity.Property(e => e.ClientId).HasColumnName("client_id");
+            entity.Property(e => e.Orderid).HasColumnName("orderid");
+        });
+
         modelBuilder.Entity<Discount>(entity =>
         {
             entity.HasKey(e => e.DiscountId).HasName("discount_pk");
@@ -79,7 +94,9 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.IssueId).HasName("issue_pk");
 
-            entity.ToTable("issue");
+            entity.ToTable("issue", tb => tb.HasComment("tạo issue, job tạo ra bởi issue : OPEN\r\n\r\nSM accept issue from client: IN_PROGRESS\r\nSM reject issue from client: CANCEL\r\n\r\nLinguist đánh: SUBMITTED\r\n\r\nSM review linguist ok: RESOLVED \r\nSM reject resolve from linguist: IN_PROGRESS\r\n\r\nclient cancel lúc nào cx đc: CANCEL"));
+
+            entity.HasIndex(e => e.JobId, "issue_unique").IsUnique();
 
             entity.Property(e => e.IssueId)
                 .ValueGeneratedNever()
@@ -98,12 +115,12 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.IssueName)
                 .HasColumnType("character varying")
                 .HasColumnName("issue_name");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.RejectResponse)
                 .HasColumnType("character varying")
                 .HasColumnName("reject_response");
             entity.Property(e => e.Status)
-                .HasComment("CANCEL, OPEN, SUBMITTED, RESOLVED")
+                .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED, IN-PROGRESS")
                 .HasColumnType("character varying")
                 .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
@@ -120,17 +137,17 @@ public partial class verbumContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("issue_user_fk");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.Issues)
-                .HasForeignKey(d => d.OrderId)
+            entity.HasOne(d => d.Job).WithOne(p => p.Issue)
+                .HasForeignKey<Issue>(d => d.JobId)
                 .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("issue_order_fk");
+                .HasConstraintName("issue_job_fk");
         });
 
         modelBuilder.Entity<IssueAttachment>(entity =>
         {
             entity.HasKey(e => new { e.IssueId, e.AttachmentUrl }).HasName("issue_attachments_pk");
 
-            entity.ToTable("issue_attachments");
+            entity.ToTable("issue_attachments", tb => tb.HasComment("tag lưu file solution và reference file: SOLUTION, ATTACHMENT"));
 
             entity.Property(e => e.IssueId).HasColumnName("issue_id");
             entity.Property(e => e.AttachmentUrl)
@@ -139,6 +156,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.Tag)
+                .HasColumnType("character varying")
+                .HasColumnName("tag");
 
             entity.HasOne(d => d.Issue).WithMany(p => p.IssueAttachments)
                 .HasForeignKey(d => d.IssueId)
@@ -149,7 +169,9 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("job_pkey");
 
-            entity.ToTable("job");
+            entity.ToTable("job", tb => tb.HasComment("chưa assign:NEW\r\n\r\nasign linguists: IN_PROGRESS\r\n \r\nlinguist làm xong: SUBMITTED\r\n\r\nSM review ok: APPROVED\r\nSM reject: IN_PROGRESS\r\n\r\nclient tạo issue thì tạo thêm 1 job mới ở sevice cuối cùng(TL-> ED -> EV)"));
+
+            entity.HasIndex(e => e.DeliverableUrl, "job_unique").IsUnique();
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
@@ -157,13 +179,16 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp(0) without time zone")
                 .HasColumnName("created_at");
+            entity.Property(e => e.DeliverableUrl)
+                .HasColumnType("character varying")
+                .HasColumnName("deliverable_url");
             entity.Property(e => e.DocumentUrl).HasColumnName("document_url");
             entity.Property(e => e.DueDate)
                 .HasColumnType("timestamp(0) without time zone")
                 .HasColumnName("due_date");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Status)
-                .HasComment("NEW, IN_PROGRESS, SUBMITTED, RESOLVED")
+                .HasComment("NEW, IN_PROGRESS, SUBMITTED, ACCEPTED")
                 .HasColumnName("status");
             entity.Property(e => e.TargetLanguageId)
                 .HasColumnType("character varying")
@@ -218,7 +243,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("order_pk");
 
-            entity.ToTable("order", tb => tb.HasComment("NEW, RESOLVED, REJECTED, CANCELED, IN_PROGRESS, DELIVERED, SUBMITTED, IN_REVIEW"));
+            entity.ToTable("order", tb => tb.HasComment("tạo: NEW\r\n\r\nstaff: ACCEPTED, REJECTED, \r\n\r\nclient CANCELED\r\n\r\ndeposit xong:IN_PROGRESS, \r\n\r\nxong tất cả các job: COMPLETED.\r\n\r\nclient tạo isue: IN_PROGRESS\r\n\r\nresolve xong isue: COMPLETED\r\n\r\npay xong: DELIVERED"));
 
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()
@@ -278,7 +303,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => new { e.OrderId, e.ReferenceFileUrl }).HasName("order_references_pk");
 
-            entity.ToTable("order_references", tb => tb.HasComment("TRANSLATION, REFERENCES, DELIVERABLES"));
+            entity.ToTable("order_references", tb => tb.HasComment("TRANSLATION, REFERENCES"));
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.ReferenceFileUrl)
@@ -323,7 +348,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.ReceiptId).HasName("receipt_pk");
 
-            entity.ToTable("receipt");
+            entity.ToTable("receipt", tb => tb.HasComment("false is deposit, true is payment"));
 
             entity.Property(e => e.ReceiptId)
                 .ValueGeneratedNever()
@@ -366,10 +391,6 @@ public partial class verbumContext : DbContext
 
             entity.ToTable("revelancy");
 
-            entity.HasIndex(e => e.SourceLanguageId, "revelancy_unique").IsUnique();
-
-            entity.HasIndex(e => e.TargetLanguageId, "revelancy_unique_1").IsUnique();
-
             entity.Property(e => e.RevelancyId)
                 .ValueGeneratedNever()
                 .HasColumnName("revelancy_id");
@@ -390,13 +411,13 @@ public partial class verbumContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("revelancy_category_fk");
 
-            entity.HasOne(d => d.SourceLanguage).WithOne(p => p.RevelancySourceLanguage)
-                .HasForeignKey<Revelancy>(d => d.SourceLanguageId)
+            entity.HasOne(d => d.SourceLanguage).WithMany(p => p.RevelancySourceLanguages)
+                .HasForeignKey(d => d.SourceLanguageId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("revelancy_language_fk");
 
-            entity.HasOne(d => d.TargetLanguage).WithOne(p => p.RevelancyTargetLanguage)
-                .HasForeignKey<Revelancy>(d => d.TargetLanguageId)
+            entity.HasOne(d => d.TargetLanguage).WithMany(p => p.RevelancyTargetLanguages)
+                .HasForeignKey(d => d.TargetLanguageId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("revelancy_language_fk_1");
 
@@ -435,7 +456,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("User_pkey");
 
-            entity.ToTable("user");
+            entity.ToTable("user", tb => tb.HasComment("confirm mail: ACTIVE\r\ntạo tài khoản: INACTIVE"));
 
             entity.HasIndex(e => e.Email, "User_email_key").IsUnique();
 

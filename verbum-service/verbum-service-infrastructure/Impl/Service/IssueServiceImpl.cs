@@ -9,6 +9,7 @@ using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
+using verbum_service_domain.Utils;
 using verbum_service_infrastructure.DataContext;
 
 namespace verbum_service_infrastructure.Impl.Service
@@ -19,14 +20,41 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly verbumContext context;
         private readonly CurrentUser currentUser;
+
+        public async Task AcceptIssueSolution(Guid issueId)
+        {
+            using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    Guid jobId = await context.Issues.Where(x => x.IssueId == issueId).Select(x => x.JobId).FirstOrDefaultAsync();
+                    string solutionUrl = await context.IssueAttachments.Where(x => x.IssueId == issueId && x.Tag == IssueFileTag.SOLUTION.ToString()).Select(x => x.AttachmentUrl).FirstOrDefaultAsync();
+
+                    if (ObjectUtils.IsEmpty(solutionUrl)) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "solution for this issue"));
+
+                    await context.Jobs.Where(x => x.Id.Equals(jobId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.DeliverableUrl, solutionUrl));
+                    await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
         public async Task AddIssue(CreateIssueRequest request)
         {
+            Guid jobId = await context.Jobs.Where(x => x.DeliverableUrl.Equals(request.DeliverableUrl)).Select(x => x.Id).FirstOrDefaultAsync();
+
             Issue issue = mapper.Map<Issue>(request);
             issue.IssueId = Guid.NewGuid();
             issue.CreatedAt = DateTime.Now;
             issue.UpdatedAt = DateTime.Now;
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
+            issue.JobId = jobId;
             context.Issues.Add(issue);
             if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
@@ -112,7 +140,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Order).ToListAsync();
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ToListAsync();
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:

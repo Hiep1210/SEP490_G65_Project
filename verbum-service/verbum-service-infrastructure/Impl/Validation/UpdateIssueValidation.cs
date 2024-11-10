@@ -31,7 +31,14 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.CANNOT_UPDATE, "issue because issue is not open anymore"));
             }
-            if(await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName) && x.IssueId != request.IssueId))
+            foreach (var attachment in request.IssueAttachments)
+            {
+                if (!Enum.IsDefined(typeof(IssueFileTag), attachment.Tag))
+                {
+                    errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "one of issue attachment's tag"));
+                }
+            }
+            if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName) && x.IssueId != request.IssueId))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
             }
