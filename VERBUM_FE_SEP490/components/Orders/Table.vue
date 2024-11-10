@@ -8,7 +8,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import type { Order } from '~/types/order'
-import { ref } from 'vue'
+import { repo } from '~/utils/repo'
 
 const props = defineProps<{
   orders: Order[]
@@ -18,36 +18,46 @@ const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString()
 }
 
-const selectedOrders = ref<string[]>([])
-
-const toggleOrderSelection = (orderId: string) => {
-  if (selectedOrders.value.includes(orderId)) {
-    selectedOrders.value = selectedOrders.value.filter((id) => id !== orderId)
-  } else {
-    selectedOrders.value.push(orderId)
-  }
-}
-
-const toggleAllOrders = (checked: boolean) => {
-  if (checked) {
-    selectedOrders.value = props.orders.map((order) => order.orderId)
-  } else {
-    selectedOrders.value = []
-  }
-}
-
 const toDetails = (orderId: string) => {
   useRouter().push('/orders/details/' + orderId)
 }
 const toCreate = () => {
   useRouter().push('/orders/create')
 }
+
+const searchValue = ref('')
+
+const ordersRepo = repo(useNuxtApp().$api)
+
+const searchOrders = async (value: string) => {
+  const orders = await ordersRepo.searchOrders(value)
+  emit('update:orders', orders)
+}
+
+const emit = defineEmits<{
+  'update:orders': [orders: Order[]]
+}>()
+
+const currentPage = ref(1)
+const pageSize = ref(8)
+const totalOrders = ref(0)
+const fetchOrders = async () => {
+  const response = await ordersRepo.getOrders(currentPage.value, pageSize.value)
+  const count = await ordersRepo.getOrdersCount()
+  totalOrders.value = count.length
+  emit('update:orders', response)
+}
+
+watch([currentPage, pageSize], fetchOrders, { immediate: true })
+
+const totalPages = computed(() => totalOrders.value ? Math.ceil(totalOrders.value / pageSize.value) : 1)
+
 </script>
 
 <template>
   <div>
     <div class="flex justify-between space-x-4 pb-4">
-      <Input placeholder="Search orders" />
+      <Input v-model="searchValue" placeholder="Search orders" @keydown.enter="searchOrders(searchValue)" />
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
@@ -74,11 +84,17 @@ const toCreate = () => {
             <TableCell>{{ order.orderName }}</TableCell>
             <TableCell>{{ order.orderStatus }}</TableCell>
             <TableCell class="text-center">
-              {{ formatDate(order.createdDate) }}
+              {{ formatDate(order.createdDate ?? '') }}
             </TableCell>
           </TableRow>
         </TableBody>
       </Table>
+    </div>
+
+    <div v-if="totalPages > 1" class="pagination flex items-center justify-center space-x-4 mt-4">
+      <Button variant="outline" :disabled="currentPage === 1" @click="currentPage--">Previous</Button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <Button variant="outline" :disabled="currentPage * pageSize >= totalOrders" @click="currentPage++">Next</Button>
     </div>
   </div>
 </template>
