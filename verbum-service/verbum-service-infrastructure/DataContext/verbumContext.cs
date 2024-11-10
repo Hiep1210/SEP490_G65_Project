@@ -147,7 +147,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => new { e.IssueId, e.AttachmentUrl }).HasName("issue_attachments_pk");
 
-            entity.ToTable("issue_attachments");
+            entity.ToTable("issue_attachments", tb => tb.HasComment("tag lưu file solution và reference file: SOLUTION, ATTACHMENT"));
 
             entity.Property(e => e.IssueId).HasColumnName("issue_id");
             entity.Property(e => e.AttachmentUrl)
@@ -156,6 +156,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.Tag)
+                .HasColumnType("character varying")
+                .HasColumnName("tag");
 
             entity.HasOne(d => d.Issue).WithMany(p => p.IssueAttachments)
                 .HasForeignKey(d => d.IssueId)

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace verbum_service_domain.Common
 {
-    public enum OrderFileTag
+    public enum IssueFileTag
     {
-        TRANSLATION, REFERENCES
+        ATTACHMENT, SOLUTION
     }
 }

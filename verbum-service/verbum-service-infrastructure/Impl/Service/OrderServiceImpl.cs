@@ -65,7 +65,7 @@ namespace verbum_service_infrastructure.Impl.Service
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs)
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
@@ -74,7 +74,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 case UserRole.DIRECTOR:
                 case UserRole.LINGUIST:
                 case UserRole.MANAGER: 
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs)
                         .ToListAsync();
                     break;
                 default:
@@ -87,7 +87,7 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
         {
             Order orders = new Order();
-            orders = await context.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
+            orders = await context.Orders.Include(x => x.Works).ThenInclude(x => x.Jobs).FirstOrDefaultAsync(x => x.OrderId == id);
             if (ObjectUtils.IsEmpty(orders))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
