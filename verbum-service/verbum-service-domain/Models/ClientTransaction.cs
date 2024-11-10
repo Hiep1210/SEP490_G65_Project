@@ -8,4 +8,6 @@ public partial class ClientTransaction
     public Guid ClientId { get; set; }
 
     public Guid TransactionId { get; set; }
+
+    public Guid Orderid { get; set; }
 }

@@ -68,8 +68,11 @@ public partial class verbumContext : DbContext
 
             entity.ToTable("client_transaction");
 
+            entity.HasIndex(e => e.Orderid, "client_transaction_unique").IsUnique();
+
             entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.ClientId).HasColumnName("client_id");
+            entity.Property(e => e.Orderid).HasColumnName("orderid");
         });
 
         modelBuilder.Entity<Discount>(entity =>
