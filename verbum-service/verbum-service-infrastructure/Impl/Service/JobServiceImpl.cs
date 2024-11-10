@@ -71,7 +71,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<JobInfoResponse>> GetAllJob()
         {
-            return mapper.Map<List<JobInfoResponse>>(await context.Jobs.Include(x => x.Assignees).ToListAsync());
+            return mapper.Map<List<JobInfoResponse>>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).ToListAsync());
         }
 
         public async Task UpdateJob(UpdateJobRequest request)
@@ -84,6 +84,7 @@ namespace verbum_service_infrastructure.Impl.Service
             Job job = await context.Jobs.Include(x => x.Assignees).FirstOrDefaultAsync(x => x.Id.Equals(request.Id));
             job.Name = request.Name;
             job.Status = request.Status;
+            job.DeliverableUrl = request.DeliverableUrl;
             List<User> newAssignees = request.AssigneesId.Select(userId => new User { Id = userId }).ToList();
             job.Assignees = await context.Users
                 .Where(user => request.AssigneesId.Contains(user.Id))

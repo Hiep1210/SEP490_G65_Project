@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace verbum_service_domain.Models;
 
+/// <summary>
+/// confirm mail: ACTIVE
+/// tạo tài khoản: INACTIVE
+/// </summary>
 public partial class User
 {
     public Guid Id { get; set; }

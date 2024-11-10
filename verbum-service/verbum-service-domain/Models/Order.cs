@@ -4,7 +4,21 @@ using System.Collections.Generic;
 namespace verbum_service_domain.Models;
 
 /// <summary>
-/// NEW, ACCEPTED, REJECTED, CANCELED, IN_PROGRESS, PAID, COMPLETED, IN_REVIEW
+/// tạo: NEW
+/// 
+/// staff: ACCEPTED, REJECTED, 
+/// 
+/// client CANCELED
+/// 
+/// deposit xong:IN_PROGRESS, 
+/// 
+/// xong tất cả các job: COMPLETED.
+/// 
+/// client tạo isue: IN_PROGRESS
+/// 
+/// resolve xong isue: COMPLETED
+/// 
+/// pay xong: DELIVERED
 /// </summary>
 public partial class Order
 {
@@ -42,8 +56,6 @@ public partial class Order
     public virtual User Client { get; set; } = null!;
 
     public virtual Discount? Discount { get; set; }
-
-    public virtual ICollection<Issue> Issues { get; set; } = new List<Issue>();
 
     public virtual ICollection<OrderReference> OrderReferences { get; set; } = new List<OrderReference>();
 

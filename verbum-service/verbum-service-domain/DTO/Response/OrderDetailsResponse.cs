@@ -1,7 +1,10 @@
-﻿namespace verbum_service_domain.DTO.Response
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace verbum_service_domain.DTO.Response
 {
     public class OrderDetailsResponse
     {
+        [Key]
         public Guid OrderId { get; set; }
         public string OrderName { get; set; }
         public string CreatedDate { get; set; }

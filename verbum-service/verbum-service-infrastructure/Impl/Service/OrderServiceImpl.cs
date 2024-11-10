@@ -147,13 +147,13 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            //if(OrderStatus.NEW.ToString().Equals(orderStatus) 
-            //    || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
-            //    || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
-            //{
-            //    throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
-            //}
-            if(OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
+            if (OrderStatus.NEW.ToString().Equals(orderStatus) || OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
+                || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
+                || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
+            }
+            if (OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
             {
                 await context.Orders
                 .Where(x => x.OrderId == orderId)
@@ -266,6 +266,19 @@ namespace verbum_service_infrastructure.Impl.Service
                 }
             }
             
+        }
+
+        public async Task ConfirmPayment(Guid clientId, Guid transactionId)
+        {
+            Guid orderId = await context.ClientTransactions.Where(x => x.TransactionId == transactionId && x.ClientId == clientId)
+                .Select(x => x.Orderid).FirstOrDefaultAsync();
+            if (ObjectUtils.IsEmpty(orderId))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "transaction"));
+            }
+            if (await context.Orders.Where(x => x.OrderId == orderId)
+                               .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString())) < 1) 
+                throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
     }
 }

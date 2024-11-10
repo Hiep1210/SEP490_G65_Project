@@ -21,12 +21,15 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly CurrentUser currentUser;
         public async Task AddIssue(CreateIssueRequest request)
         {
+            Guid jobId = await context.Jobs.Where(x => x.DeliverableUrl.Equals(request.DeliverableUrl)).Select(x => x.Id).FirstOrDefaultAsync();
+
             Issue issue = mapper.Map<Issue>(request);
             issue.IssueId = Guid.NewGuid();
             issue.CreatedAt = DateTime.Now;
             issue.UpdatedAt = DateTime.Now;
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
+            issue.JobId = jobId;
             context.Issues.Add(issue);
             if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
@@ -112,7 +115,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Order).ToListAsync();
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ToListAsync();
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:

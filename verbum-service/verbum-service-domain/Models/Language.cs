@@ -13,9 +13,9 @@ public partial class Language
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual Revelancy? RevelancySourceLanguage { get; set; }
+    public virtual ICollection<Revelancy> RevelancySourceLanguages { get; set; } = new List<Revelancy>();
 
-    public virtual Revelancy? RevelancyTargetLanguage { get; set; }
+    public virtual ICollection<Revelancy> RevelancyTargetLanguages { get; set; } = new List<Revelancy>();
 
     public virtual ICollection<Order> OrdersNavigation { get; set; } = new List<Order>();
 }

@@ -27,10 +27,12 @@ namespace verbum_service_domain.DTO.Response
         public int WordCount { get; set; }
 
         public string DocumentUrl { get; set; } = null!;
+        public string? DeliverableUrl { get; set; }
 
         public string TargetLanguageId { get; set; } = null!;
 
         public Guid? WorkId { get; set; }
+        public IssueResponse? Issue { get; set; }
         public ICollection<string> AssigneeNames { get; set; }
     }
 }

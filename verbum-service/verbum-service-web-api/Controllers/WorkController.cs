@@ -26,7 +26,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(typeof(List<WorkResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAllWork()
+        public async Task<IActionResult> Get()
         {
             return ResponseFilter.OkOrNoContent(await workService.GetAllWork(), this);
         }

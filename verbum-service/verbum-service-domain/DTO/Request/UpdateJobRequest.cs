@@ -17,6 +17,7 @@ namespace verbum_service_domain.DTO.Request
         /// </summary>
         public string? Status { get; set; }
         public DateTime? DueDate { get; set; }
+        public string? DeliverableUrl { get; set; }
         public List<Guid>? AssigneesId { get; set; }
     }
 }

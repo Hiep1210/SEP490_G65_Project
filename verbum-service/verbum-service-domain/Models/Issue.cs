@@ -3,6 +3,19 @@ using System.Collections.Generic;
 
 namespace verbum_service_domain.Models;
 
+/// <summary>
+/// tạo issue, job tạo ra bởi issue : OPEN
+/// 
+/// SM accept issue from client: IN_PROGRESS
+/// SM reject issue from client: CANCEL
+/// 
+/// Linguist đánh: SUBMITTED
+/// 
+/// SM review linguist ok: RESOLVED 
+/// SM reject resolve from linguist: IN_PROGRESS
+/// 
+/// client cancel lúc nào cx đc: CANCEL
+/// </summary>
 public partial class Issue
 {
     public Guid IssueId { get; set; }
@@ -14,13 +27,11 @@ public partial class Issue
     public DateTime? UpdatedAt { get; set; }
 
     /// <summary>
-    /// CANCEL, OPEN, RESOLVED, ACCEPTED
+    /// CANCEL, OPEN, RESOLVED, ACCEPTED, IN-PROGRESS
     /// </summary>
     public string? Status { get; set; }
 
     public Guid? ClientId { get; set; }
-
-    public Guid? OrderId { get; set; }
 
     public string? IssueDescription { get; set; }
 
@@ -30,11 +41,13 @@ public partial class Issue
 
     public string? RejectResponse { get; set; }
 
+    public Guid JobId { get; set; }
+
     public virtual User? Assignee { get; set; }
 
     public virtual User? Client { get; set; }
 
     public virtual ICollection<IssueAttachment> IssueAttachments { get; set; } = new List<IssueAttachment>();
 
-    public virtual Order? Order { get; set; }
+    public virtual Job Job { get; set; } = null!;
 }
