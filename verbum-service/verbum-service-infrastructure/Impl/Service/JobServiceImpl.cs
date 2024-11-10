@@ -46,7 +46,6 @@ namespace verbum_service_infrastructure.Impl.Service
                                     Id = Guid.NewGuid(),
                                     Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + docUrl.Split("/")[^1].Split(".docx")[0],
                                     Status = JobStatus.NEW.ToString(),
-                                    DueDate = work.DueDate,
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
                                     WordCount = 0,
@@ -85,6 +84,7 @@ namespace verbum_service_infrastructure.Impl.Service
             job.Name = request.Name;
             job.Status = request.Status;
             job.DeliverableUrl = request.DeliverableUrl;
+            job.DueDate = request.DueDate;
             List<User> newAssignees = request.AssigneesId.Select(userId => new User { Id = userId }).ToList();
             job.Assignees = await context.Users
                 .Where(user => request.AssigneesId.Contains(user.Id))

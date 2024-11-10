@@ -53,7 +53,7 @@ namespace verbum_service.Controllers
         {
             Tokens tokens = await userService.Login(userLogin);
             tokenService.SetTokensInsideCookie(tokens, HttpContext);
-            return Ok();
+            return Ok(tokens);
         }
 
         [HttpGet("google-login")]
