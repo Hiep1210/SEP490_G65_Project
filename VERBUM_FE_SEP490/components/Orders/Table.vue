@@ -91,7 +91,7 @@ const totalPages = computed(() => totalOrders.value ? Math.ceil(totalOrders.valu
       </Table>
     </div>
 
-    <div class="pagination flex items-center justify-center space-x-4 mt-4">
+    <div v-if="totalPages > 1" class="pagination flex items-center justify-center space-x-4 mt-4">
       <Button variant="outline" :disabled="currentPage === 1" @click="currentPage--">Previous</Button>
       <span>Page {{ currentPage }} of {{ totalPages }}</span>
       <Button variant="outline" :disabled="currentPage * pageSize >= totalOrders" @click="currentPage++">Next</Button>

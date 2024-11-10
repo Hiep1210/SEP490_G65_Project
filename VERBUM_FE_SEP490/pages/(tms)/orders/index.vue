@@ -7,18 +7,12 @@ definePageMeta({
 })
 
 const { orders, getOrders } = useOrders()
-const totalOrders = ref(0)
 
-// onMounted(async () => {
-//   if (!orders.value.length) {
-//     await getOrders()
-//   }
-//   totalOrders.value = orders.value.length
-// })
-
-// watch(orders, (newOrders) => {
-//   totalOrders.value = newOrders.length
-// }, { immediate: true })
+onMounted(async () => {
+  if (!orders.value.length) {
+    await getOrders()
+  }
+})
 
 
 </script>
