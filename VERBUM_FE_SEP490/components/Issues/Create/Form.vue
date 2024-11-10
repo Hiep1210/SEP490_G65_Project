@@ -123,7 +123,7 @@ const getElementsWithHighestServiceOrder = (
               v-for="item in getElementsWithHighestServiceOrder(
                 props.jobDeliverables
               )"
-              :value="String(item.deliverableUrl)"
+              :value="String(item.deliverableFileUrl)"
             >
               {{ getFirebaseFileName(item.deliverableFileUrl) }}
             </SelectItem>

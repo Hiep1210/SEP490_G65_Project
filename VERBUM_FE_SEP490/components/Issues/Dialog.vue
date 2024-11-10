@@ -248,31 +248,33 @@ watch(
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Files:</div>
-        <div
-          v-for="attachment in issue.issueAttachments"
-          :key="attachment.attachmentUrl"
-        >
-          <a
-            :href="attachment.attachmentUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
-            :title="getFirebaseFileName(attachment.attachmentUrl)"
+        <div v-if="issue.issueAttachments">
+          <div
+            v-for="attachment in issue.issueAttachments"
+            :key="attachment.attachmentUrl"
           >
-            <img
-              src="~/assets/img/file_icon.png"
-              loading="eager"
-              format="avif"
-              width="100"
-              height="50"
-              alt="file icon"
-            />
-            <h1
-              class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
+            <a
+              :href="attachment.attachmentUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+              :title="getFirebaseFileName(attachment.attachmentUrl)"
             >
-              {{ getFirebaseFileName(attachment.attachmentUrl) }}
-            </h1>
-          </a>
+              <img
+                src="~/assets/img/file_icon.png"
+                loading="eager"
+                format="avif"
+                width="100"
+                height="50"
+                alt="file icon"
+              />
+              <h1
+                class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
+              >
+                {{ getFirebaseFileName(attachment.attachmentUrl) }}
+              </h1>
+            </a>
+          </div>
         </div>
       </div>
 

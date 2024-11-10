@@ -68,7 +68,7 @@ watch(
           {{ issue.issueName }}
         </TableCell>
         <TableCell class="font-medium underline">
-          <NuxtLink :to="`/orders/details/${issue.orderId}`">{{ issue.orderName }}</NuxtLink>
+          <NuxtLink :to="`/orders/details/${issue.orderId}`">{{ issue.orderId }}</NuxtLink>
         </TableCell>
         <TableCell>
           {{

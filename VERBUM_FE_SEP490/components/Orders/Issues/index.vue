@@ -24,6 +24,7 @@ const props = defineProps({
 
 const fetchIssues = async () => {
   issues.value = await getIssuesByOrders(props.orderId)
+  console.log('Fetched Issues:', issues.value)
 }
 
 const handleUpdate = async (updateIssues) => {
@@ -34,6 +35,7 @@ const handleUpdate = async (updateIssues) => {
 onMounted(() => {
   fetchIssues()
 })
+
 </script>
 
 <template>

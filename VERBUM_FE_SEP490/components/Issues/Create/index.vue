@@ -13,23 +13,21 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import type { CreateIssuePayload } from '~/types/payload/createIssue'
 
-const route = useRoute()
-const orderId = route.params.id
 const { createIssue } = useIssues()
 
 const props = defineProps({
   jobDeliverables: {
     type: Array,
     default: () => []
-  }}
-)
+  }
+})
 
 const formSchema = toTypedSchema(
   z.object({
     issueName: z.string().min(2).max(50),
     deliverableUrl: z.string().min(1, { message: 'Required' }),
     issueDescription: z.string().min(10).max(255),
-    issueAttachments: z.string().min(1)
+    issueAttachments: z.string()
   })
 )
 
@@ -37,16 +35,14 @@ async function onSubmit(values: CreateIssuePayload) {
   console.log(values)
   const payload = {
     ...values,
-    orderId: orderId,
     issueAttachments: values.issueAttachments
       .split(',')
-      .map((url: string) => ({ attachmentUrl: url.trim() }))
+      .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
   }
   await createIssue(payload)
 }
 
 console.log('create issues index', props.jobDeliverables)
-
 </script>
 
 <template>
@@ -58,7 +54,7 @@ console.log('create issues index', props.jobDeliverables)
   >
     <Dialog>
       <DialogTrigger as-child>
-        <Button variant="outline"> Create Issue </Button>
+        <Button variant="outline"> Create Issue</Button>
       </DialogTrigger>
       <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
         <DialogHeader>
@@ -69,13 +65,13 @@ console.log('create issues index', props.jobDeliverables)
         </DialogHeader>
 
         <form @submit="submitForm">
-          <IssuesCreateForm :job-deliverables="props.jobDeliverables"/>
+          <IssuesCreateForm :job-deliverables="props.jobDeliverables" />
         </form>
 
         <DialogFooter>
-<!--          <DialogClose as-child>-->
-            <Button type="submit" form="dialogForm"> Create </Button>
-<!--          </DialogClose>-->
+          <!--          <DialogClose as-child>-->
+          <Button type="submit" form="dialogForm"> Create</Button>
+          <!--          </DialogClose>-->
         </DialogFooter>
       </DialogContent>
     </Dialog>
