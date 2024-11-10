@@ -21,6 +21,8 @@ import type { Issue } from '~/types/issues'
 import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
 import { getIssueBadgeClass } from '@/utils/getBadgeClass'
+import { getFirebaseFileName } from '~/utils/getFirebaseFileName'
+
 const { assignList, getAssignList } = useUsers()
 const { updateIssueStatus, sendCancelResponse } = useIssues()
 
@@ -73,7 +75,11 @@ const handleCancelStatus = () => {
   reasonForCancellation.value = ''
 }
 
-const handleStatusChange = async (issuesId: string, oldStatus: string, newStatus: string) => {
+const handleStatusChange = async (
+  issuesId: string,
+  oldStatus: string,
+  newStatus: string
+) => {
   if (newStatus === 'CANCEL') {
     isCancelDialogOpen.value = true
     previousStatus.value = oldStatus
@@ -126,24 +132,11 @@ watch(
         </DialogTitle>
       </DialogHeader>
 
-      <Select v-model="selectedStatus"
-        @update:modelValue="(newStatus) => handleStatusChange(issue.issueId, issue.status, newStatus)">
-        <SelectTrigger class="max-w-fit p-0 border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden">
-          <SelectValue>
-            <Badge :class="getIssueBadgeClass(selectedStatus)">{{ selectedStatus }}</Badge>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem v-for="issueStatus in filteredIssueStatuses" :key="issueStatus" :value="issueStatus">
-              <Badge :class="getIssueBadgeClass(issueStatus)">{{ issueStatus }}</Badge>
-            </SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-
-      <div v-if="issue.cancelResponse" class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="font-semibold">Cancellation Reason:</div>
+      <div
+        v-if="issue.cancelResponse"
+        class="p-3 rounded-xl border-2 border-stone-300"
+      >
+        <div class="font-semibold text-red-600">Cancellation Reason:</div>
         <p>{{ issue.cancelResponse }}</p>
       </div>
 
@@ -165,7 +158,10 @@ watch(
               <TableCell class="font-semibold">Created by:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <Input v-model="issue.clientName" class="border border-cyan-700 rounded p-1 w-full" />
+                  <Input
+                    v-model="issue.clientName"
+                    class="border border-cyan-700 rounded p-1 w-full"
+                  />
                 </template>
                 <template v-else>{{ issue.clientName }}</template>
               </TableCell>
@@ -182,14 +178,56 @@ watch(
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <select v-model="issue.assigneeId" class="border border-cyan-700 rounded p-1 w-full">
-                    <option v-for="user in assignList" :key="user.id" :value="user.id">
+                  <select
+                    v-model="issue.assigneeId"
+                    class="border border-cyan-700 rounded w-full"
+                  >
+                    <option
+                      v-for="user in assignList"
+                      :key="user.id"
+                      :value="user.id"
+                    >
                       {{ user.name }}
                     </option>
                   </select>
                 </template>
                 <template v-else>{{ issue.assigneeName }}</template>
               </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-semibold">Status:</TableCell>
+              <TableCell
+                ><Select
+                  v-model="selectedStatus"
+                  @update:modelValue="
+                    (newStatus) =>
+                      handleStatusChange(issue.issueId, issue.status, newStatus)
+                  "
+                >
+                  <SelectTrigger
+                    class="max-w-fit p-0 border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden"
+                  >
+                    <SelectValue>
+                      <Badge :class="getIssueBadgeClass(selectedStatus)"
+                        >{{ selectedStatus }}
+                      </Badge>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="issueStatus in filteredIssueStatuses"
+                        :key="issueStatus"
+                        :value="issueStatus"
+                      >
+                        <Badge :class="getIssueBadgeClass(issueStatus)"
+                          >{{ issueStatus }}
+                        </Badge>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select></TableCell
+              >
             </TableRow>
           </TableBody>
         </Table>
@@ -199,7 +237,10 @@ watch(
         <div class="font-semibold">Description:</div>
         <p>
           <template v-if="isEditing">
-            <Textarea v-model="issue.issueDescription" class="border border-cyan-700 rounded p-1 w-full" />
+            <Textarea
+              v-model="issue.issueDescription"
+              class="border border-cyan-700 rounded p-1 w-full"
+            />
           </template>
           <template v-else>{{ issue.issueDescription }}</template>
         </p>
@@ -207,26 +248,67 @@ watch(
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Files:</div>
-        <CommonFilesCard v-for="file in issue.issueAttachments" :key="file.attachmentUrl" />
+        <div
+          v-for="attachment in issue.issueAttachments"
+          :key="attachment.attachmentUrl"
+        >
+          <a
+            :href="attachment.attachmentUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+            :title="getFirebaseFileName(attachment.attachmentUrl)"
+          >
+            <img
+              src="~/assets/img/file_icon.png"
+              loading="eager"
+              format="avif"
+              width="100"
+              height="50"
+              alt="file icon"
+            />
+            <h1
+              class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
+            >
+              {{ getFirebaseFileName(attachment.attachmentUrl) }}
+            </h1>
+          </a>
+        </div>
       </div>
 
       <DialogFooter>
-        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel</Button>
-        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close</Button>
-        <Button v-if="!isEditing && issue.status !== 'CANCEL'" @click="enableEditing">Edit</Button>
+        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog"
+          >Cancel
+        </Button>
+        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog"
+          >Close
+        </Button>
+        <Button
+          v-if="!isEditing && issue.status !== 'CANCEL'"
+          @click="enableEditing"
+          >Edit
+        </Button>
         <Button v-if="isEditing" @click="emitUpdate">Update</Button>
       </DialogFooter>
-
     </DialogContent>
   </Dialog>
-  <IssuesConfirmDialog :title="titleStatusConfirm" :description="descriptionStatusConfirm" :open="isConfirmDialogOpen"
-    @close="handleCancelStatus" @confirm="handleConfirmStatus" />
+  <IssuesConfirmDialog
+    :title="titleStatusConfirm"
+    :description="descriptionStatusConfirm"
+    :open="isConfirmDialogOpen"
+    @close="handleCancelStatus"
+    @confirm="handleConfirmStatus"
+  />
   <Dialog :open="isCancelDialogOpen" @close="handleCancelStatus">
     <DialogContent class="max-w-md">
       <DialogHeader>
         <DialogTitle>Provide Cancellation Reason</DialogTitle>
       </DialogHeader>
-      <Input v-model="reasonForCancellation" placeholder="Enter reason for cancellation" class="w-full" />
+      <Input
+        v-model="reasonForCancellation"
+        placeholder="Enter reason for cancellation"
+        class="w-full"
+      />
       <DialogDescription class="text-red-500 font-semibold">
         {{ descriptionStatusConfirm }}
       </DialogDescription>

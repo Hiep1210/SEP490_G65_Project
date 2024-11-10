@@ -3,7 +3,7 @@ import type { Order } from '~/types/order'
 import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_NEW } from '~/constants/orderSatus'
+import { ORDER_NEW } from '~/constants/orderSatus'
 
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
@@ -124,11 +124,6 @@ interface Language {
   support: boolean
 }
 const languageList = ref<Language[]>([])
-
-const handleUpdate = async (updateIssues: Issue) => {
-  await updateIssue(updateIssues)
-  await getIssues()
-}
 
 onMounted(async () => {
   try {
@@ -323,8 +318,7 @@ const confirmSetPrices = async () => {
       <!-- Smaller Issues List Section -->
       <div v-if="order.orderStatus === ORDER_NEW" class="flex-1 space-y-4 border rounded-md">
         <OrdersIssues
-          v-if="order.orderStatus === ORDER_NEW"
-          :order="order"
+          :order-deliverables="order.deliverableFileUrls"
           :order-id="orderId"
           :role="role"
           :user="user"

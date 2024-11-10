@@ -17,9 +17,17 @@ const route = useRoute()
 const orderId = route.params.id
 const { createIssue } = useIssues()
 
+const props = defineProps({
+  orderDeliverables: {
+    type: Array,
+    default: () => []
+  }}
+)
+
 const formSchema = toTypedSchema(
   z.object({
     issueName: z.string().min(2).max(50),
+    deliverableUrl: z.string(),
     issueDescription: z.string().min(10).max(255),
     issueAttachments: z.string().min(1)
   })
@@ -58,7 +66,7 @@ async function onSubmit(values: CreateIssuePayload) {
         </DialogHeader>
 
         <form @submit="submitForm">
-          <IssuesCreateForm />
+          <IssuesCreateForm/>
         </form>
 
         <DialogFooter>

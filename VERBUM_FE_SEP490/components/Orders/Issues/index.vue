@@ -5,11 +5,11 @@ const { issues, getIssuesByOrders, updateIssue } = useIssues()
 
 const props = defineProps({
   orderId: {
-    type: string,
+    type: String,
     default: ''
   },
   role: {
-    type: string,
+    type: String,
     default: ''
   },
   user: {
