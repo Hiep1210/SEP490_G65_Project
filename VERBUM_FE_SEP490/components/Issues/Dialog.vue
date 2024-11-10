@@ -207,7 +207,7 @@ watch(
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Files:</div>
-        <p>{{ issue.issueAttachments }}</p>
+        <CommonFilesCard v-for="file in issue.issueAttachments" :key="file.attachmentUrl" />
       </div>
 
       <DialogFooter>
