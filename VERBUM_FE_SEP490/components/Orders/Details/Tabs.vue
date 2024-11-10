@@ -25,7 +25,7 @@
             </TableHeader>
             <TableBody>
               <TableRow v-for="file in order.translationFileUrls" :key="file">
-                <TableCell>{{ file }}</TableCell>
+                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
                 <TableCell>
                   <Button variant="outline" size="sm"> Options </Button>
                 </TableCell>
@@ -95,6 +95,8 @@
 </template>
 
 <script lang="ts" setup>
+import { getFirebaseFileName } from '@/utils/getFirebaseFileName'
+
 defineProps({
   order: {
     type: Object,
