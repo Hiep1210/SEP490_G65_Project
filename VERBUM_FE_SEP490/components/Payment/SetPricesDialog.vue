@@ -87,6 +87,7 @@ const isSupported = (language: string) => {
           <p class="font-semibold">Target Language:</p>
         </div>
         <div class="flex-auto">
+          
           <p
             :class="
               order.sourceLanguageId ? isSupported(order.sourceLanguageId) : ''
@@ -94,20 +95,22 @@ const isSupported = (language: string) => {
           >
             {{ order.sourceLanguageId }}
           </p>
+          
           <ul v-for="item in order.targetLanguageId" :key="item">
             <li :class="isSupported(item)">{{ item }}</li>
           </ul>
+          <p class="text-xs italic text-gray-600">
+            Order have <span class="text-green-700 font-bold">{{ total }}</span> supported languages for target languages.
+          </p>
         </div>
       </div>
-      <p class="text-xs italic font-semibold">
+      <p class="text-sm italic font-semibold">
         Supported languages will be in
         <span class="text-green-700">green color</span>.
       </p>
       <hr>
       <div>
-        <p class="text-sm font-semibold">
-          Order have <span class="text-green-700 font-bold">{{ total }}</span> supported languages for target languages.
-        </p>
+        
         <label class="font-semibold">Price: </label>
         <input
           v-model="price"
