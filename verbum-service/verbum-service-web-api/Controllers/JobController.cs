@@ -52,7 +52,7 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("approved")]
+        [HttpPut("approve")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
