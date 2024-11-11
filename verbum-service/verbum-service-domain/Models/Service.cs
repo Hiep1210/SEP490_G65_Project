@@ -11,5 +11,7 @@ public partial class Service
 
     public decimal? ServicePrice { get; set; }
 
+    public int ServiceOrder { get; set; }
+
     public virtual ICollection<Work> Works { get; set; } = new List<Work>();
 }

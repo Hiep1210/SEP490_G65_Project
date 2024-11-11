@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { repo } from '@/utils/repo'
-const { jobs, getJobs } = useJobs()
-const { assignList, getAssignList } = useUsers()
-const role = useAuthStore().user?.role
+const { jobs, getJobsOfWork } = useJobs()
+const {assignList, getAssignList} = useUsers()
+const role = useAuthStore().user?.role as string | undefined
+const route = useRoute()
+const workId = route.params.id as string
 onMounted(() => {
     if (!jobs.value.length) {
-        getJobs()
+        getJobsOfWork(workId)
     }
     if (role?.includes('MANAGER')) {
         getAssignList()
     }
 })
+
 provide('assignList', assignList)
 </script>
 
@@ -20,4 +22,6 @@ provide('assignList', assignList)
     </div>
 </template>
 
-<style scoped></style>
+<style>
+
+</style>

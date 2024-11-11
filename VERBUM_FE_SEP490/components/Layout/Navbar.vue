@@ -24,6 +24,7 @@ const roleMenuItems = {
   ],
   MANAGER: [
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
+    { navName: 'Jobs', navLink: '/jobs', navIcon: FolderOpen },
     { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
   ],
   STAFF: [{ navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }],
