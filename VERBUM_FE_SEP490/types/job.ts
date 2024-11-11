@@ -7,6 +7,7 @@ export interface Job {
     updatedAt: string;
     wordCount: number;
     documentUrl: string;
+    deliverableUrl: string;
     targetLanguageId: string;
     workId: string;
     assigneeNames: string[];
