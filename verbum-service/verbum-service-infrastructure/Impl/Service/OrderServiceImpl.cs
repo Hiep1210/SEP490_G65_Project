@@ -65,7 +65,7 @@ namespace verbum_service_infrastructure.Impl.Service
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
@@ -73,8 +73,10 @@ namespace verbum_service_infrastructure.Impl.Service
                 case UserRole.STAFF: 
                 case UserRole.DIRECTOR:
                 case UserRole.LINGUIST:
-                case UserRole.MANAGER: 
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences)
+                case UserRole.EDIT_MANAGER:
+                case UserRole.TRANSLATE_MANAGER:
+                case UserRole.EVALUATE_MANAGER:
+                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
                         .ToListAsync();
                     break;
                 default:
@@ -87,7 +89,7 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
         {
             Order orders = new Order();
-            orders = await context.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
+            orders = await context.Orders.Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
             if (ObjectUtils.IsEmpty(orders))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
@@ -270,14 +272,14 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ConfirmPayment(Guid clientId, Guid transactionId)
         {
-            Guid orderId = await context.ClientTransactions.Where(x => x.TransactionId == transactionId && x.ClientId == clientId)
-                .Select(x => x.Orderid).FirstOrDefaultAsync();
-            if (ObjectUtils.IsEmpty(orderId))
+            ClientTransaction transaction = await context.ClientTransactions.FirstOrDefaultAsync(x => x.TransactionId == transactionId && x.ClientId == clientId);
+            if (ObjectUtils.IsEmpty(transaction.Orderid))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "transaction"));
             }
-            if (await context.Orders.Where(x => x.OrderId == orderId)
-                               .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString())) < 1) 
+            string status = transaction.IsDeposit ? OrderStatus.IN_PROGRESS.ToString() : OrderStatus.DELIVERED.ToString();
+            if (await context.Orders.Where(x => x.OrderId == transaction.Orderid)
+                               .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, status)) < 1) 
                 throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
     }

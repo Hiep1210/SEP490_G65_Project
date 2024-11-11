@@ -10,4 +10,6 @@ public partial class ClientTransaction
     public Guid TransactionId { get; set; }
 
     public Guid Orderid { get; set; }
+
+    public bool IsDeposit { get; set; }
 }

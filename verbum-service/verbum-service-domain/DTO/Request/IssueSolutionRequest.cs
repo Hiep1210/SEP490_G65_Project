@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace verbum_service_domain.DTO.Request
 {
-    public class UploadIssueAttachmentFiles
+    public class IssueSolutionRequest
     {
-        public string AttachmentUrl { get; set; }
-        public string Tag { get; set; }
+        public Guid IssueId { get; set; }
+        public string SolutionUrl { get; set; }
     }
 }

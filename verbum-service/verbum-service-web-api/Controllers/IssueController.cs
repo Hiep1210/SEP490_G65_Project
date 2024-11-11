@@ -99,5 +99,16 @@ namespace verbum_service.Controllers
             await issueService.UpdateIssueRejectResponse(request);
             return NoContent();
         }
+
+        [HttpPut("accept-issue-solution")]
+        [Roles(UserRole.LINGUIST)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> AcceptIssueSolution([FromQuery][Required] Guid issueId)
+        {
+            await issueService.AcceptIssueSolution(issueId);
+            return NoContent();
+        }
     }
 }

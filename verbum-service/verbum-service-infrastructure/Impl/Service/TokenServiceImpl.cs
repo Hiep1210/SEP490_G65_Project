@@ -88,7 +88,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
             var token = new JwtSecurityToken(
               claims: claims,
-              expires: DateTime.Now.AddHours(MailConstant.MailExpirationTime),
+              expires: DateTime.Now.AddYears(MailConstant.MailExpirationTime),
               audience: _config["Jwt:Audience"],
               issuer: _config["Jwt:Issuer"],
               signingCredentials: credentials);

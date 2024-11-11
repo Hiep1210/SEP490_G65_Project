@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using verbum_service_application.Validation;
+using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.Utils;
@@ -23,6 +24,13 @@ namespace verbum_service_infrastructure.Impl.Validation
             if(ObjectUtils.IsEmpty(request.IssueName) || ObjectUtils.IsEmpty(request.IssueDescription) || ObjectUtils.IsEmpty(request.DeliverableUrl))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "missing fields"));
+            }
+            foreach (var attachment in request.IssueAttachments)
+            {
+                if (!Enum.IsDefined(typeof(IssueFileTag), attachment.Tag))
+                {
+                    errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "one of issue attachment's tag"));
+                }
             }
             if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName)))
             {
