@@ -270,7 +270,7 @@ namespace verbum_service_infrastructure.Impl.Service
             
         }
 
-        public async Task ConfirmPayment(Guid clientId, Guid transactionId)
+        public async Task ConfirmPayment(Guid clientId, string transactionId)
         {
             ClientTransaction transaction = await context.ClientTransactions.FirstOrDefaultAsync(x => x.TransactionId == transactionId && x.ClientId == clientId);
             if (ObjectUtils.IsEmpty(transaction.Orderid))
