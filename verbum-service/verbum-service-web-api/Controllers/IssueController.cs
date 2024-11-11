@@ -101,7 +101,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("accept-issue-solution")]
-        [Roles(UserRole.LINGUIST)]
+        [Roles(UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
