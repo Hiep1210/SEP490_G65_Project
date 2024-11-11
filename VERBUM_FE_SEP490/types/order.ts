@@ -11,7 +11,7 @@ export interface Order {
   hasTranslateService?: boolean
   hasEditService?: boolean
   hasEvaluateService?: boolean
-  reference?: string
+  orderNote?: string
   translationFileUrls?: string[]
   referenceFileUrls?: string[]
   deliverableFileUrls?: string[]
