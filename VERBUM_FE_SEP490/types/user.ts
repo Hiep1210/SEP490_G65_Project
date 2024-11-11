@@ -5,3 +5,10 @@ export interface User {
   role: string
   status: string
 }
+
+export interface Linguist {
+  id: string
+  name: string
+  relavancies: string[]
+  roleCode: string
+}

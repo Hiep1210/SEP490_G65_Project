@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -44,6 +45,34 @@ namespace verbum_service_infrastructure.Impl.Service
             }
         }
 
+        public async Task ApproveIssue(Guid issueId, Guid orderId)
+        {
+            int issueRecords = await context.Issues
+                .Where(x => x.IssueId == issueId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
+
+            if (issueRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+            var jobs = await context.Jobs
+                .Include(x => x.Work)
+                .Include(x => x.Issue)
+                .Where(x => x.Work.OrderId == orderId)
+                .ToListAsync();
+
+            bool allCompleted = jobs.All(job =>
+            job.Status == JobStatus.APPROVED.ToString() &&
+            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString()) || job.Issue.Status == IssueStatusEnum.CANCEL.ToString());
+
+            if (allCompleted)
+            {
+                int orderRecords = await context.Orders
+                    .Where(o => o.OrderId == orderId)
+                    .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
+                if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            }
+        }
+
         public async Task AddIssue(CreateIssueRequest request)
         {
             Guid jobId = await context.Jobs.Where(x => x.DeliverableUrl.Equals(request.DeliverableUrl)).Select(x => x.Id).FirstOrDefaultAsync();
@@ -56,6 +85,11 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.ClientId = currentUser.Id;
             issue.JobId = jobId;
             context.Issues.Add(issue);
+
+            int orderRecords = await context.Orders
+                            .Where(o => o.OrderId == request.OrderId)
+                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
             if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 

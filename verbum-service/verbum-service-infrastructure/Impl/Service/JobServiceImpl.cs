@@ -2,14 +2,6 @@
 using Lombok.NET;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Org.BouncyCastle.Crypto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -94,5 +86,34 @@ namespace verbum_service_infrastructure.Impl.Service
                 throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
             }
         }
+
+        public async Task ApproveJob(Guid jobId, Guid orderId)
+        {
+            int jobRecords = await context.Jobs
+                .Where(x => x.Id == jobId)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.APPROVED.ToString()));
+
+            if (jobRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+            var jobs = await context.Jobs
+                .Include(x => x.Work)
+                .Include(x => x.Issue)
+                .Where(x => x.Work.OrderId == orderId)
+                .ToListAsync();
+
+            bool allCompleted = jobs.All(job =>
+            job.Status == JobStatus.APPROVED.ToString() &&
+            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString()) || job.Issue.Status == IssueStatusEnum.CANCEL.ToString());
+
+            if (allCompleted)
+            {
+                int orderRecords = await context.Orders
+                    .Where(o => o.OrderId == orderId)
+                    .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
+                if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            }
+        }
+
     }
 }

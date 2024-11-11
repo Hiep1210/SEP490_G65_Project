@@ -23,5 +23,6 @@ namespace verbum_service_application.Service
         Task UpdateIssueCancelResponse(ResponseRequest request);
         Task UpdateIssueRejectResponse(ResponseRequest request);
         Task AcceptIssueSolution (Guid issueId);
+        Task ApproveIssue(Guid issueId, Guid orderId);
     }
 }
