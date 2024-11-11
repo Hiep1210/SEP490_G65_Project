@@ -103,7 +103,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
             bool allCompleted = jobs.All(job =>
             job.Status == JobStatus.APPROVED.ToString() &&
-            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString()));
+            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString()) || job.Issue.Status == IssueStatusEnum.CANCEL.ToString());
 
             if (allCompleted)
             {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -56,6 +57,11 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.ClientId = currentUser.Id;
             issue.JobId = jobId;
             context.Issues.Add(issue);
+
+            int orderRecords = await context.Orders
+                            .Where(o => o.OrderId == request.OrderId)
+                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
             if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
