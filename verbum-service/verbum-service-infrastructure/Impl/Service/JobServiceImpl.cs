@@ -62,7 +62,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<JobInfoResponse>> GetAllJob()
         {
-            return mapper.Map<List<JobInfoResponse>>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).ToListAsync());
+            return mapper.Map<List<JobInfoResponse>>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ToListAsync());
         }
 
         public async Task UpdateJob(UpdateJobRequest request)
