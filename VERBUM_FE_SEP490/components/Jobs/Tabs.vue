@@ -15,7 +15,7 @@
           >
             There are no working files, try refreshing the page
           </div>
-          <div v-else>{{ getFirebaseFileName(job.documentUrl) }}</div>
+          <div v-else class="p-2">{{ getFirebaseFileName(job.documentUrl) }}</div>
         </div>
       </TabsContent>
       <TabsContent value="deliverable">

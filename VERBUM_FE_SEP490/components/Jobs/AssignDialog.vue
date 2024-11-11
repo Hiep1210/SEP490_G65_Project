@@ -1,3 +1,43 @@
+<script lang="ts" setup>
+import type { Linguist } from '@/types/user'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { cn } from '@/lib/utils'
+import { CalendarIcon } from 'lucide-vue-next'
+import { format } from 'date-fns'
+
+const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
+
+const schema = toTypedSchema(z.object({
+  assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
+  dueDate: z.coerce.date().min(new Date(), 'Due date is required')
+}))
+
+const { handleSubmit, setFieldValue } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    assignee_id: [],
+    dueDate: new Date()
+  }
+})
+
+const selectedLinguists = ref<string[]>([])
+const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
+  selectedLinguists.value = newSelectedLinguists
+  setFieldValue('assignee_id', newSelectedLinguists)
+}
+
+const emit = defineEmits(['assign'])
+
+const onSubmit = handleSubmit((values) => {
+  const payload = {
+    assigneesId: values.assignee_id,
+    dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
+  }
+  console.log(JSON.stringify(payload, null, 2))
+  emit('assign', payload)
+})
+</script>
 <template>
   <div>
     <Dialog>
@@ -6,35 +46,64 @@
         <DialogHeader>
           <DialogTitle>Assign Job</DialogTitle>
           <DialogDescription class="text-black space-y-2">
-            Choose a linguist
+            Choose linguists and due date
           </DialogDescription>
         </DialogHeader>
-        <Select>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a linguist" model-value="selectedUser?.name" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="user in assignList" :key="user.user_id" :value="user.user_id" @click="selectedUser = user">{{ user.name }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        <DialogFooter>
-          <Button variant="outline" @click="assignJob">Assign</Button>
-        </DialogFooter>
+        <Form v-slot="{ meta, values, validate }" as="form" keep-values :validation-schema="schema">
+          <form
+            class="space-y-2"
+            @submit="(e) => {
+              e.preventDefault()
+              validate()
+              console.log(meta.valid)
+              if (meta.valid) {
+              onSubmit(values)
+            }
+          }">
+            <FormField v-slot="{ componentField, errorMessage }" name="assignee_id">
+              <FormItem class="flex flex-col">
+                <FormLabel>Linguist</FormLabel>
+                <JobsLinguistSelector
+                  v-bind="componentField"
+                  v-model:selected-linguists="selectedLinguists"
+                  :error="!!errorMessage"
+                  :linguists="assignList"
+                  @update:selected-linguists="updateSelectedLinguists" />
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField, value }" name="dueDate">
+              <FormItem class="flex flex-col">
+                <FormLabel>Due date</FormLabel>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <Button
+                      variant="outline"
+                      :class="cn(
+                        'w-[280px] justify-start text-left font-normal',
+                        !value && 'text-muted-foreground',
+                      )"
+                    >
+                      <CalendarIcon class="mr-2 h-4 w-4" />
+                      {{ value ? value.toLocaleDateString() : "Pick a date" }}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent class="w-auto p-0">
+                    <Calendar v-bind="componentField" initial-focus />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <DialogFooter>
+              <Button type="submit" variant="outline" :disabled="!meta.valid">Confirm</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
 
   </div>
 </template>
-
-<script lang="ts" setup>
-import type { User } from '@/types/user'
-const assignList = inject<Ref<User[]>>('assignList')
-const selectedUser = ref<User | null>(null)
-
-const assignJob = () => {
-  console.log(selectedUser.value)
-}
-</script>
 
 <style></style>
