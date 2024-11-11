@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 import { ORDER_NEW } from '~/constants/orderSatus'
@@ -9,6 +8,7 @@ import { format } from 'date-fns'
 
 const { toast } = useToast()
 
+const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
@@ -20,10 +20,12 @@ const editedOrder = ref<Partial<Order> | null>(null)
 const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
+const openRatingDialog = ref(false)
 const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
+  getSupportedLanguages()
 })
 
 // Enter edit mode
@@ -157,6 +159,29 @@ const handleSetPrices = () => {
   tempPrice.value = order.value?.orderPrice || '0'
 }
 
+const handlePaymentClose = () => {
+  openPaymentDialog.value = false
+  if(order.value?.orderStatus === 'ACCEPTED'){
+    openRatingDialog.value = true
+  }
+}
+
+const handleRatingClose = () => {
+  openRatingDialog.value = false
+  refreshOrder()
+}
+
+const handleRatingSubmit = () => {
+  openRatingDialog.value = false
+  refreshOrder()
+}
+
+const refreshOrder = async () => {
+  if (orderId) {
+    await getOrder(orderId)
+  }
+}
+
 const confirmSetPrices = async () => {
   try {
     if (tempPrice.value !== null && order.value?.orderId) {
@@ -187,10 +212,10 @@ const confirmSetPrices = async () => {
             <p class="text-[2rem] font-semibold flex-auto">
               {{ order?.orderName }}
             </p>
-            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT'">
+            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
               <Button @click="handlePay('IN_PROGRESS')">Deposit </Button>
             </div>
-            <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT'">
+            <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
               <Button @click="handlePay('DELIVERED')">Paying Remaining </Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
@@ -339,6 +364,7 @@ const confirmSetPrices = async () => {
         :order="order"
         :price="tempPrice"
         :open="openSetPricesDialog"
+        :supported-language="supportedLanguages"
         @close="openSetPricesDialog = false"
         @confirm="
           (newPrice) => {
@@ -361,7 +387,14 @@ const confirmSetPrices = async () => {
         :order="order"
         :status="payStatus"
         :open="openPaymentDialog"
-        @close="openPaymentDialog = false"
+        @close="handlePaymentClose"
+      />
+
+      <RatingDialog
+          :open="openRatingDialog"
+          :order-id="order.orderId"
+          @close="handleRatingClose"
+          @submit="handleRatingSubmit"
       />
     </div>
   </div>

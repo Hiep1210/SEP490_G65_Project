@@ -1,6 +1,7 @@
 import type { $Fetch, NitroFetchRequest } from 'nitropack'
 import type { Order } from '@/types/order'
 import type { Language } from '@/types/language'
+import type { Job } from '@/types/job'
 export const repo = <T>(fetch: $Fetch<T, NitroFetchRequest>) => ({
   async getLanguages(): Promise<Language[]> {
     return fetch<Language[]>(`/lang`)
@@ -21,6 +22,15 @@ export const repo = <T>(fetch: $Fetch<T, NitroFetchRequest>) => ({
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(order)
+    })
+  },
+  async assignLinguists(payload: Partial<Job>): Promise<Partial<Job>> {
+    return fetch<Partial<Job>>(`/job/edit`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     })
   }
 })

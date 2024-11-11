@@ -2,9 +2,11 @@
 import { onMounted, ref } from 'vue';
 import { loadScript } from '@paypal/paypal-js';
 import type { PayPalScriptOptions, OnApproveActions, OnApproveData, PayPalNamespace } from '@paypal/paypal-js';
-import { useOrders } from '#imports';
+import { useToast } from '../ui/toast';
 const paypalButton = ref<HTMLDivElement | null>(null);
-const {updateSuccessPayment} = useOrders();
+const { updateSuccessPayment } = useOrders();
+const { createReceipt } = useReceipt();
+
 const props = defineProps<{
     orderId: string,
   price: string,
@@ -12,8 +14,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['payment-success']);
 
+const depositOrPayment = props.status === 'IN_PROGRESS' ? false : true
 
-
+const {toast} = useToast();
 onMounted(async () => {
   if (paypalButton.value) {
     const options: PayPalScriptOptions = {
@@ -44,11 +47,17 @@ onMounted(async () => {
 
           await updateSuccessPayment(props.orderId, props.status)
           
+          await createReceipt(props.orderId, depositOrPayment, Number(props.price))
+          
           return actions.order.capture().then((details) => {
             if (details?.payer?.name?.given_name) {
-              alert(`Transaction completed by ${details.payer.name.given_name}`);
+              toast({
+                title: `Transaction completed by ${details.payer.name.given_name}`
+              })
             } else {
-              alert("Transaction completed.");
+              toast({
+                title: "Transaction completed."
+              })
             }
             emit('payment-success');
           });
