@@ -11,7 +11,8 @@ import {
 import type { Order } from '~/types/order'
 
 const props = defineProps<{
-  order: Order
+  order: Order,
+  clientId: string,
   open: boolean
   status: string
 }>()
@@ -142,6 +143,7 @@ const closeDialog = () => {
         </div>
         <PaymentPaypalButton
           :order-id="order.orderId"
+          :client-id="clientId"
           :price="pricePay"
           :status="status"
           @payment-success="closeDialog"

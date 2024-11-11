@@ -168,26 +168,33 @@ export const useOrders = () => {
     }
   }
 
-  const updateSuccessPayment = async (orderId: string, status: string) => {
+  const confirmPayment = async (clientId: string, transactionId: string, orderId: string, isDeposit: boolean) => {
     try {
-      await useAPI(`/order/change-status`, {
+      // Initial API call to confirm payment
+      await useAPI(`/order/confirm-payment`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        params: { orderId: orderId, orderStatus: status }
-      })
-
-      toast({
-        title: 'Your order is paid successfully!!',
-        description: `We are going to do your order. Thank you for choosing our service.`
-      })
+        params: { clientId, transactionId }
+      });
+  
+      // Update in database after confirmation
+      const response = await fetch('/api/updatePayment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, transactionId, orderId, isDeposit })
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        console.log(result.message);
+      } else {
+        console.error('Failed to update database:', result.message);
+      }
     } catch (error) {
-      toast({
-        title: 'Error updating order status ',
-        description: 'An error occurred while updating the order status!!'
-      })
-      console.error('Error updating Order status:', error)
+      console.error('Error confirming payment or updating database:', error);
     }
-  }
+  };
+  
 
   return {
     isLoading,
@@ -198,6 +205,6 @@ export const useOrders = () => {
     changeOrderStatus,
     sendRejectOrder,
     setOrderPrice,
-    updateSuccessPayment
+    confirmPayment
   }
 }

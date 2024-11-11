@@ -14,6 +14,7 @@ const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
 const role = user?.role
+const clientId = user?.user_id;
 const isEditing = ref(false)
 const editedOrder = ref<Partial<Order> | null>(null)
 
@@ -52,7 +53,6 @@ const enableEdit = () => {
     }
   }
 }
-
 // Cancel edit mode
 const cancelEdit = () => {
   isEditing.value = false
@@ -407,6 +407,7 @@ const confirmSetPrices = async () => {
 
       <PaymentDialog
         :order="order"
+        :client-id="clientId as string"
         :status="payStatus"
         :open="openPaymentDialog"
         @close="handlePaymentClose"
