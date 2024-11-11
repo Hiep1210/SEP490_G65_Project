@@ -33,12 +33,16 @@ const formSchema = toTypedSchema(
 
 async function onSubmit(values: CreateIssuePayload) {
   console.log(values)
+
   const payload = {
     ...values,
     issueAttachments: values.issueAttachments
-      .split(',')
-      .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
+      ? values.issueAttachments
+          .split(',')
+          .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
+      : []
   }
+
   await createIssue(payload)
 }
 

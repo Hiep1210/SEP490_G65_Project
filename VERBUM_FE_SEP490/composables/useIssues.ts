@@ -65,15 +65,18 @@ export const useIssues = () => {
   const updateIssue = async (issue: Issue) => {
     try {
       const payload = issue
-      await useAPI('/issue', {
+      const {data, error} = await useAPI('/issue', {
         method: 'PUT',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       })
-      toast({
-        title: 'Issue updated !!',
-        description: `Issue has been updated!!`
-      })
+      if(!error.value) {
+        toast({
+          title: 'Issue updated !!',
+          description: `Issue has been updated!!`
+        })
+      }
+      return data
     } catch (error) {
       toast({
         title: 'Error updating issue',
@@ -85,16 +88,15 @@ export const useIssues = () => {
 
   const createIssue = async (payload: CreateIssuePayload) => {
     try {
-      const response = await useAPI('/issue', {
+      const {error, refresh} = await useAPI('/issue', {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       })
-      if (!response) {
+      if (error.value) {
         toast({
           title: 'Error creating issue',
           description: `Failed to create issue: ${response.statusText}`,
-          status: 'error'
         })
         console.error('Error creating issue:', response)
         return
@@ -103,6 +105,7 @@ export const useIssues = () => {
         title: 'Issue created !!',
         description: `Issue has been created!!`
       })
+      await refresh()
     } catch (error) {
       toast({
         title: 'Error creating issue',

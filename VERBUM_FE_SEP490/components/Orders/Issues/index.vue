@@ -48,9 +48,12 @@ onMounted(() => {
       <IssuesTable :issues="issues" :role="props.role" @update="handleUpdate" />
     </div>
     <div v-else class="w-full h-full flex justify-center items-center">
-      <p class="font-bold">
+      <p v-if="props.role === 'CLIENT'" class="font-bold">
         Have issues with the order?
         <span class="text-primary">Let us know.</span>
+      </p>
+      <p v-else class="font-bold">
+        <span class="text-primary">No issue found</span>
       </p>
     </div>
   </div>

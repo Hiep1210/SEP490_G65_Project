@@ -24,7 +24,7 @@ import { getIssueBadgeClass } from '@/utils/getBadgeClass'
 import { getFirebaseFileName } from '~/utils/getFirebaseFileName'
 
 const { assignList, getAssignList } = useUsers()
-const { updateIssueStatus, sendCancelResponse } = useIssues()
+const { updateIssueStatus, sendCancelResponse, updateIssue } = useIssues()
 
 const props = defineProps<{
   open: boolean
@@ -54,8 +54,20 @@ onMounted(() => {
 const issue = ref(props.rowData)
 const issueStatuses = ['OPEN', 'IN_PROGRESS', 'CANCEL', 'SUBMITTED', 'RESOLVED']
 const selectedStatus = ref(issue.value.status)
-const emitUpdate = () => {
-  emit('update', issue.value)
+
+const updateIssueDetail = async () => {
+  const payload = {
+    issueId: issue.value.issueId,
+    issueName: issue.value.issueName,
+    issueDescription: issue.value.issueDescription,
+    assigneeId: issue.value.assigneeId,
+    issueAttachments: issue.value.issueAttachments
+  }
+  console.log('update', payload)
+  await updateIssue(payload)
+  if (issue.value.status === 'OPEN') {
+    await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
+  }
   isEditing.value = false
 }
 
@@ -105,7 +117,7 @@ const filteredIssueStatuses = computed(() => {
     case 'TRANSLATE_MANAGER':
       return ['CANCEL', 'RESOLVED']
     case 'LINGUIST':
-      return ['SUBMITTED', 'IN_PROGRESS']
+      return ['SUBMITTED']
     default:
       return issueStatuses
   }
@@ -146,7 +158,7 @@ watch(
             <TableRow>
               <TableCell class="font-semibold">Issue name:</TableCell>
               <TableCell>
-                <template v-if="isEditing">
+                <template v-if="isEditing && role === 'CLIENT'">
                   <Input v-model="issue.issueName" class="rounded p-1 w-full" />
                 </template>
                 <template v-else>{{ issue.issueName }}</template>
@@ -157,13 +169,7 @@ watch(
             <TableRow v-if="role !== 'CLIENT'">
               <TableCell class="font-semibold">Created by:</TableCell>
               <TableCell>
-                <template v-if="isEditing">
-                  <Input
-                    v-model="issue.clientName"
-                    class="border border-cyan-700 rounded p-1 w-full"
-                  />
-                </template>
-                <template v-else>{{ issue.clientName }}</template>
+                {{ issue.clientName }}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -178,18 +184,25 @@ watch(
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
                 <template v-if="isEditing">
-                  <select
+                  <Select
                     v-model="issue.assigneeId"
                     class="border border-cyan-700 rounded w-full"
                   >
-                    <option
-                      v-for="user in assignList"
-                      :key="user.id"
-                      :value="user.id"
-                    >
-                      {{ user.name }}
-                    </option>
-                  </select>
+                    <SelectTrigger class="w-[180px]">
+                      <SelectValue :placeholder="issue.assigneeName" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="user in assignList"
+                          :key="user.id"
+                          :value="user.id"
+                        >
+                          {{ user.name }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </template>
                 <template v-else>{{ issue.assigneeName }}</template>
               </TableCell>
@@ -236,7 +249,7 @@ watch(
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Description:</div>
         <p>
-          <template v-if="isEditing">
+          <template v-if="isEditing && role === 'CLIENT'">
             <Textarea
               v-model="issue.issueDescription"
               class="border border-cyan-700 rounded p-1 w-full"
@@ -248,7 +261,7 @@ watch(
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
         <div class="font-semibold">Files:</div>
-        <div v-if="issue.issueAttachments">
+        <div v-if="issue.issueAttachments.length !== 0">
           <div
             v-for="attachment in issue.issueAttachments"
             :key="attachment.attachmentUrl"
@@ -276,6 +289,9 @@ watch(
             </a>
           </div>
         </div>
+        <div v-else>
+          <p class="text-primary font-semibold">No attachments found</p>
+        </div>
       </div>
 
       <DialogFooter>
@@ -290,7 +306,7 @@ watch(
           @click="enableEditing"
           >Edit
         </Button>
-        <Button v-if="isEditing" @click="emitUpdate">Update</Button>
+        <Button v-if="isEditing" @click="updateIssueDetail">Update</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
