@@ -14,5 +14,6 @@ namespace verbum_service_domain.DTO.Request
 
         public string? IssueDescription { get; set; }
         public List<UploadIssueAttachmentFiles>? IssueAttachments { get; set; } = new List<UploadIssueAttachmentFiles>();
+        public Guid OrderId { get; set; }
     }
 }

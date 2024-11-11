@@ -1,6 +1,7 @@
 ﻿using Lombok.NET;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
@@ -48,6 +49,16 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> UpdateJob([FromBody] UpdateJobRequest request)
         {
             await jobService.UpdateJob(request);
+            return NoContent();
+        }
+
+        [HttpPut("approve")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> ApproveJob([Required] Guid jobId, [Required] Guid orderId)
+        {
+            await jobService.ApproveJob(jobId,orderId);
             return NoContent();
         }
     }

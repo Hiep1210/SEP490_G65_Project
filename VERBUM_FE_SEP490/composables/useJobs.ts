@@ -22,9 +22,19 @@ export const useJobs = () => {
     }
   }
 
+  const getJobsOfWork = async (workId: string) => {
+    try {
+      const { data } = await useAPI(`/job/get-all?filter=WorkId eq ${workId}`)
+      jobs.value = data.value as Job[]
+    } catch (error) {
+      console.error('Failed to fetch jobs of work:', error)
+    }
+  }
+
   return {
     getJobs,
     editJob,
+    getJobsOfWork,
     jobs,
     job,
   }
