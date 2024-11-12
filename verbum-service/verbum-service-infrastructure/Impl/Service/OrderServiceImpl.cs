@@ -149,7 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            if (OrderStatus.NEW.ToString().Equals(orderStatus) || OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
+            if (OrderStatus.NEW.ToString().Equals(orderStatus) 
+                //|| OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
                 || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
                 || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
             {
