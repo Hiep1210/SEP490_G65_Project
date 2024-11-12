@@ -250,8 +250,8 @@ const confirmSetPrices = async () => {
                 >Discount: {{ order.discountId }}</span
               >
               <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
-              <span v-if="order.reference"
-                >Reference: {{ order.reference }}</span
+              <span v-if="order.orderNote"
+                >Note: {{ order.orderNote }}</span
               >
             </div>
 

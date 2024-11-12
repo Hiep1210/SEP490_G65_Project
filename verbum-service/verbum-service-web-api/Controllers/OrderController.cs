@@ -92,7 +92,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ConfirmPayment([Required] Guid clientId, [Required] Guid transactionId)
+        public async Task<IActionResult> ConfirmPayment([Required] Guid clientId, [Required] string transactionId)
         {
             await orderService.ConfirmPayment(clientId, transactionId);
             return NoContent();

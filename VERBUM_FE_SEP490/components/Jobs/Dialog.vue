@@ -40,32 +40,84 @@ const assignLinguists = async (payload: {
   const assignPayload = {
     id: props.job?.id,
     name: props.job?.name,
-    status: props.job?.status,
+    status: "IN_PROGRESS",
     assigneesId: payload.assigneesId,
     dueDate: payload.dueDate
-
   }
   try {
     const res = await repo(useNuxtApp().$api).assignLinguists(assignPayload)
     console.log(res)
-    if (res.status === '204') {
+    if (!res) {
       toast({
         title: 'Linguists assigned successfully',
         description: 'Linguists have been assigned to the job',
       })
+      window.location.reload()
+    }
+    else {
+      toast({
+        title: 'Failed to assign linguists',
+        description: 'Please try again later',
+        variant: 'destructive'
+      })
     }
   } catch (error) {
     console.error('Failed to assign linguists:', error)
-    toast({
-      title: 'Failed to assign linguists',
-      description: 'Please try again later',
-      variant: 'destructive'
-    })
   }
 }
-
-const approve = () => {
-  console.log('approve')
+const approve = async () => {
+  try {
+    const {status, error} = await useAPI('/job/approve', {
+      method: 'PUT',
+      query: {
+        jobId: props.job?.id,
+        orderId: props.job?.orderId
+      }
+    })
+    if (status.value === "error") {
+      toast({
+        title: 'Failed to approve job',
+        description: error.value?.message,
+        variant: 'destructive'
+      })
+    }
+    if (status.value === "success") {
+      toast({
+        title: 'Job approved successfully',
+        description: 'The job has been approved successfully',
+      })
+      window.location.reload()
+    }
+  } catch (error) {
+    console.error('Failed to approve job:', error)
+  }
+}
+const reject = async () => {
+  try {
+    const {status, error} = await useAPI('/job/edit', {
+      method: 'PUT',
+      body: {
+        ...props.job,
+        status: "IN_PROGRESS"
+      }
+    })
+    if (status.value === "error") {
+      toast({
+        title: 'Failed to reject job',
+        description: error.value?.message,
+        variant: 'destructive'
+      })
+    }
+    if (status.value === "success") {
+      toast({
+        title: 'Job rejected successfully',
+        description: 'The job has been rejected successfully',
+      })
+      window.location.reload()
+    }
+  } catch (error) {
+    console.error('Failed to reject job:', error)
+  }
 }
 </script>
 
@@ -76,7 +128,7 @@ const approve = () => {
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>{{ props.job?.name }}</DialogTitle>
+        <DialogTitle>{{ props.job?.assigneeNames?.map((assignee: any) => assignee.name).join(', ') }}</DialogTitle>
         <div class="flex justify-between">
           <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
         </div>
@@ -99,7 +151,7 @@ const approve = () => {
           </div>
           <div>
             <p v-if="props.job?.assigneeNames && props.job.assigneeNames.length > 0" class="text-sm">Assigned to: {{
-              props.job?.assigneeNames.toLocaleString() }}</p>
+              props.job?.assigneeNames.map(assignee => assignee.name).join(', ') }}</p>
             <p class="text-sm">Target Language: {{ props.job?.targetLanguageId }} </p>
             <p class="text-sm">Word Count: {{ props.job?.wordCount }} </p>
             <p v-if="props.job?.dueDate" class="text-sm">Due Date: {{ props.job?.dueDate }} </p>
@@ -113,9 +165,12 @@ const approve = () => {
         <template v-if="props.role?.includes('MANAGER')">
           <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" @assign="assignLinguists" />
           <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="approve">Approve</Button>
+          <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="reject">Reject</Button>
         </template>
         <template v-else>
-          <Button variant="outline" :disabled="!canUploadFile">Upload File</Button>
+          <JobsUploadFileDialog :job="props.job">
+            <Button variant="outline" :disabled="!canUploadFile">Upload File</Button>
+          </JobsUploadFileDialog>
         </template>
       </DialogFooter>
     </DialogContent>

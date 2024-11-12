@@ -149,7 +149,8 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            if (OrderStatus.NEW.ToString().Equals(orderStatus) || OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
+            if (OrderStatus.NEW.ToString().Equals(orderStatus) 
+                //|| OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
                 || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
                 || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
             {
@@ -270,7 +271,7 @@ namespace verbum_service_infrastructure.Impl.Service
             
         }
 
-        public async Task ConfirmPayment(Guid clientId, Guid transactionId)
+        public async Task ConfirmPayment(Guid clientId, string transactionId)
         {
             ClientTransaction transaction = await context.ClientTransactions.FirstOrDefaultAsync(x => x.TransactionId == transactionId && x.ClientId == clientId);
             if (ObjectUtils.IsEmpty(transaction.Orderid))

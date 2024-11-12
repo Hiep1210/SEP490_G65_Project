@@ -7,7 +7,7 @@ public partial class ClientTransaction
 {
     public Guid ClientId { get; set; }
 
-    public Guid TransactionId { get; set; }
+    public string TransactionId { get; set; } = null!;
 
     public Guid Orderid { get; set; }
 
