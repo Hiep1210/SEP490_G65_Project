@@ -22,19 +22,19 @@ const allStatus = ref<Status[]>([
     itemsPerPage: 5 // Set the number of items to show per page for each status
   },
   {
-    status: 'IN-PROGRESS',
+    status: 'IN_PROGRESS',
     class: 'bg-teal-200 text-black',
     currentPage: 1,
     itemsPerPage: 5
   },
   {
-    status: 'COMPLETED',
+    status: 'SUBMITTED',
     class: 'bg-emerald-200 text-black',
     currentPage: 1,
     itemsPerPage: 5
   },
   {
-    status: 'CANCEL',
+    status: 'APPROVED',
     class: 'bg-gray-200 text-black',
     currentPage: 1,
     itemsPerPage: 5

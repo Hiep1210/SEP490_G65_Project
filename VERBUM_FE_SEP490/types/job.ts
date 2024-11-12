@@ -10,5 +10,6 @@ export interface Job {
     deliverableUrl: string;
     targetLanguageId: string;
     workId: string;
-    assigneeNames: string[];
+    assigneeNames: object[];
+    orderId: string;
 }
