@@ -22,9 +22,19 @@ import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
 import { getIssueBadgeClass } from '@/utils/getBadgeClass'
 import { getFirebaseFileName } from '~/utils/getFirebaseFileName'
+import type { ResolveIssuePayload } from '~/types/payload/resolveIssue'
+import { useFileDialog } from '@vueuse/core'
+import { cn } from '@/lib/utils'
+import {
+  ref as storageRef,
+  getDownloadURL,
+  uploadBytesResumable
+} from 'firebase/storage'
+import { ServiceManagersRole } from '~/constants/userRole'
 
 const { assignList, getAssignList } = useUsers()
-const { updateIssueStatus, sendCancelResponse, updateIssue } = useIssues()
+const { updateIssueStatus, sendCancelResponse, updateIssue, resolveIssue } =
+  useIssues()
 
 const props = defineProps<{
   open: boolean
@@ -42,7 +52,54 @@ const descriptionStatusConfirm =
   'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
 const isConfirmDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
+const isResolveDialogOpen = ref(false)
 const reasonForCancellation = ref('')
+
+const storage = useFirebaseStorage()
+const downloadUrls = ref<string[]>([])
+const uploadProgress = ref<number[]>([])
+
+const downloadUrlsString = computed(() => downloadUrls.value.join(','))
+
+const { files, open: openFileSelect } = useFileDialog()
+
+async function uploadFiles() {
+  if (files.value?.length) {
+    const promises = Array.from(files.value).map(
+      (file, index) =>
+        new Promise<string>((resolve, reject) => {
+          const fileRef = storageRef(storage, `uploads/${file.name}`)
+          const uploadTask = uploadBytesResumable(fileRef, file)
+
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              uploadProgress.value[index] = Math.round(progress)
+            },
+            (error) => {
+              reject(error)
+            },
+            async () => {
+              const url = await getDownloadURL(fileRef)
+              resolve(url)
+            }
+          )
+        })
+    )
+
+    const urls = await Promise.all(promises)
+    downloadUrls.value = [...downloadUrls.value, ...urls]
+  }
+}
+
+watch(files, () => {
+  if (files.value?.length) {
+    uploadProgress.value = Array(files.value.length).fill(0)
+    uploadFiles()
+  }
+})
 
 onMounted(() => {
   if (!assignList.value.length) {
@@ -63,7 +120,6 @@ const updateIssueDetail = async () => {
     assigneeId: issue.value.assigneeId,
     issueAttachments: issue.value.issueAttachments
   }
-  console.log('update', payload)
   await updateIssue(payload)
   if (issue.value.status === 'OPEN') {
     await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
@@ -73,6 +129,36 @@ const updateIssueDetail = async () => {
 
 const enableEditing = () => {
   isEditing.value = true
+}
+
+const getUserIdByName = (users: User[], name: string): string | undefined => {
+  const user = users.find((user) => user.name === name)
+  return user?.id
+}
+
+const handleResolveIssue = async () => {
+  const solutionAttachment: IssueAttachments = {
+    issueId: issue.value.issueId,
+    attachmentUrl: downloadUrlsString,
+    tag: 'SOLUTION',
+    isDeleted: false
+  };
+
+  const updatedIssueAttachments = [...issue.value.issueAttachments, solutionAttachment];
+
+  const payload: ResolveIssuePayload = {
+    issueId: issue.value.issueId,
+    issueName: issue.value.issueName,
+    issueDescription: issue.value.issueDescription,
+    assigneeId: getUserIdByName(assignList.value, issue.value.assigneeName),
+    issueAttachments: updatedIssueAttachments
+  };
+
+  console.log(payload);
+
+  await resolveIssue(payload);
+  await updateIssueStatus(issue.value.issueId, 'SUBMITTED');
+  isResolveDialogOpen.value = false;
 }
 
 const handleConfirmStatus = async () => {
@@ -95,6 +181,9 @@ const handleStatusChange = async (
   if (newStatus === 'CANCEL') {
     isCancelDialogOpen.value = true
     previousStatus.value = oldStatus
+  } else if (newStatus === 'SUBMITTED') {
+    isResolveDialogOpen.value = true
+    previousStatus.value = oldStatus
   } else {
     await updateIssueStatus(issuesId, newStatus)
     issue.value.status = newStatus
@@ -106,9 +195,10 @@ const closeDialog = () => {
   isEditing.value = false
 }
 
+
+
 // Compute allowed statuses based on the role
 const filteredIssueStatuses = computed(() => {
-  console.log('role', props.role)
   switch (props.role) {
     case 'CLIENT':
       return ['CANCEL']
@@ -183,7 +273,13 @@ watch(
             <TableRow v-if="role !== 'CLIENT'">
               <TableCell class="font-semibold">Assign:</TableCell>
               <TableCell>
-                <template v-if="isEditing">
+                <template
+                  v-if="
+                    isEditing &&
+                    ServiceManagersRole.includes(role) &&
+                    issue.status === 'OPEN'
+                  "
+                >
                   <Select
                     v-model="issue.assigneeId"
                     class="border border-cyan-700 rounded w-full"
@@ -317,6 +413,7 @@ watch(
     @close="handleCancelStatus"
     @confirm="handleConfirmStatus"
   />
+
   <Dialog :open="isCancelDialogOpen" @close="handleCancelStatus">
     <DialogContent class="max-w-md">
       <DialogHeader>
@@ -333,6 +430,52 @@ watch(
       <DialogFooter>
         <Button class="bg-gray-500" @click="handleCancelStatus">Cancel</Button>
         <Button class="bg-red-500" @click="handleConfirmStatus">Confirm</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <Dialog :open="isResolveDialogOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Upload Issues Solution</DialogTitle>
+      </DialogHeader>
+      <Button
+        class="block"
+        type="button"
+        @click="openFileSelect({ accept: '*', multiple: true })"
+      >
+        Upload Files
+      </Button>
+      <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
+        <CardHeader>
+          <CardDescription>Uploaded files</CardDescription>
+        </CardHeader>
+        <CardContent class="grid gap-3">
+          <div
+            v-for="(file, index) in files"
+            :key="file.name"
+            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
+          >
+            <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div class="flex flex-col gap-1">
+              <p class="text-sm font-medium leading-none">
+                {{ file.name }}
+              </p>
+              <div class="flex gap-5 max-w-sm">
+                <Progress v-model="uploadProgress[index]" />
+                <p class="text-sm font-medium leading-none">
+                  {{ uploadProgress[index] || 0 }}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <DialogFooter>
+        <DialogClose as-child>
+          <Button class="bg-gray-500">Cancel</Button>
+        </DialogClose>
+        <Button class="bg-red-500" @click="handleResolveIssue">Submit</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

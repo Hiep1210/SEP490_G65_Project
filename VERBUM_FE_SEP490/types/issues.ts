@@ -1,6 +1,8 @@
-export type IssueAttachment = {
+export type IssueAttachments = {
   issueId: string
   attachmentUrl: string
+  tag:string
+  isDeleted: boolean
 }
 
 export type Issue = {
@@ -15,6 +17,6 @@ export type Issue = {
   issueDescription: string
   assigneeName: string
   assigneeId: string
-  issueAttachments: IssueAttachment[]
+  issueAttachments: IssueAttachments[]
   cancelResponse: string
 }

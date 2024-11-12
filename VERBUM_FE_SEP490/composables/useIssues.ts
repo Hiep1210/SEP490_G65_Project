@@ -1,6 +1,7 @@
 import { useToast } from '~/components/ui/toast'
 import type { Issue } from '~/types/issues'
 import type { CreateIssuePayload } from '~/types/payload/createIssue'
+import type { ResolveIssuePayload } from '~/types/payload/resolveIssue'
 
 const { toast } = useToast()
 export const useIssues = () => {
@@ -164,6 +165,29 @@ export const useIssues = () => {
     }
   }
 
+  const resolveIssue = async (issue: ResolveIssuePayload) => {
+    try {
+      await useAPI(
+        `/issue`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(issue),
+        }
+      )
+      toast({
+        title: 'Issue status updated !!',
+        description: `Issue status has been updated!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating issue status',
+        description: 'An error occurred while updating the issue status!!'
+      })
+      console.error('Error updating issue status:', error)
+    }
+  }
+
   return {
     isLoading,
     issues,
@@ -172,6 +196,7 @@ export const useIssues = () => {
     updateIssue,
     createIssue,
     updateIssueStatus,
-    sendCancelResponse
+    sendCancelResponse,
+    resolveIssue
   }
 }
