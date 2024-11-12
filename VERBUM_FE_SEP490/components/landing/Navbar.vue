@@ -8,7 +8,7 @@
       
       <div>
         <div class="hidden lg:flex items-center gap-4">
-          <a href="#">Log in</a>
+          <a href="/login">Log in</a>
           <LandingLink href="#" size="md">Sign up</LandingLink>
         </div>
       </div>

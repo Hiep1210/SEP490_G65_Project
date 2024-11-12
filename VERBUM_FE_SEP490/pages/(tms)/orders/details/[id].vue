@@ -2,7 +2,7 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_NEW } from '~/constants/orderSatus'
+import { ORDER_COMPLETED, ORDER_NEW } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 
@@ -350,7 +350,7 @@ const confirmSetPrices = async () => {
       </div>
 
       <!-- Smaller Issues List Section -->
-      <div v-if="order.orderStatus === ORDER_NEW" class="flex-1 space-y-4 border rounded-md">
+      <div v-if="order.orderStatus === ORDER_COMPLETED" class="flex-1 space-y-4 border rounded-md">
         <OrdersIssues
           :job-deliverables="order.jobDeliverables"
           :order-id="orderId"
