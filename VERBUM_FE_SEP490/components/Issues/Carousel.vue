@@ -20,7 +20,7 @@ const props = defineProps<{
   role: string
 }>()
 
-const activeIssueStatuses = ['OPEN']
+const activeIssueStatuses = ['OPEN', 'IN_PROGRESS']
 
 const acceptedIssues = (data: Issue[]) => {
   return data.filter((item) => activeIssueStatuses.includes(item.status))
