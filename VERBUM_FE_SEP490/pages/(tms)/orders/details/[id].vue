@@ -176,7 +176,6 @@ const handleSetPrices = () => {
 
 const handlePaymentClose = () => {
   openPaymentDialog.value = false
-  refreshOrder()
   if(order.value?.orderStatus === 'DELIVERED'){
     openRatingDialog.value = true
   }
