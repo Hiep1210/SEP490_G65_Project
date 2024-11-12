@@ -13,7 +13,47 @@ const { toast } = useToast()
 
 export const useRating = () => {
   const ratings = ref<Rating[]>([])
+  const filteredRating = ref<Rating | null>(null)
   const isLoading = ref(false)
+
+  const getRatings = async () => {
+    isLoading.value = true
+    try {
+      const { data: ratingData } = await useAPI<Rating[]>('/rating/get-all', {
+        method: 'GET'
+      })
+
+      if (!ratingData?.value || ratingData.value.length === 0) {
+        toast({
+          title: 'No ratings found!',
+          description: 'There are no ratings available!!'
+        })
+        ratings.value = []
+      } else {
+        ratings.value = ratingData.value
+      }
+    } catch (error) {
+      toast({
+        title: 'Error fetching ratings!!',
+        description: 'An error occurred while fetching ratings!!'
+      })
+      console.log('Error fetching ratings: ', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const getRatingByOrderId = async (orderId: string) => {
+    await getRatings()
+    filteredRating.value = ratings.value.find(rating => rating.orderId === orderId) || null
+
+    if (!filteredRating.value) {
+      toast({
+        title: 'No ratings found!',
+        description: `No ratings available for order ID: ${orderId}.`
+      })
+    }
+  }
 
   const createRating = async (rating: Rating) => {
     try {
@@ -38,6 +78,9 @@ export const useRating = () => {
   return {
     ratings,
     isLoading,
+    filteredRating,
+    getRatings,
+    getRatingByOrderId,
     createRating
   }
 }
