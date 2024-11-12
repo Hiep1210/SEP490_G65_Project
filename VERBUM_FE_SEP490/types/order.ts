@@ -1,3 +1,5 @@
+import type { JobDeliverables } from "./jobDeliverables"
+
 export interface Order {
   orderId: string
   orderName?: string
@@ -14,6 +16,6 @@ export interface Order {
   orderNote?: string
   translationFileUrls?: string[]
   referenceFileUrls?: string[]
-  deliverableFileUrls?: string[]
+  jobDeliverables?: JobDeliverables[]
   paymentStatus?: string
 }

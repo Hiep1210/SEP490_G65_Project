@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   title: 'Home',
-  layout: 'landing'
+  layout: 'landing',
 })
 
 const pricing = [
