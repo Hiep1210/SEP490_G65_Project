@@ -70,7 +70,9 @@ public partial class verbumContext : DbContext
 
             entity.HasIndex(e => e.Orderid, "client_transaction_unique").IsUnique();
 
-            entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
+            entity.Property(e => e.TransactionId)
+                .HasColumnType("character varying")
+                .HasColumnName("transaction_id");
             entity.Property(e => e.ClientId).HasColumnName("client_id");
             entity.Property(e => e.IsDeposit)
                 .HasDefaultValue(false)

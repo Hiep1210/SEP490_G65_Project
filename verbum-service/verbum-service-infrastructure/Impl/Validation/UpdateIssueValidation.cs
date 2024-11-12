@@ -27,10 +27,10 @@ namespace verbum_service_infrastructure.Impl.Validation
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "missing fields"));
                 return errors;
             }
-            if (!IssueStatusEnum.OPEN.ToString().Equals(await context.Issues.Where(x => x.IssueId == request.IssueId).Select(x => x.Status).FirstOrDefaultAsync())) 
-            {
-                errors.Add(AlertMessage.Alert(ValidationAlertCode.CANNOT_UPDATE, "issue because issue is not open anymore"));
-            }
+            //if (!IssueStatusEnum.OPEN.ToString().Equals(await context.Issues.Where(x => x.IssueId == request.IssueId).Select(x => x.Status).FirstOrDefaultAsync())) 
+            //{
+            //    errors.Add(AlertMessage.Alert(ValidationAlertCode.CANNOT_UPDATE, "issue because issue is not open anymore"));
+            //}
             foreach (var attachment in request.IssueAttachments)
             {
                 if (!Enum.IsDefined(typeof(IssueFileTag), attachment.Tag))
