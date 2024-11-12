@@ -5,11 +5,13 @@ import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
+import { CircleUser } from 'lucide-vue-next'
 
 const { toast } = useToast()
 const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
+const { getRatingByOrderId, filteredRating } = useRating()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -21,7 +23,7 @@ const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const openRatingDialog = ref(false)
-const tempPrice = ref<string>('0')
+const tempPrice = ref<string>('0') 
 
 onMounted(() => {
   getOrder(orderId)
@@ -29,6 +31,7 @@ onMounted(() => {
     getIssuesByOrders(orderId as string)
   }
   getSupportedLanguages()
+  getRatingByOrderId(orderId as string);
 })
 
 // Enter edit mode
@@ -167,12 +170,14 @@ const handlePay = (status: string) => {
 
 const handleSetPrices = () => {
   openSetPricesDialog.value = true
+  refreshOrder()
   tempPrice.value = order.value?.orderPrice || '0'
 }
 
 const handlePaymentClose = () => {
   openPaymentDialog.value = false
-  if(order.value?.orderStatus === 'ACCEPTED'){
+  refreshOrder()
+  if(order.value?.orderStatus === 'DELIVERED'){
     openRatingDialog.value = true
   }
 }
@@ -358,6 +363,25 @@ const confirmSetPrices = async () => {
         </div>
 
         <OrdersDetailsTabs :order="order" />
+
+        <!-- Rating -->
+         <div v-if="filteredRating && order.orderStatus === 'DELIVERED'" class="flex gap-2 border rounded-md p-5">
+          <div>
+            <CircleUser class="h-10 w-10" />
+          </div>
+          <div>
+            <p class="text-[1.5rem] font-semibold">Your Review</p>
+            <div class="">
+              <RatingDisplay :question="'Expectation '" :rating="filteredRating.expectation"/>
+              <RatingDisplay :question="'In Time '" :rating="filteredRating.inTime"/>
+              <RatingDisplay :question="'Issues Resolved '" :rating="filteredRating.issueResolved"/>
+            </div>
+            <div class="mt-3">
+               {{ filteredRating.moreThought }}
+            </div>
+          </div>
+         </div>
+
       </div>
 
       <!-- Smaller Issues List Section -->
