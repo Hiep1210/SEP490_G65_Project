@@ -46,7 +46,8 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        //note
+        [Roles(UserRole.CLIENT, UserRole.MANAGER, UserRole.LINGUIST)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -57,7 +58,8 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("change-status")]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        //note
+        [Roles(UserRole.CLIENT, UserRole.MANAGER, UserRole.LINGUIST)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
