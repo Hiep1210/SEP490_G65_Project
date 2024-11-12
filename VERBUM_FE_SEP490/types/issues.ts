@@ -19,4 +19,5 @@ export type Issue = {
   assigneeId: string
   issueAttachments: IssueAttachments[]
   cancelResponse: string
+  rejectResponse: string
 }

@@ -33,7 +33,7 @@ import {
 import { ServiceManagersRole } from '~/constants/userRole'
 
 const { assignList, getAssignList } = useUsers()
-const { updateIssueStatus, sendCancelResponse, updateIssue, resolveIssue } =
+const { updateIssueStatus, sendCancelResponse, updateIssue, resolveIssue, approveIssueSolution, acceptIssueSolution, sendRejectResponse } =
   useIssues()
 
 const props = defineProps<{
@@ -50,10 +50,14 @@ const previousStatus = ref('')
 const titleStatusConfirm = 'Change status'
 const descriptionStatusConfirm =
   'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
-const isConfirmDialogOpen = ref(false)
+const rejectSolutionDescription =
+  'Are you sure you want to reject the solution?'
+  const isConfirmDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
 const isResolveDialogOpen = ref(false)
+const isRejectSolutionDialogOpen = ref(false)
 const reasonForCancellation = ref('')
+const reasonForRejectSolution = ref('')
 
 const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
@@ -160,8 +164,19 @@ const handleResolveIssue = async () => {
   console.log(payload)
 
   await resolveIssue(payload)
-  // await updateIssueStatus(issue.value.issueId, 'SUBMITTED')
+  await updateIssueStatus(issue.value.issueId, 'SUBMITTED')
   isResolveDialogOpen.value = false
+}
+
+const handleCancelResolve = () => {
+  selectedStatus.value = previousStatus.value
+  isResolveDialogOpen.value = false
+}
+
+const openRejectDialog = () => {
+  isRejectSolutionDialogOpen.value = true
+  // selectedStatus.value = previousStatus.value
+  // await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
 }
 
 const handleConfirmStatus = async () => {
@@ -174,6 +189,18 @@ const handleCancelStatus = () => {
   selectedStatus.value = previousStatus.value
   isCancelDialogOpen.value = false
   reasonForCancellation.value = ''
+}
+
+const handleConfirmRejectSolution = async () => {
+  await sendRejectResponse(issue.value.issueId, reasonForRejectSolution.value)
+  await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
+  isCancelDialogOpen.value = false
+}
+
+const handleCancelRejectSolution = () => {
+  selectedStatus.value = previousStatus.value
+  isRejectSolutionDialogOpen.value = false
+  reasonForRejectSolution.value = ''
 }
 
 const handleStatusChange = async (
@@ -191,6 +218,14 @@ const handleStatusChange = async (
     await updateIssueStatus(issuesId, newStatus)
     issue.value.status = newStatus
   }
+}
+
+const handleReviewResolveIssue = async () => {
+  const response = await approveIssueSolution(issue.value.issueId, issue.value.orderId)
+  if(response) {
+    await acceptIssueSolution(issue.value.issueId)
+  }
+  await updateIssueStatus(issue.value.issueId, 'RESOLVED')
 }
 
 const closeDialog = () => {
@@ -241,6 +276,14 @@ watch(
       >
         <div class="font-semibold text-red-600">Cancellation Reason:</div>
         <p>{{ issue.cancelResponse }}</p>
+      </div>
+
+      <div
+        v-if="issue.rejectResponse && (role === 'CLIENT' || ServiceManagersRole.includes(role)) && issue.status !== 'RESOLVED'"
+        class="p-3 rounded-xl border-2 border-stone-300"
+      >
+        <div class="font-semibold text-red-600">Reject Solution Reason:</div>
+        <p>{{ issue.rejectResponse }}</p>
       </div>
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
@@ -392,13 +435,24 @@ watch(
       </div>
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="font-semibold">Solution Files:</div>
+        <div class="flex justify-between">
+          <div class="font-semibold">Solution Files:</div>
+          <div v-if="ServiceManagersRole.includes(role) && issue.status !== 'RESOLVED'" class="flex gap-2">
+            <Button class="bg-gray-500" @click="openRejectDialog"
+              >Reject</Button
+            >
+            <Button class="bg-red-500" @click="handleReviewResolveIssue"
+              >Mark as resolved</Button
+            >
+          </div>
+        </div>
         <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
           <div
             v-for="attachment in issue.issueAttachments"
             :key="attachment.attachmentUrl"
           >
             <a
+            v-if="attachment.tag === 'SOLUTION'"
               :href="attachment.attachmentUrl"
               target="_blank"
               rel="noopener noreferrer"
@@ -470,7 +524,27 @@ watch(
     </DialogContent>
   </Dialog>
 
-  <Dialog :open="isResolveDialogOpen">
+  <Dialog :open="isRejectSolutionDialogOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Provide Reject Reason</DialogTitle>
+      </DialogHeader>
+      <Input
+        v-model="reasonForRejectSolution"
+        placeholder="Enter reason for cancellation"
+        class="w-full"
+      />
+      <DialogDescription class="text-red-500 font-semibold">
+        {{ rejectSolutionDescription }}
+      </DialogDescription>
+      <DialogFooter>
+        <Button class="bg-gray-500" @click="handleCancelRejectSolution">Cancel</Button>
+        <Button class="bg-red-500" @click="handleConfirmRejectSolution">Confirm</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <Dialog :open="isResolveDialogOpen" @close="handleCancelResolve">
     <DialogContent class="max-w-md">
       <DialogHeader>
         <DialogTitle>Upload Issues Solution</DialogTitle>
@@ -508,7 +582,7 @@ watch(
         </CardContent>
       </Card>
       <DialogFooter>
-        <Button class="bg-gray-500" @click="handleCancelStatus">Cancel</Button>
+        <Button class="bg-gray-500" @click="handleCancelResolve">Cancel</Button>
         <Button class="bg-red-500" @click="handleResolveIssue">Submit</Button>
       </DialogFooter>
     </DialogContent>

@@ -97,9 +97,9 @@ export const useIssues = () => {
       if (error.value) {
         toast({
           title: 'Error creating issue',
-          description: `Failed to create issue: ${response.statusText}`,
+          description: `Failed to create issue: ${error.value}`,
         })
-        console.error('Error creating issue:', response)
+        console.error('Error creating issue:', error.value)
         return
       }
       toast({
@@ -165,6 +165,33 @@ export const useIssues = () => {
     }
   }
 
+  const sendRejectResponse = async (issueId: string, responseContent: string) => {
+    try {
+      const payload = {
+        id: issueId,
+        responseContent: responseContent
+      }
+      await useAPI(
+        `/issue/send-reject-response`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      )
+      toast({
+        title: 'Issue rejected !!',
+        description: `Issue solution has been rejected!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error reject issue solution',
+        description: 'An error occurred while reject the issue solution!!'
+      })
+      console.error('Error updating issue status:', error)
+    }
+  }
+
   const resolveIssue = async (issue: ResolveIssuePayload) => {
     try {
       await useAPI(
@@ -188,6 +215,63 @@ export const useIssues = () => {
     }
   }
 
+  const approveIssueSolution= async (issueId: string, orderId: string) => {
+    try {
+      const {data, error, refresh} = await useAPI(`/issue/approve?issueId=${issueId}&orderId=${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (error.value) {
+        toast({
+          title: 'Error approve issue',
+          description: `Failed to approve issue: ${error.value}`,
+        })
+        console.error('Error approve issue:', error.value)
+        return
+      }
+      toast({
+        title: 'Issue approved !!',
+        description: `Issue has been approved!!`
+      })
+      await refresh()
+      return data
+    } catch (error) {
+      toast({
+        title: 'Error approve issue',
+        description: 'An error occurred while approving the issue!!'
+      })
+      console.error('Error approve issue:', error)
+    }
+  }
+
+  const acceptIssueSolution= async (issueId: string) => {
+    try {
+      const {error, refresh} = await useAPI(`/issue/accept-issue-solution?issueId=${issueId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (error.value) {
+        toast({
+          title: 'Error approve issue',
+          description: `Failed to approve issue: ${error.value}`,
+        })
+        console.error('Error approve issue:', error.value)
+        return
+      }
+      toast({
+        title: 'Issue approved !!',
+        description: `Issue has been approved!!`
+      })
+      await refresh()
+    } catch (error) {
+      toast({
+        title: 'Error approve issue',
+        description: 'An error occurred while approving the issue!!'
+      })
+      console.error('Error approve issue:', error)
+    }
+  }
+
   return {
     isLoading,
     issues,
@@ -197,6 +281,9 @@ export const useIssues = () => {
     createIssue,
     updateIssueStatus,
     sendCancelResponse,
-    resolveIssue
+    resolveIssue,
+    approveIssueSolution,
+    acceptIssueSolution,
+    sendRejectResponse
   }
 }
