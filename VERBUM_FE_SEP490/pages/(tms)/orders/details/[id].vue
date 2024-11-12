@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
+import { ORDER_NEW } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 
 const { toast } = useToast()
-const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
+
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
@@ -25,9 +25,6 @@ const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
-  if (!issues.value.length) {
-    getIssuesByOrders(orderId as string)
-  }
   getSupportedLanguages()
 })
 
@@ -141,14 +138,6 @@ interface Language {
 }
 const languageList = ref<Language[]>([])
 
-const showIssuesDialog = ref(false)
-const selectedData = ref()
-
-const handleUpdate = async (updateIssues: Issue) => {
-  await updateIssue(updateIssues)
-  await getIssues()
-}
-
 const orderRepo = repo(useNuxtApp().$api)
 
 onMounted(async () => {
@@ -215,10 +204,10 @@ const confirmSetPrices = async () => {
     <div v-if="!order">
       <NuxtLoadingIndicator />
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5">
+    <div v-else class=" flex md:grid-cols-2 gap-5 pb-5">
       <!-- Order Information and File URLs Section -->
-      <div class="space-y-4">
-        <div class="container p-4 space-y-2 orderDetails border rounded-md">
+      <div class="flex-1 space-y-4">
+        <div class="p-4 space-y-2 orderDetails border rounded-md">
           <div class="flex">
             <p class="text-[2rem] font-semibold flex-auto">
               {{ order?.orderName }}
@@ -361,24 +350,13 @@ const confirmSetPrices = async () => {
       </div>
 
       <!-- Smaller Issues List Section -->
-      <div class="space-y-4 border rounded-md">
-        <div class="flex justify-between items-center p-3 border-b">
-          <span class="text-lg font-semibold">Issues</span>
-          <IssuesCreate v-if="role === 'CLIENT'" :order-id="orderId" />
-        </div>
-        <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
-          <IssuesTable
-            :issues="issues"
-            :role="user?.role as string"
-            @update="handleUpdate"
-          />
-        </div>
-        <div v-else class="w-full h-full flex justify-center items-center">
-          <p class="font-bold">
-            Have issues with the order?
-            <span class="text-primary">Let us know.</span>
-          </p>
-        </div>
+      <div v-if="order.orderStatus === ORDER_NEW" class="flex-1 space-y-4 border rounded-md">
+        <OrdersIssues
+          :job-deliverables="order.jobDeliverables"
+          :order-id="orderId"
+          :role="role"
+          :user="user"
+        />
       </div>
 
       <!-- Set Prices Dialog -->
