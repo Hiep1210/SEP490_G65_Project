@@ -17,7 +17,7 @@ import {
   TableCell,
   TableBody
 } from '@/components/ui/table'
-import type { Issue } from '~/types/issues'
+import type { Issue, IssueAttachments } from '~/types/issues'
 import { formatDate } from '~/utils/date'
 import { useUsers } from '~/composables/useUsers'
 import { getIssueBadgeClass } from '@/utils/getBadgeClass'
@@ -131,20 +131,23 @@ const enableEditing = () => {
   isEditing.value = true
 }
 
-const getUserIdByName = (users: User[], name: string): string | undefined => {
+const getUserIdByName = (users: User[], name: string): string => {
   const user = users.find((user) => user.name === name)
-  return user?.id
+  return user?.id ?? ''
 }
 
 const handleResolveIssue = async () => {
   const solutionAttachment: IssueAttachments = {
     issueId: issue.value.issueId,
-    attachmentUrl: downloadUrlsString,
+    attachmentUrl: downloadUrlsString.value,
     tag: 'SOLUTION',
     isDeleted: false
-  };
+  }
 
-  const updatedIssueAttachments = [...issue.value.issueAttachments, solutionAttachment];
+  const updatedIssueAttachments = [
+    ...issue.value.issueAttachments,
+    solutionAttachment
+  ]
 
   const payload: ResolveIssuePayload = {
     issueId: issue.value.issueId,
@@ -152,13 +155,13 @@ const handleResolveIssue = async () => {
     issueDescription: issue.value.issueDescription,
     assigneeId: getUserIdByName(assignList.value, issue.value.assigneeName),
     issueAttachments: updatedIssueAttachments
-  };
+  }
 
-  console.log(payload);
+  console.log(payload)
 
-  await resolveIssue(payload);
-  await updateIssueStatus(issue.value.issueId, 'SUBMITTED');
-  isResolveDialogOpen.value = false;
+  await resolveIssue(payload)
+  // await updateIssueStatus(issue.value.issueId, 'SUBMITTED')
+  isResolveDialogOpen.value = false
 }
 
 const handleConfirmStatus = async () => {
@@ -195,8 +198,6 @@ const closeDialog = () => {
   isEditing.value = false
 }
 
-
-
 // Compute allowed statuses based on the role
 const filteredIssueStatuses = computed(() => {
   switch (props.role) {
@@ -205,7 +206,7 @@ const filteredIssueStatuses = computed(() => {
     case 'EDIT_MANAGER':
     case 'EVALUATE_MANAGER':
     case 'TRANSLATE_MANAGER':
-      return ['CANCEL', 'RESOLVED']
+      return ['CANCEL']
     case 'LINGUIST':
       return ['SUBMITTED']
     default:
@@ -356,8 +357,43 @@ watch(
       </div>
 
       <div class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="font-semibold">Files:</div>
-        <div v-if="issue.issueAttachments.length !== 0">
+        <div class="font-semibold">Issue Attachment Files:</div>
+        <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
+          <div
+            v-for="attachment in issue.issueAttachments"
+            :key="attachment.attachmentUrl"
+          >
+            <a
+              :href="attachment.attachmentUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+              :title="getFirebaseFileName(attachment.attachmentUrl)"
+            >
+              <img
+                src="~/assets/img/file_icon.png"
+                loading="eager"
+                format="avif"
+                width="100"
+                height="50"
+                alt="file icon"
+              />
+              <h1
+                class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
+              >
+                {{ getFirebaseFileName(attachment.attachmentUrl) }}
+              </h1>
+            </a>
+          </div>
+        </div>
+        <div v-else>
+          <p class="text-primary font-semibold">No attachments found</p>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-xl border-2 border-stone-300">
+        <div class="font-semibold">Solution Files:</div>
+        <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
           <div
             v-for="attachment in issue.issueAttachments"
             :key="attachment.attachmentUrl"
@@ -472,9 +508,7 @@ watch(
         </CardContent>
       </Card>
       <DialogFooter>
-        <DialogClose as-child>
-          <Button class="bg-gray-500">Cancel</Button>
-        </DialogClose>
+        <Button class="bg-gray-500" @click="handleCancelStatus">Cancel</Button>
         <Button class="bg-red-500" @click="handleResolveIssue">Submit</Button>
       </DialogFooter>
     </DialogContent>
