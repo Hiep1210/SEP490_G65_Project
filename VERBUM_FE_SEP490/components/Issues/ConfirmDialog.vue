@@ -51,7 +51,7 @@ function handleConfirm() {
         <Button class="bg-slate-500 hover:bg-slate-600" @click="$emit('close')"
           >Cancel</Button
         >
-        <Button @click="handleConfirm"">Confirm</Button>
+        <Button @click="handleConfirm">Confirm</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
