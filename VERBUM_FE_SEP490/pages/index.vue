@@ -7,7 +7,7 @@ definePageMeta({
 const pricing = [
   {
     name: 'Personal',
-    price: 'Translte',
+    price: 'Translate',
     popular: true,
     features: [
       'Translate the document(s) from one to another language.',
