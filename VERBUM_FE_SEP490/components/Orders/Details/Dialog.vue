@@ -22,7 +22,6 @@ const reason = ref('')
         <Label>Reason</Label>
         <Input v-model="reason" />
       </div>
-
       <DialogFooter>
         <Button @click="orderId && sendRejectOrder(orderId, reason)">Reject</Button>
       </DialogFooter>

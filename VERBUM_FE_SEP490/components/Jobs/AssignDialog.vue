@@ -4,7 +4,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { cn } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-vue-next'
+import {CalendarDate} from "@internationalized/date"
 import { format } from 'date-fns'
+
 
 const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
 
@@ -89,7 +91,7 @@ const onSubmit = handleSubmit((values) => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
-                    <Calendar v-bind="componentField" initial-focus />
+                    <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)" />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
@@ -105,5 +107,3 @@ const onSubmit = handleSubmit((values) => {
 
   </div>
 </template>
-
-<style></style>

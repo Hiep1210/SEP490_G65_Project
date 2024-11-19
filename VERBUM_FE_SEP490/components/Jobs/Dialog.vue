@@ -163,7 +163,7 @@ const reject = async () => {
       </DialogDescription>
       <DialogFooter>
         <template v-if="props.role?.includes('MANAGER')">
-          <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" @assign="assignLinguists" />
+          <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" :order-due-date="props.job?.dueDate" @assign="assignLinguists" />
           <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="approve">Approve</Button>
           <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="reject">Reject</Button>
         </template>
