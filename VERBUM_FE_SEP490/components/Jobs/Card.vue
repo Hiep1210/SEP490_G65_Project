@@ -5,6 +5,9 @@ const props = defineProps<{
   data: Job
 }>();
 const emit = defineEmits(['click:card'])
+useHead({
+  title: "Works Details"
+})
 </script>
 
 <template>
