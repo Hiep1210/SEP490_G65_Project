@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TData, TValue">
 import {
   Table,
   TableBody,
@@ -7,94 +7,67 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import {
+  FlexRender,
+  getCoreRowModel,
+  useVueTable,
+  type ColumnDef,
+} from "@tanstack/vue-table"
 import type { Order } from '~/types/order'
 import { repo } from '~/utils/repo'
 
 const props = defineProps<{
-  orders: Order[]
+  columns: ColumnDef<TData, TValue>[],
+  data: TData[]
 }>()
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString()
-}
+const table = useVueTable({
+  get data() { return props.data },
+  get columns() { return props.columns },
+  getCoreRowModel: getCoreRowModel()
+})
 
-const toDetails = (orderId: string) => {
-  useRouter().push('/orders/details/' + orderId)
-}
 const toCreate = () => {
-  useRouter().push('/orders/create')
+  navigateTo("/orders/create")
 }
 
-const searchValue = ref('')
-
-const ordersRepo = repo(useNuxtApp().$api)
-
-const searchOrders = async (value: string) => {
-  const orders = await ordersRepo.searchOrders(value)
-  emit('update:orders', orders)
-}
-
-const emit = defineEmits<{
-  'update:orders': [orders: Order[]]
-}>()
-
-const currentPage = ref(1)
-const pageSize = ref(8)
-const totalOrders = ref(0)
-const fetchOrders = async () => {
-  const response = await ordersRepo.getOrders(currentPage.value, pageSize.value)
-  const count = await ordersRepo.getOrdersCount()
-  totalOrders.value = count.length
-  emit('update:orders', response)
-}
-
-watch([currentPage, pageSize], fetchOrders, { immediate: true })
-
-const totalPages = computed(() => totalOrders.value ? Math.ceil(totalOrders.value / pageSize.value) : 1)
 
 </script>
 
 <template>
   <div>
     <div class="flex justify-between space-x-4 pb-4">
-      <Input v-model="searchValue" placeholder="Search orders" @keydown.enter="searchOrders(searchValue)" />
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
     <div class="border rounded-lg overflow-hidden">
-      <div v-if="orders.length === 0" class="text-center">
-        <span>
-          <p class="text-lg font-semibold">
-            There are no orders to display. What about creating one?
-          </p>
-        </span>
-      </div>
-      <Table v-else>
+      <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead class="w-[100px]">#</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead class="text-center">Created At</TableHead>
+          <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+            <TableHead v-for="header in headerGroup.headers" :key="header.id">
+              <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+                :props="header.getContext()" />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="(order, index) in props.orders" :key="order.orderId" @click="toDetails(order.orderId)">
-            <TableCell class="font-medium">{{ index + 1 }}</TableCell>
-            <TableCell>{{ order.orderName }}</TableCell>
-            <TableCell>{{ order.orderStatus }}</TableCell>
-            <TableCell class="text-center">
-              {{ formatDate(order.createdDate ?? '') }}
-            </TableCell>
-          </TableRow>
+          <template v-if="table.getRowModel().rows?.length">
+            <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
+              :data-state="row.getIsSelected() ? 'selected' : undefined">
+              <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+              </TableCell>
+            </TableRow>
+          </template>
+          <template v-else>
+            <TableRow>
+              <TableCell :colspan="columns.length" class="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          </template>
         </TableBody>
       </Table>
-    </div>
-
-    <div v-if="totalPages > 1" class="pagination flex items-center justify-center space-x-4 mt-4">
-      <Button variant="outline" :disabled="currentPage === 1" @click="currentPage--">Previous</Button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <Button variant="outline" :disabled="currentPage * pageSize >= totalOrders" @click="currentPage++">Next</Button>
     </div>
   </div>
 </template>

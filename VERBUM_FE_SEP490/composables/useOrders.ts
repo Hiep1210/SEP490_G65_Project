@@ -13,7 +13,7 @@ export const useOrders = () => {
   const getOrders = async () => {
     isLoading.value = true
     try {
-      const { data: ordersData } = await useAPI<Order[]>('/order/get-all', {
+      const { data: ordersData } = await useAPI<Order[]>('/order/get-all?$orderby=orderName desc', {
         method: 'GET',
         credentials: 'include',
       })

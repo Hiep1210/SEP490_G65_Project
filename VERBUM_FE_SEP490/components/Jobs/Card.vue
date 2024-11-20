@@ -5,10 +5,16 @@ const props = defineProps<{
   data: Job
 }>();
 const emit = defineEmits(['click:card'])
+useHead({
+  title: "Works Details"
+})
 </script>
 
 <template>
-  <div class="bg-slate-50 m-1 mb-3 rounded-lg p-2 h-20 w-[17rem] hover:bg-slate-100 cursor-pointer" @click="emit('click:card')">
+  <div
+    class="bg-slate-50 p-1 mb-3 rounded-lg h-20 w-full max-w-md hover:bg-slate-100 cursor-pointer"
+    @click="emit('click:card')"
+  >
     <div class="font-semibold truncate" :title="props.data.name">
       {{ props.data.name }}
     </div>

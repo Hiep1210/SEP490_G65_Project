@@ -29,6 +29,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.IssueAttachments, opt => opt.MapFrom(src => src.IssueAttachments.Where(a => !a.IsDeleted)))
                 .ForMember(dest => dest.DocumentUrl, opt => opt.MapFrom(src => src.Job.DocumentUrl))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Job.Work.OrderId))
+                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Job.Work.Order.OrderName))
                 .ReverseMap();
             CreateMap<IssueAttachment, UploadIssueAttachmentFiles>().ReverseMap();
             CreateMap<IssueAttachment, UpdateIssueAttachmentFile>().ReverseMap();
