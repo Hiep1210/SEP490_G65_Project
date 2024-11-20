@@ -9,12 +9,10 @@
       <TabsContent value="working">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
-            v-if="
-              !Array.isArray(order.translationFileUrls) ||
-              !order.translationFileUrls.length
-            "
-            class="p-2 text-center"
-          >
+v-if="
+            !Array.isArray(order.translationFileUrls) ||
+            !order.translationFileUrls.length
+          " class="p-2 text-center">
             There are no working files, try refreshing the page
           </div>
           <Table v-else>
@@ -26,9 +24,7 @@
             <TableBody>
               <TableRow v-for="file in order.translationFileUrls" :key="file">
                 <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm"> Options </Button>
-                </TableCell>
+                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="file"/></TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -37,12 +33,10 @@
       <TabsContent value="reference">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
-            v-if="
-              !Array.isArray(order.referenceFileUrls) ||
-              !order.referenceFileUrls.length
-            "
-            class="p-2 text-center"
-          >
+v-if="
+            !Array.isArray(order.referenceFileUrls) ||
+            !order.referenceFileUrls.length
+          " class="p-2 text-center">
             There are no reference files
           </div>
           <Table v-else>
@@ -53,10 +47,8 @@
             </TableHeader>
             <TableBody>
               <TableRow v-for="file in order.referenceFileUrls" :key="file">
-                <TableCell>{{ file }}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm"> Options </Button>
-                </TableCell>
+                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
+                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="file"/></TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -66,12 +58,10 @@
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
-              !Array.isArray(order.deliverableFileUrls) ||
-              !order.deliverableFileUrls.length
-            "
-            class="p-2 text-center"
-          >
-            There are no deliverable files
+            !Array.isArray(order.jobDeliverables) ||
+            !order.jobDeliverables.length
+             " class="p-2 text-center">
+              There are no deliverable files
           </div>
           <Table v-else>
             <TableHeader>
@@ -80,11 +70,9 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="file in order.deliverableFileUrls" :key="file">
-                <TableCell>{{ file }}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm"> Options </Button>
-                </TableCell>
+              <TableRow v-for="deliverable in order.jobDeliverables" :key="deliverable.deliverableFileUrl">
+                <TableCell>{{ getFirebaseFileName(deliverable.deliverableFileUrl || '') }}</TableCell>
+                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="deliverable.deliverableFileUrl || ''"/></TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -96,15 +84,16 @@
 
 <script lang="ts" setup>
 import { getFirebaseFileName } from '@/utils/getFirebaseFileName'
-
+import type { Order } from '~/types/order';
 defineProps({
   order: {
-    type: Object,
+    type: Object as () => Order,
     default: () => ({
       translationFileUrls: [],
       referenceFileUrls: [],
-      deliverableFileUrls: []
-    })
+      deliverableFileUrls: [],
+      orderId: ''
+    }) as Order
   }
 })
 </script>

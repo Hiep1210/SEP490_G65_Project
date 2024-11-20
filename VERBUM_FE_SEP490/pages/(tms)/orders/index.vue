@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { columns } from '~/components/Orders/column';
+
 useSeoMeta({
   title: 'Orders'
 })
@@ -19,6 +21,6 @@ onMounted(async () => {
 
 <template>
   <ClientOnly>
-    <LazyOrdersTable :orders="orders" @update:orders="orders = $event" />
+    <LazyOrdersTable :columns="columns" :data="orders" />
   </ClientOnly>
 </template>
