@@ -58,23 +58,11 @@ namespace verbum_service_infrastructure.Impl.Service
                 .Where(x => x.Work.OrderId == orderId)
                 .ToListAsync();
 
-            //bool allCompleted = true;
-            //foreach (var job in jobs)
-            //{
-            //    if (job.Status != JobStatus.APPROVED.ToString() && ObjectUtils.IsNotEmpty(job.Issue) && job.Issue.Status != IssueStatusEnum.RESOLVED.ToString() && job.Issue.Status != IssueStatusEnum.CANCEL.ToString())
-            //    {
-            //        allCompleted = false;
-            //        break;
-            //    }
-            //}
+            bool allCompleted = jobs.All(job =>
+            job.Status == JobStatus.APPROVED.ToString() &&
+            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString() || job.Issue.Status == IssueStatusEnum.CANCEL.ToString()));
 
-            bool notAllCompleted = jobs.All(job =>
-            job.Status != JobStatus.APPROVED.ToString() &&
-            (ObjectUtils.IsNotEmpty(job.Issue)
-            && job.Issue.Status != IssueStatusEnum.RESOLVED.ToString())
-            && job.Issue.Status != IssueStatusEnum.CANCEL.ToString());
-
-            if (notAllCompleted)
+            if (allCompleted)
             {
                 int orderRecords = await context.Orders
                     .Where(o => o.OrderId == orderId)

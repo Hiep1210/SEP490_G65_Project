@@ -17,7 +17,6 @@ namespace verbum_service_infrastructure.Impl.Service
     {
         private readonly verbumContext context;
         private readonly IMapper mapper;
-        private readonly CurrentUser currentUser;
 
         public async Task CreateReceipt(CreateReceipRequest request)
         {
