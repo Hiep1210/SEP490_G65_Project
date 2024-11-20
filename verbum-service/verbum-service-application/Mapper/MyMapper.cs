@@ -23,6 +23,7 @@ namespace verbum_service_application.Mapper
                 .ReverseMap();
             CreateMap<Issue, CreateIssueRequest>().ReverseMap();
             CreateMap<Issue, UpdateIssueRequest>().ReverseMap();
+            CreateMap<Issue, ReopenIssueRequest>().ReverseMap();
             CreateMap<Issue, IssueResponse>()
                 .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.Name))
                 .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(src => src.Assignee.Name))
