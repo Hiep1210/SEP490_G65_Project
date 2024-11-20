@@ -59,23 +59,23 @@ namespace verbum_service_infrastructure.Impl.Service
                 .Where(x => x.Work.OrderId == orderId)
                 .ToListAsync();
 
-            bool allCompleted = true;
-            foreach (var job in jobs)
-            {
-                if (job.Status != JobStatus.APPROVED.ToString() && ObjectUtils.IsNotEmpty(job.Issue) && job.Issue.Status != IssueStatusEnum.RESOLVED.ToString() && job.Issue.Status != IssueStatusEnum.CANCEL.ToString())
-                {
-                    allCompleted = false;
-                    break;
-                }
-            }
+            //bool allCompleted = true;
+            //foreach (var job in jobs)
+            //{
+            //    if (job.Status != JobStatus.APPROVED.ToString() && ObjectUtils.IsNotEmpty(job.Issue) && job.Issue.Status != IssueStatusEnum.RESOLVED.ToString() && job.Issue.Status != IssueStatusEnum.CANCEL.ToString())
+            //    {
+            //        allCompleted = false;
+            //        break;
+            //    }
+            //}
 
-            //bool allCompleted = jobs.All(job =>
-            //job.Status == JobStatus.APPROVED.ToString() &&
-            //(ObjectUtils.IsEmpty(job.Issue) 
-            //|| job.Issue.Status == IssueStatusEnum.RESOLVED.ToString()) 
-            //|| job.Issue.Status == IssueStatusEnum.CANCEL.ToString());
+            bool notAllCompleted = jobs.All(job =>
+            job.Status != JobStatus.APPROVED.ToString() &&
+            (ObjectUtils.IsNotEmpty(job.Issue)
+            && job.Issue.Status != IssueStatusEnum.RESOLVED.ToString())
+            && job.Issue.Status != IssueStatusEnum.CANCEL.ToString());
 
-            if (allCompleted)
+            if (notAllCompleted)
             {
                 int orderRecords = await context.Orders
                     .Where(o => o.OrderId == orderId)
@@ -186,7 +186,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<IssueResponse>> ViewAllIssue()
         {
-            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ThenInclude(x => x.Work).ToListAsync();
+            List<Issue> issues = await context.Issues.Include(x => x.Assignee).Include(x => x.IssueAttachments).Include(x => x.Client).Include(x => x.Job).ThenInclude(x => x.Work).ThenInclude(x => x.Order).ToListAsync();
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
