@@ -123,5 +123,16 @@ namespace verbum_service.Controllers
             await issueService.ApproveIssue(issueId, orderId);
             return NoContent();
         }
+
+        [HttpPut("reopen")]
+        [Roles(UserRole.CLIENT)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> ReopenIssue([FromBody] ReopenIssueRequest request)
+        {
+            await issueService.ReopenIssue(request);
+            return NoContent();
+        }
     }
 }

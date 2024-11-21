@@ -38,7 +38,7 @@ const enableEdit = () => {
     const {
       translationFileUrls,
       referenceFileUrls,
-      deliverableFileUrls,
+      jobDeliverables,
       createdDate,
       discountId,
       paymentStatus,
@@ -331,7 +331,7 @@ const confirmSetPrices = async () => {
             >Edit Order</Button
           >
           <Button
-            v-if="role === 'CLIENT' && order.orderStatus === 'NEW'"
+            v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')"
             variant="outline"
             @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button

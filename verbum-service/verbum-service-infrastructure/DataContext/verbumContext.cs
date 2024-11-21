@@ -124,6 +124,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.RejectResponse)
                 .HasColumnType("character varying")
                 .HasColumnName("reject_response");
+            entity.Property(e => e.SrcDocumentUrl)
+                .HasColumnType("character varying")
+                .HasColumnName("src_document_url");
             entity.Property(e => e.Status)
                 .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED, IN-PROGRESS")
                 .HasColumnType("character varying")

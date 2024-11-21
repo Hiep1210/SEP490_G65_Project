@@ -42,7 +42,7 @@ const allStatus = ref<Status[]>([
 ])
 
 // Search query for filtering works by name
-const searchQuery = ref('')
+const searchQuery = ref<string>('')
 
 // Function to calculate total pages for a specific status
 const totalPages = (status: Status) => {
@@ -56,7 +56,7 @@ const filteredJobsByStatus = (status: Status) => {
     const matchesStatus =
       job.status === status.status ||
       (status.status === 'NEW' && job.status === null)
-    const matchesQuery = job.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesQuery = job.name && job.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     return matchesStatus && matchesQuery
   })
 }
