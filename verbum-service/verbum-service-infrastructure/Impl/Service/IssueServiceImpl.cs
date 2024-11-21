@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Lombok.NET;
-using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Org.BouncyCastle.Asn1.Ocsp;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -35,6 +33,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
                     await context.Jobs.Where(x => x.Id.Equals(jobId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.DeliverableUrl, solutionUrl));
                     await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
+                    await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectResponse, (string?)null));
                     transaction.Commit();
                 }
                 catch
@@ -84,6 +83,7 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.Status = IssueStatusEnum.OPEN.ToString();
             issue.ClientId = currentUser.Id;
             issue.JobId = jobId;
+            issue.SrcDocumentUrl = request.DeliverableUrl;
             context.Issues.Add(issue);
 
             int orderRecords = await context.Orders
@@ -122,6 +122,21 @@ namespace verbum_service_infrastructure.Impl.Service
             updateIssue.IssueName = request.IssueName;
             updateIssue.IssueDescription = request.IssueDescription;
             updateIssue.AssigneeId = request.AssigneeId;
+            context.Issues.Update(updateIssue);
+            int records = await context.SaveChangesAsync();
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+        }
+
+        public async Task ReopenIssue (ReopenIssueRequest request)
+        {
+            string status = await context.Issues.Where(x => x.IssueId == request.IssueId).Select(x => x.Status).FirstOrDefaultAsync();
+            if (status != IssueStatusEnum.CANCEL.ToString()) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
+            if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName))) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
+
+            Issue updateIssue = mapper.Map<Issue>(request);
+            updateIssue.UpdatedAt = DateTime.Now;
+            updateIssue.Status = IssueStatusEnum.OPEN.ToString();
+            updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
             context.Issues.Update(updateIssue);
             int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);

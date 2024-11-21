@@ -94,7 +94,7 @@ async function onSubmit(values: FormValues) {
 
   try {
     // Send the payload to the backend using a POST request
-    await useAPI('/order/add', {
+    const { status } = await useAPI('/order/add', {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
@@ -105,7 +105,18 @@ async function onSubmit(values: FormValues) {
       title: 'Order Created !!',
       description: `Order has been created successfully!!`
     })
-    router.push('/orders')
+    if (status.value === "success") {
+      const response = await repo(useNuxtApp().$api).getOrders()
+      if (!response){
+        toast({
+          title: 'Error Fetching Orders',
+          description: 'An error occurred while fetching the Orders!!'
+        })
+        return
+      }
+      const createdOrder = response[0]
+      router.push('/orders/details/' + createdOrder.orderId)
+    }
   } catch (err) {
     console.error('Request failed:', err)
     toast({
