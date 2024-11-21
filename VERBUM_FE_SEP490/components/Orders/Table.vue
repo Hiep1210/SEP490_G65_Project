@@ -13,9 +13,6 @@ import {
   useVueTable,
   type ColumnDef,
 } from "@tanstack/vue-table"
-import type { Order } from '~/types/order'
-import { repo } from '~/utils/repo'
-
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
@@ -52,8 +49,12 @@ const toCreate = () => {
         </TableHeader>
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
-            <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
-              :data-state="row.getIsSelected() ? 'selected' : undefined">
+            <TableRow
+              v-for="row in table.getRowModel().rows" :key="row.id"
+              class="cursor-pointer"
+              :data-state="row.getIsSelected() ? 'selected' : undefined"
+              @click="navigateTo(`/orders/details/${row.original.id}`)"
+              >
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                 <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
               </TableCell>
