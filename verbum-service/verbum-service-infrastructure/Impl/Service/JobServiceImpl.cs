@@ -87,11 +87,15 @@ namespace verbum_service_infrastructure.Impl.Service
             }
         }
 
-        public async Task ApproveJob(Guid jobId, Guid orderId)
+        public async Task ApproveJob(Guid jobId)
         {
             int jobRecords = await context.Jobs
                 .Where(x => x.Id == jobId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.APPROVED.ToString()));
+
+            Guid orderId = await context.Jobs.Where(x => x.Id == jobId)
+                        .Include(x => x.Work)
+                        .ThenInclude(x => x.Order).Select(x => x.Work.Order.OrderId).FirstOrDefaultAsync();
 
             if (jobRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
 

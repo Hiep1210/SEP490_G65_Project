@@ -56,9 +56,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ApproveJob([Required] Guid jobId, [Required] Guid orderId)
+        public async Task<IActionResult> ApproveJob([Required] Guid jobId)
         {
-            await jobService.ApproveJob(jobId,orderId);
+            await jobService.ApproveJob(jobId);
             return NoContent();
         }
     }
