@@ -54,6 +54,7 @@ watch(
 </script>
 
 <template>
+  <h1 v-if="acceptedIssues.length === 0" class="text-2xl font-semibold">Active Issues</h1>
   <Carousel class="w-full max-w-[80vw] px-5">
     <CarouselContent>
       <CarouselItem

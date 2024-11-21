@@ -20,7 +20,7 @@ namespace verbum_service_infrastructure.Impl.Service
             this.mapper = mapper;
         }
 
-        private bool AreAllUrlsValid(List<string> urls)
+        public bool AreAllUrlsValid(List<string> urls)
         {
             if (urls == null || urls.Count == 0)
             {

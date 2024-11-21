@@ -42,6 +42,7 @@ const props = defineProps<{
   role: string
 }>()
 
+
 const emit = defineEmits(['close', 'update', 'update-status'])
 const isOpen = ref(props.open)
 const isEditing = ref(false)
@@ -112,6 +113,10 @@ onMounted(() => {
   console.log({ assignList })
 })
 
+async function refreshPage() {
+  window.location.reload();
+}
+
 const issue = ref(props.rowData)
 const issueStatuses = ['OPEN', 'IN_PROGRESS', 'CANCEL', 'SUBMITTED', 'RESOLVED']
 const selectedStatus = ref(issue.value.status)
@@ -127,6 +132,7 @@ const updateIssueDetail = async () => {
   await updateIssue(payload)
   if (issue.value.status === 'OPEN') {
     await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
+    refreshPage()
   }
   isEditing.value = false
 }
@@ -166,6 +172,7 @@ const handleResolveIssue = async () => {
   await resolveIssue(payload)
   await updateIssueStatus(issue.value.issueId, 'SUBMITTED')
   isResolveDialogOpen.value = false
+  refreshPage()
 }
 
 const handleCancelResolve = () => {
@@ -183,6 +190,7 @@ const handleConfirmStatus = async () => {
   await sendCancelResponse(issue.value.issueId, reasonForCancellation.value)
   await updateIssueStatus(issue.value.issueId, 'CANCEL')
   isCancelDialogOpen.value = false
+  refreshPage()
 }
 
 const handleCancelStatus = () => {
@@ -195,6 +203,7 @@ const handleConfirmRejectSolution = async () => {
   await sendRejectResponse(issue.value.issueId, reasonForRejectSolution.value)
   await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
   isCancelDialogOpen.value = false
+  refreshPage()
 }
 
 const handleCancelRejectSolution = () => {
@@ -217,6 +226,7 @@ const handleStatusChange = async (
   } else {
     await updateIssueStatus(issuesId, newStatus)
     issue.value.status = newStatus
+
   }
 }
 
@@ -226,6 +236,7 @@ const handleReviewResolveIssue = async () => {
     await acceptIssueSolution(issue.value.issueId)
   }
   await updateIssueStatus(issue.value.issueId, 'RESOLVED')
+  refreshPage()
 }
 
 const closeDialog = () => {
@@ -262,7 +273,7 @@ watch(
 </script>
 
 <template>
-  <Dialog :open="isOpen" @click-outside="closeDialog" @close="closeDialog">
+  <Dialog :open="isOpen" @click-outside="closeDialog">
     <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
       <DialogHeader>
         <DialogTitle class="font-semibold text-4xl text-cyan-700">
@@ -407,6 +418,7 @@ watch(
             :key="attachment.attachmentUrl"
           >
             <a
+            v-if="attachment.tag === 'ATTACHMENT'"
               :href="attachment.attachmentUrl"
               target="_blank"
               rel="noopener noreferrer"
@@ -488,7 +500,7 @@ watch(
           >Close
         </Button>
         <Button
-          v-if="!isEditing && issue.status !== 'CANCEL'"
+          v-if="!isEditing && issue.status !== 'CANCEL' && issue.status !== 'RESOLVED'"
           @click="enableEditing"
           >Edit
         </Button>

@@ -27,6 +27,11 @@ namespace verbum_service_infrastructure.Impl.Service
                 try
                 {
                     Guid jobId = await context.Issues.Where(x => x.IssueId == issueId).Select(x => x.JobId).FirstOrDefaultAsync();
+                    Guid orderId = await context.Issues.Where(x => x.IssueId == issueId)
+                        .Include(x => x.Job)
+                        .ThenInclude(x => x.Work)
+                        .ThenInclude(x => x.Order).Select(x => x.Job.Work.Order.OrderId).FirstOrDefaultAsync();
+
                     string solutionUrl = await context.IssueAttachments.Where(x => x.IssueId == issueId && x.Tag == IssueFileTag.SOLUTION.ToString()).Select(x => x.AttachmentUrl).FirstOrDefaultAsync();
 
                     if (ObjectUtils.IsEmpty(solutionUrl)) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "solution for this issue"));
@@ -34,6 +39,26 @@ namespace verbum_service_infrastructure.Impl.Service
                     await context.Jobs.Where(x => x.Id.Equals(jobId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.DeliverableUrl, solutionUrl));
                     await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
                     await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectResponse, (string?)null));
+
+                    var jobs = await context.Jobs
+                        .Include(x => x.Work)
+                        .Include(x => x.Issue)
+                        .Where(x => x.Work.OrderId == orderId)
+                        .ToListAsync();
+
+                    bool allCompleted = jobs.All(job =>
+                    job.Status == JobStatus.APPROVED.ToString() &&
+                    (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString() || job.Issue.Status == IssueStatusEnum.CANCEL.ToString()));
+
+                    if (allCompleted)
+                    {
+                        int orderRecords = await context.Orders
+                            .Where(o => o.OrderId == orderId)
+                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
+                        if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+                    }
+
                     transaction.Commit();
                 }
                 catch
@@ -41,34 +66,6 @@ namespace verbum_service_infrastructure.Impl.Service
                     transaction.Rollback();
                     throw;
                 }
-            }
-        }
-
-        public async Task ApproveIssue(Guid issueId, Guid orderId)
-        {
-            int issueRecords = await context.Issues
-                .Where(x => x.IssueId == issueId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
-
-            if (issueRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
-
-            var jobs = await context.Jobs
-                .Include(x => x.Work)
-                .Include(x => x.Issue)
-                .Where(x => x.Work.OrderId == orderId)
-                .ToListAsync();
-
-            bool allCompleted = jobs.All(job =>
-            job.Status == JobStatus.APPROVED.ToString() &&
-            (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString() || job.Issue.Status == IssueStatusEnum.CANCEL.ToString()));
-
-            if (allCompleted)
-            {
-                int orderRecords = await context.Orders
-                    .Where(o => o.OrderId == orderId)
-                    .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
-
-                if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
             }
         }
 

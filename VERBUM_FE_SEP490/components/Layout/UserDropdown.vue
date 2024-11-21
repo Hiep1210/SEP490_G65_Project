@@ -11,6 +11,7 @@ import { CircleUser } from 'lucide-vue-next'
 const authStore = useCookie('AuthStore')
 const access_token = useCookie('access_token')
 const refresh_token = useCookie('refresh_token')
+const { user } = useAuthStore()
 
 const handleLogout = () => {
   authStore.value = ''
@@ -30,7 +31,7 @@ const handleLogout = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{{user?.name }} - <span class="text-primary">{{user?.role}}</span></DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
