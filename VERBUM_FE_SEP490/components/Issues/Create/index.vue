@@ -19,6 +19,10 @@ const props = defineProps({
   jobDeliverables: {
     type: Array,
     default: () => []
+  },
+  orderId: {
+    type: String,
+    default: ''
   }
 })
 
@@ -36,26 +40,25 @@ async function onSubmit(values: CreateIssuePayload) {
 
   const payload = {
     ...values,
+    orderId: props.orderId,
     issueAttachments: values.issueAttachments
       ? values.issueAttachments
-          .split(',')
-          .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
+        .split(',')
+        .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
       : []
   }
 
-  await createIssue(payload)
+  const response = await createIssue(payload)
+  if (response) {
+    window.location.reload();
+  }
 }
 
 console.log('create issues index', props.jobDeliverables)
 </script>
 
 <template>
-  <Form
-    id="dialogForm"
-    v-slot="{ submitForm }"
-    :validation-schema="formSchema"
-    @submit="onSubmit"
-  >
+  <Form id="dialogForm" v-slot="{ submitForm }" :validation-schema="formSchema" @submit="onSubmit">
     <Dialog>
       <DialogTrigger as-child>
         <Button variant="outline"> Create Issue</Button>
