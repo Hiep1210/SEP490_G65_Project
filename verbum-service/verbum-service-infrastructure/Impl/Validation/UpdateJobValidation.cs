@@ -28,10 +28,6 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "job status"));
             }
-            if (await context.Jobs.AnyAsync(x => x.Name.Equals(request.Name) && x.Id != request.Id))
-            {
-                errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "job name"));
-            }
             return errors;
         }
     }
