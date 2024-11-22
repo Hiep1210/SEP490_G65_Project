@@ -28,7 +28,6 @@ const tempPrice = ref<string>('0')
 onMounted(() => {
   getOrder(orderId)
   getSupportedLanguages()
-  getRatingByOrderId(orderId as string);
 })
 
 // Enter edit mode
@@ -201,6 +200,11 @@ const confirmSetPrices = async () => {
     console.error('Failed to set price:', error) // Log error if API call fails
   }
 }
+
+if (order.value?.orderStatus === 'COMPLETED') {
+  getRatingByOrderId(orderId as string)
+}
+
 </script>
 
 <template>
@@ -353,7 +357,7 @@ const confirmSetPrices = async () => {
         <OrdersDetailsTabs :order="order" />
 
         <!-- Rating -->
-         <div v-if="filteredRating && order.orderStatus === 'DELIVERED'" class="flex gap-2 border rounded-md p-5">
+         <div v-if="filteredRating && order.orderStatus === 'COMPLETED'" class="flex gap-2 border rounded-md p-5">
           <div>
             <CircleUser class="h-10 w-10" />
           </div>
