@@ -1,15 +1,15 @@
 <template>
   <div>
     <Tabs default-value="working" class="w-full">
-      <TabsList class="grid w-full grid-cols-3">
+      <TabsList class="grid w-full" :class="haveDeletedFiles">
         <TabsTrigger value="working">Working Files</TabsTrigger>
         <TabsTrigger value="reference">Reference Files</TabsTrigger>
         <TabsTrigger value="deliverable">Deliverable Files</TabsTrigger>
+        <TabsTrigger v-if="order && order.deleteddFileUrls && order.deleteddFileUrls.length > 0" value="deleted">Deleted Files</TabsTrigger>
       </TabsList>
       <TabsContent value="working">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div
-v-if="
+          <div v-if="
             !Array.isArray(order.translationFileUrls) ||
             !order.translationFileUrls.length
           " class="p-2 text-center">
@@ -24,7 +24,9 @@ v-if="
             <TableBody>
               <TableRow v-for="file in order.translationFileUrls" :key="file">
                 <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
-                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="file"/></TableCell>
+                <TableCell>
+                  <OrdersDetailsOptions :id="order.orderId" :url="file" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -32,8 +34,7 @@ v-if="
       </TabsContent>
       <TabsContent value="reference">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div
-v-if="
+          <div v-if="
             !Array.isArray(order.referenceFileUrls) ||
             !order.referenceFileUrls.length
           " class="p-2 text-center">
@@ -48,7 +49,9 @@ v-if="
             <TableBody>
               <TableRow v-for="file in order.referenceFileUrls" :key="file">
                 <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
-                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="file"/></TableCell>
+                <TableCell>
+                  <OrdersDetailsOptions :id="order.orderId" :url="file" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -56,12 +59,11 @@ v-if="
       </TabsContent>
       <TabsContent value="deliverable">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div
-            v-if="
+          <div v-if="
             !Array.isArray(order.jobDeliverables) ||
             !order.jobDeliverables.length
-             " class="p-2 text-center">
-              There are no deliverable files
+          " class="p-2 text-center">
+            There are no deliverable files
           </div>
           <Table v-else>
             <TableHeader>
@@ -72,7 +74,34 @@ v-if="
             <TableBody>
               <TableRow v-for="deliverable in order.jobDeliverables" :key="deliverable.deliverableFileUrl">
                 <TableCell>{{ getFirebaseFileName(deliverable.deliverableFileUrl || '') }}</TableCell>
-                <TableCell><OrdersDetailsOptions :id="order.orderId" :url="deliverable.deliverableFileUrl || ''"/></TableCell>
+                <TableCell>
+                  <OrdersDetailsOptions :id="order.orderId" :url="deliverable.deliverableFileUrl || ''" />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </TabsContent>
+      <TabsContent value="deleted">
+        <div class="border rounded-md h-max-[18rem] overflow-auto">
+          <div v-if="
+            !Array.isArray(order.deleteddFileUrls) ||
+            !order.deleteddFileUrls.length
+          " class="p-2 text-center">
+            There are no deleted files
+          </div>
+          <Table v-else>
+            <TableHeader>
+              <TableRow>
+                <TableHead>URL</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="file in order.deleteddFileUrls" :key="file">
+                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
+                <TableCell>
+                  <OrdersDetailsOptions :id="order.orderId" :url="file" :is-deleted="true" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -85,15 +114,19 @@ v-if="
 <script lang="ts" setup>
 import { getFirebaseFileName } from '@/utils/getFirebaseFileName'
 import type { Order } from '~/types/order';
-defineProps({
+const props = defineProps({
   order: {
     type: Object as () => Order,
     default: () => ({
       translationFileUrls: [],
       referenceFileUrls: [],
       deliverableFileUrls: [],
+      deleteddFileUrls: [],
       orderId: ''
     }) as Order
   }
 })
+const haveDeletedFiles = computed(() =>
+  props.order.deleteddFileUrls && props.order.deleteddFileUrls.length > 0 ? 'grid-cols-4' : 'grid-cols-3'
+)
 </script>
