@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="TData, TValue">
+<script setup lang="ts" generic="TData extends {orderId: string}, TValue">
 import {
   Table,
   TableBody,
@@ -49,9 +49,23 @@ const toCreate = () => {
 <template>
   <div>
     <div class="flex justify-between space-x-4 pb-4">
-      <Input class="max-w-sm" placeholder="Filter orders..."
-        :model-value="table.getColumn('orderName')?.getFilterValue() as string"
-        @update:model-value=" table.getColumn('orderName')?.setFilterValue($event)" />
+      <div class="space-x-2">
+        <Input 
+          class="max-w-sm" 
+          placeholder="Filter orders..."
+          :model-value="table.getColumn('orderName')?.getFilterValue() as string"
+          @update:model-value=" table.getColumn('orderName')?.setFilterValue($event)" />
+          <select
+            class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+            :model-value="table.getColumn('orderStatus')?.getFilterValue() as string"
+            @update:model-value="table.getColumn('orderStatus')?.setFilterValue($event)"
+          >
+            <option value="">All Statuses</option>
+            <option value="ACCEPTED">ACCEPTED</option>
+            <option value="IN_PROGRESS">IN PROGRESS</option>
+            <option value="NEW">NEW</option>
+          </select>
+      </div>
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
 
