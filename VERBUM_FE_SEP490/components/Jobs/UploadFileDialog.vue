@@ -12,7 +12,7 @@
           </DialogDescription>
         </DialogHeader>
         <h1>Uploaded file</h1>
-        <div v-for="(file, index) in files" :key="file.name"
+        <div v-for="file in files" :key="file.name"
           class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0">
           <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
           <div class="flex flex-col gap-1">
@@ -49,7 +49,7 @@ import { ref as storageRef, getDownloadURL, uploadBytesResumable } from 'firebas
 import { cn } from '@/lib/utils'
 import { toast } from '../ui/toast';
 const props = defineProps<{
-  job: Job
+  job: Job | undefined
 }>()
 
 const storage = useFirebaseStorage()
@@ -100,7 +100,7 @@ const uploadDeliverable = async () => {
   const payload = {
     ...props.job,
     status: "SUBMITTED",
-    assigneesId: props.job.assigneeNames.map((assignee: any) => assignee.id),
+    assigneesId: props.job?.assigneeNames.map((assignee: any) => assignee.id),
     deliverableUrl: downloadUrl.value
   }
   console.log(JSON.stringify(payload, null, 2))

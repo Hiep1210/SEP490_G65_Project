@@ -3,6 +3,7 @@ import type { Linguist } from '@/types/user'
 import { Check } from 'lucide-vue-next'
 interface LinguistSelectorProps {
   linguists: Linguist[]
+  assignedLinguists?: string[]
   modelValue?: string[]
   error?: boolean
 }
@@ -54,7 +55,12 @@ const filteredLinguists = computed(() =>
 )
 
 const selectedLinguistsDisplay = computed(() => {
-  if (selectedLinguistsIdsArray.value.length === 0) return 'Select Linguist'
+  if (selectedLinguistsIdsArray.value.length === 0 && !props.assignedLinguists) {
+    return 'Select linguist'
+  }
+  if (selectedLinguistsIdsArray.value.length === 0 && props.assignedLinguists) {
+    return props.assignedLinguists.join(', ')
+  }
   
   const selectedLinguists = props.linguists
     .filter(linguist => selectedLinguistsIdsArray.value.includes(linguist.id))

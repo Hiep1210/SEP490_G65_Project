@@ -1,4 +1,7 @@
 import type { Job } from '@/types/job'
+import { useToast } from '~/components/ui/toast'
+
+const { toast } = useToast()
 export const useJobs = () => {
   const jobs = ref<Job[]>([])
   const job = ref<Job | null>(null)
@@ -38,11 +41,66 @@ export const useJobs = () => {
       console.error('Failed to fetch jobs of work:', error)
     }
   }
-
+  const approve = async (job: Partial<Job> | undefined) => {
+    try {
+      const {status, error} = await useAPI('/job/approve', {
+        method: 'PUT',
+        query: {
+          jobId: job?.id,
+          orderId: job?.orderId
+        }
+      })
+      if (status.value === "error") {
+        toast({
+          title: 'Failed to approve job',
+          description: error.value?.message,
+          variant: 'destructive'
+        })
+      }
+      if (status.value === "success") {
+        toast({
+          title: 'Job approved successfully',
+          description: 'The job has been approved successfully',
+        })
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('Failed to approve job:', error)
+    }
+  }
+  const reject = async (job: Partial<Job> | undefined) => {
+    try {
+      const {status, error} = await useAPI('/job/edit', {
+        method: 'PUT',
+        body: {
+          ...job,
+          status: "IN_PROGRESS"
+        }
+      })
+      if (status.value === "error") {
+        toast({
+          title: 'Failed to reject job',
+          description: error.value?.message,
+          variant: 'destructive'
+        })
+      }
+      if (status.value === "success") {
+        toast({
+          title: 'Job rejected successfully',
+          description: 'The job has been rejected successfully',
+        })
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('Failed to reject job:', error)
+    }
+  }
   return {
     getJobs,
     editJob,
     getJobsOfWork,
+    approve,
+    reject,
     jobs,
     job,
   }

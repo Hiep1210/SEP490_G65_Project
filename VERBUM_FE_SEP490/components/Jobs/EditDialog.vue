@@ -1,54 +1,9 @@
-<script lang="ts" setup>
-import type { Linguist } from '@/types/user'
-import { toTypedSchema } from '@vee-validate/zod'
-import * as z from 'zod'
-import { cn } from '@/lib/utils'
-import { CalendarIcon } from 'lucide-vue-next'
-import { CalendarDate } from "@internationalized/date"
-import { format } from 'date-fns'
-
-const props = defineProps<{
-  orderDueDate: string
-}>()
-const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
-
-const schema = toTypedSchema(z.object({
-  assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(), 'Due date is required').max(new Date(props.orderDueDate), {
-    message: 'Due date must be before the order due date'
-  }
-  )
-}))
-
-const { handleSubmit, setFieldValue } = useForm({
-  validationSchema: schema,
-  initialValues: {
-    assignee_id: [],
-    dueDate: new Date()
-  }
-})
-
-const selectedLinguists = ref<string[]>([])
-const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
-  selectedLinguists.value = newSelectedLinguists
-  setFieldValue('assignee_id', newSelectedLinguists)
-}
-
-const emit = defineEmits(['assign'])
-
-const onSubmit = handleSubmit((values) => {
-  const payload = {
-    assigneesId: values.assignee_id,
-    dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
-  }
-  console.log(JSON.stringify(payload, null, 2))
-  emit('assign', payload)
-})
-</script>
 <template>
   <div>
     <Dialog>
-      <DialogTrigger as-child><Button variant="outline">Assign</Button></DialogTrigger>
+      <DialogTrigger as-child>
+        <slot />
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Assign Job</DialogTitle>
@@ -88,8 +43,7 @@ const onSubmit = handleSubmit((values) => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
-                    <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)"
-                      :max-value="orderDueDate" />
+                    <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)" />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
@@ -105,3 +59,48 @@ const onSubmit = handleSubmit((values) => {
 
   </div>
 </template>
+
+<script lang="ts" setup>
+import * as z from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import type { Linguist } from '@/types/user'
+import { cn } from '@/lib/utils'
+import { CalendarIcon } from 'lucide-vue-next'
+import { CalendarDate } from "@internationalized/date"
+import { format } from 'date-fns'
+
+const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
+const selectedLinguists = ref<string[]>([])
+
+const schema = toTypedSchema(z.object({
+  assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
+  dueDate: z.coerce.date().min(new Date(), 'Due date is required')
+}))
+
+const { handleSubmit, setFieldValue } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    assignee_id: [],
+    dueDate: new Date()
+  }
+})
+
+
+const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
+  selectedLinguists.value = newSelectedLinguists
+  setFieldValue('assignee_id', newSelectedLinguists)
+}
+
+const emit = defineEmits(['edit'])
+
+const onSubmit = handleSubmit((values) => {
+  const payload = {
+    assigneesId: values.assignee_id,
+    dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
+  }
+  console.log(JSON.stringify(payload, null, 2))
+  emit('edit', payload)
+})
+</script>
+
+<style></style>
