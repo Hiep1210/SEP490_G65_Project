@@ -2,6 +2,7 @@
 using Lombok.NET;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Asn1.Ocsp;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -36,7 +37,7 @@ namespace verbum_service_infrastructure.Impl.Service
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + docUrl.Split("/")[^1].Split(".docx")[0],
+                                    Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + docUrl.Split("/")[^1].Split(".docx")[0].Replace("%20", " "),
                                     Status = JobStatus.NEW.ToString(),
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
@@ -60,9 +61,18 @@ namespace verbum_service_infrastructure.Impl.Service
             }
         }
 
-        public async Task<List<JobInfoResponse>> GetAllJob()
+        public async Task<List<JobListResponse>> GetAllJob()
         {
-            return mapper.Map<List<JobInfoResponse>>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ToListAsync());
+            List<JobListResponse> allJobs = mapper.Map<List<JobListResponse>>(await context.Jobs.Include(x => x.Assignees).ToListAsync()); 
+            return allJobs;
+        }
+
+        public async Task<JobInfoResponse> GetJobById(Guid jobId)
+        {
+            JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
+            List<string> urls = await context.Jobs.Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation).Where(x => x.DocumentUrl.Equals(job.DocumentUrl) && x.Id != job.Id).OrderBy(x => x.Work.ServiceCodeNavigation.ServiceOrder).Select(x => x.DeliverableUrl).ToListAsync();
+            job.PreviousJobDeliverables = urls;
+            return job;
         }
 
         public async Task UpdateJob(UpdateJobRequest request)

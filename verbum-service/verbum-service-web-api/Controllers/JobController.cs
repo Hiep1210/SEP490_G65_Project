@@ -23,13 +23,25 @@ namespace verbum_service.Controllers
         [HttpGet("get-all")]
         [EnableQuery]
         [Roles(UserRole.LINGUIST, UserRole.MANAGER)]
-        [ProducesResponseType(typeof(List<JobInfoResponse>), 200)]
+        [ProducesResponseType(typeof(List<JobListResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll()
         {
             return ResponseFilter.OkOrNoContent(await jobService.GetAllJob(), this);
+        }
+
+        [HttpGet("get-detail")]
+        [EnableQuery]
+        [Roles(UserRole.LINGUIST, UserRole.MANAGER)]
+        [ProducesResponseType(typeof(JobInfoResponse), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAll([FromQuery][Required] Guid jobId)
+        {
+            return ResponseFilter.OkOrNoContent(await jobService.GetJobById(jobId), this);
         }
 
         [HttpPost("add")]

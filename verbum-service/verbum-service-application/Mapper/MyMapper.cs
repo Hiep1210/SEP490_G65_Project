@@ -67,6 +67,9 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Work.OrderId))
                 .ReverseMap();
+            CreateMap<Job, JobListResponse>()
+                .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))
+                .ReverseMap();
             CreateMap<Job, UpdateJobRequest>()
                 .ForMember(dest => dest.AssigneesId, opt => opt.MapFrom(src => src.Assignees.Select(x => x.Id).ToList()))
                 .ReverseMap();

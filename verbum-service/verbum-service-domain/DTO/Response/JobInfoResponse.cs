@@ -35,5 +35,6 @@ namespace verbum_service_domain.DTO.Response
         public Guid OrderId { get; set; }
         public IssueResponse? Issue { get; set; }
         public ICollection<UserInfo> AssigneeNames { get; set; }
+        public ICollection<string> PreviousJobDeliverables { get; set; }
     }
 }
