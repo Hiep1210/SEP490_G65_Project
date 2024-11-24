@@ -63,15 +63,5 @@ namespace verbum_service.Controllers
             await jobService.UpdateJob(request);
             return NoContent();
         }
-
-        [HttpPut("approve")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> ApproveJob([Required] Guid jobId)
-        {
-            await jobService.ApproveJob(jobId);
-            return NoContent();
-        }
     }
 }
