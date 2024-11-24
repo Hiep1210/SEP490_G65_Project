@@ -9,5 +9,6 @@ namespace verbum_service_application.Service
         Task CreateJobs(CreateJobsRequest request);
         Task UpdateJob(UpdateJobRequest request);
         Task<JobInfoResponse> GetJobById (Guid jobId);
+        Task ApproveJob(Guid jobId);
     }
 }
