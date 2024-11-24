@@ -8,21 +8,6 @@ const props = defineProps<{
 }>()
 const jobStatuses = ['OPEN', 'IN_PROGRESS', 'SUBMITTED', 'APPROVED']
 
-const filteredJobStatuses = computed(() => {
-  switch (props.role) {
-    case 'CLIENT':
-      return ['CANCEL']
-    case 'EDIT_MANAGER':
-    case 'EVALUATE_MANAGER':
-    case 'TRANSLATE_MANAGER':
-      return ['CANCEL', 'APPROVED']
-    case 'LINGUIST':
-      return ['SUBMITTED', 'IN_PROGRESS']
-    default:
-      return jobStatuses
-  }
-})
-
 const canUploadFile = computed(() => {
   if (!props.job) return false
 
@@ -30,6 +15,15 @@ const canUploadFile = computed(() => {
   const hasRequiredFields = props.job.dueDate && props.job.assigneeNames?.length > 0
 
   return isStatusValid && hasRequiredFields
+})
+
+const canEdit = computed(() => {
+  if (!props.job) return false
+
+  const hasRequiredFields = props.job.dueDate && props.job.assigneeNames?.length > 0
+  const isPermitted = props.role?.includes('MANAGER')
+
+  return hasRequiredFields && isPermitted
 })
 
 const { toast } = useToast()
@@ -65,60 +59,7 @@ const assignLinguists = async (payload: {
     console.error('Failed to assign linguists:', error)
   }
 }
-const approve = async () => {
-  try {
-    const {status, error} = await useAPI('/job/approve', {
-      method: 'PUT',
-      query: {
-        jobId: props.job?.id,
-        orderId: props.job?.orderId
-      }
-    })
-    if (status.value === "error") {
-      toast({
-        title: 'Failed to approve job',
-        description: error.value?.message,
-        variant: 'destructive'
-      })
-    }
-    if (status.value === "success") {
-      toast({
-        title: 'Job approved successfully',
-        description: 'The job has been approved successfully',
-      })
-      window.location.reload()
-    }
-  } catch (error) {
-    console.error('Failed to approve job:', error)
-  }
-}
-const reject = async () => {
-  try {
-    const {status, error} = await useAPI('/job/edit', {
-      method: 'PUT',
-      body: {
-        ...props.job,
-        status: "IN_PROGRESS"
-      }
-    })
-    if (status.value === "error") {
-      toast({
-        title: 'Failed to reject job',
-        description: error.value?.message,
-        variant: 'destructive'
-      })
-    }
-    if (status.value === "success") {
-      toast({
-        title: 'Job rejected successfully',
-        description: 'The job has been rejected successfully',
-      })
-      window.location.reload()
-    }
-  } catch (error) {
-    console.error('Failed to reject job:', error)
-  }
-}
+const { approve, reject } = useJobs()
 </script>
 
 <template>
@@ -137,17 +78,9 @@ const reject = async () => {
         <div class="flex flex-col gap-2">
           <div class="flex justify-between">
             <h1 class="text-2xl font-semibold">Details</h1>
-            <Dialog>
-              <DialogTrigger><Button variant="outline">Edit</Button></DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you sure absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    Edit the job details
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            <JobsEditDialog v-if="canEdit">
+              <Button variant="outline">Edit</Button>
+            </JobsEditDialog>
           </div>
           <div>
             <p v-if="props.job?.assigneeNames && props.job.assigneeNames.length > 0" class="text-sm">Assigned to: {{
@@ -164,8 +97,8 @@ const reject = async () => {
       <DialogFooter>
         <template v-if="props.role?.includes('MANAGER')">
           <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" :order-due-date="props.job?.dueDate" @assign="assignLinguists" />
-          <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="approve">Approve</Button>
-          <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED'" @click="reject">Reject</Button>
+          <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED' || !props.job" @click="approve(props.job)">Approve</Button>
+          <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED' || !props.job" @click="reject(props.job)">Reject</Button>
         </template>
         <template v-else>
           <JobsUploadFileDialog :job="props.job">
