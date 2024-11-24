@@ -127,7 +127,7 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task ReopenIssue (ReopenIssueRequest request)
         {
             Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
-            if (updateIssue.Status != IssueStatusEnum.CANCEL.ToString()) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
+            if (updateIssue.Status != IssueStatusEnum.CANCEL.ToString() && updateIssue.Status != IssueStatusEnum.RESOLVED.ToString()) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
             if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName) && !x.IssueId.Equals(request.IssueId))) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
 
             updateIssue.UpdatedAt = DateTime.Now;
