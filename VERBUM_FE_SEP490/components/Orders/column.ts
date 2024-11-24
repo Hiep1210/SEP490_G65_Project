@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/vue-table";
 import type { Order } from "@/types/order";
+import { formatToVietnamTimezone } from "~/utils/date";
 
 export const columns: ColumnDef<Order>[] = [
     {
@@ -19,6 +20,10 @@ export const columns: ColumnDef<Order>[] = [
     {
         accessorKey: 'createdDate',
         header: 'Created At',
-        cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('createdDate')),
-    },
+        cell: ({ row }) => {
+            const date = row.getValue('createdDate') as string;
+            const formattedDate = formatToVietnamTimezone(date);
+            return h('div', {}, formattedDate);
+        },
+    }
 ]
