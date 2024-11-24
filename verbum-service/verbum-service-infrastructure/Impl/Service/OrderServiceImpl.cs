@@ -14,6 +14,7 @@ using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
 using verbum_service_domain.Utils;
 using verbum_service_infrastructure.DataContext;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace verbum_service_infrastructure.Impl.Service
 {
@@ -125,7 +126,8 @@ namespace verbum_service_infrastructure.Impl.Service
                 Guid receiptId = Guid.NewGuid();
                 //the uri on which paypal send back the data
                 string baseURI = SystemConfig.BE_DOMAIN + "/order/confirm-payment?guid=" + receiptId;
-                var createdPayment = this.CreatePayment(apiContext, baseURI, orderId.ToString());
+                double orderPrice = (double)await context.Orders.Where(x => x.OrderId == orderId).Select(x => x.OrderPrice).FirstOrDefaultAsync();
+                var createdPayment = this.CreatePayment(apiContext, baseURI, orderId.ToString(), orderPrice);
                 //get links returned from paypal in response to Create function call  
                 var links = createdPayment.links.GetEnumerator();
                 string paypalRedirectUrl = string.Empty;
@@ -171,7 +173,7 @@ namespace verbum_service_infrastructure.Impl.Service
             return this.payment.Execute(apiContext, paymentExecution);
         }
 
-        private Payment CreatePayment(APIContext apiContext, string redirectUrl, string orderId)
+        private Payment CreatePayment(APIContext apiContext, string redirectUrl, string orderName, double orderPrice)
         {
             //create itemlist and add item objects to it  
 
@@ -182,9 +184,9 @@ namespace verbum_service_infrastructure.Impl.Service
             //Adding Item Details like name, currency, price etc  
             itemList.items.Add(new Item()
             {
-                name = "Item Detail",
+                name = "Order " + orderName,
                 currency = "USD",
-                price = "1.00",
+                price = (Math.Ceiling((orderPrice / 2) * 100) / 100).ToString("F2"),
                 quantity = "1",
                 sku = "asd"
             });
@@ -209,7 +211,7 @@ namespace verbum_service_infrastructure.Impl.Service
             var amount = new Amount()
             {
                 currency = "USD",
-                total = "1.00", // Total must be equal to sum of tax, shipping and subtotal.  
+                total = (Math.Ceiling((orderPrice / 2) * 100) / 100).ToString("F2"), // Total must be equal to sum of tax, shipping and subtotal.  
                                 //details = details
             };
             var transactionList = new List<Transaction>();
