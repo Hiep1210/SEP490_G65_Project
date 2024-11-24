@@ -133,6 +133,7 @@ namespace verbum_service_infrastructure.Impl.Service
             updateIssue.UpdatedAt = DateTime.Now;
             updateIssue.Status = IssueStatusEnum.OPEN.ToString();
             updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
+            updateIssue.CancelResponse = null;
             context.Issues.Update(updateIssue);
             int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
