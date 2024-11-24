@@ -128,7 +128,7 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             string status = await context.Issues.Where(x => x.IssueId == request.IssueId).Select(x => x.Status).FirstOrDefaultAsync();
             if (status != IssueStatusEnum.CANCEL.ToString()) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
-            if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName))) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
+            if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName) && !x.IssueId.Equals(request.IssueId))) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
 
             Issue updateIssue = mapper.Map<Issue>(request);
             updateIssue.UpdatedAt = DateTime.Now;
