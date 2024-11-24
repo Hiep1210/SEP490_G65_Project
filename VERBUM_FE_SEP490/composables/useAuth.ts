@@ -10,7 +10,6 @@ export const useAuth = () => {
   const accessToken = ref<string | null>(null)
   const refreshToken = ref<string | null>(null)
   const authStore = useAuthStore()
-  let refreshInterval: number | null = null
 
   const router = useRouter()
   const config = useRuntimeConfig()
@@ -91,65 +90,46 @@ export const useAuth = () => {
     accessToken.value = null
     refreshToken.value = null
     authStore.clearUser()
-    router.push('/login')
+    navigateTo('/login')
+  }
+   const refreshAccessToken = async () => {
+    try {
+      const response = await fetch(`${config.public.baseUrl}/api/auth/refresh-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        if(confirm('Your session has expired. Please login again.')) {
+          logout()
+        }
+        throw new Error('Failed to refresh token')
+      }
+
+      const data = await response.json()
+      accessToken.value = data.accessToken
+      refreshToken.value = data.refreshToken
+      const decodedUser = decodeToken(accessToken.value as string)
+    } catch (error) {
+      console.error('Failed to refresh token:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to refresh token'
+      })
+    }
   }
 
   const googleAuth = async () => {
     window.open(`${config.public.baseUrl}/auth/google-login`)
   }
   // Refresh token silently
-  const silentTokenRefresh = async () => {
-    if (!authStore.user) {
-      console.log('No user logged in, skipping refresh')
-      return // Skip if no user is logged in
-    }
-
-    const response = await fetch(
-      `${config.public.baseUrl}/auth/refresh-token`,
-      {
-        method: 'POST',
-        credentials: 'include'
-      }
-    )
-
-    if (response.ok) {
-      const data = await response.json()
-      console.log(data)
-    } else {
-      useAuthStore().clearUser()
-      router.push('/login')
-    }
-  }
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      startSilentRefresh()
-    } else {
-      stopSilentRefresh()
-    }
-  }
-
-  const startSilentRefresh = () => {
-    if (!useAuthStore().user || refreshInterval !== null) return // Skip if no user or refresh already running
-    // silentTokenRefresh() // Do an immediate refresh
-    refreshInterval = window.setInterval(silentTokenRefresh, 60 * 60 * 1000) // Refresh every 60 minutes
-  }
-
-  const stopSilentRefresh = () => {
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval)
-      refreshInterval = null
-    }
-  }
-
   return {
     user: user.value,
     login,
     logout,
     signup,
     googleAuth,
-    handleVisibilityChange,
-    startSilentRefresh,
-    stopSilentRefresh
+    refreshAccessToken
   }
 }
