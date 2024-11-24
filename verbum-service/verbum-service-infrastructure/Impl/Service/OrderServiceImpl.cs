@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
+using PayPal.Api;
+using System;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -19,8 +23,11 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly verbumContext context;
         private readonly IMapper mapper;
         private readonly CurrentUser currentUser;
+        private readonly IConfiguration Configuration;
+        private Payment payment;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public async Task CreateOrder(Order info)
+        public async Task CreateOrder(verbum_service_domain.Models.Order info)
         {
             try
             {
@@ -28,7 +35,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 context.Orders.Add(info);
                 await context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -51,7 +58,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
                 await context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -60,7 +67,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<OrderDetailsResponse>> GetAllOrder()
         {
-            List<Order> orders = new List<Order>();
+            List<verbum_service_domain.Models.Order> orders = new List<verbum_service_domain.Models.Order>();
             Guid clientId = currentUser.Id;
             switch (currentUser.Role)
             {
@@ -69,8 +76,8 @@ namespace verbum_service_infrastructure.Impl.Service
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
-                case UserRole.ADMIN: 
-                case UserRole.STAFF: 
+                case UserRole.ADMIN:
+                case UserRole.STAFF:
                 case UserRole.DIRECTOR:
                 case UserRole.LINGUIST:
                 case UserRole.EDIT_MANAGER:
@@ -88,7 +95,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
         {
-            Order orders = new Order();
+            verbum_service_domain.Models.Order orders = new verbum_service_domain.Models.Order();
             orders = await context.Orders.Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
             if (ObjectUtils.IsEmpty(orders))
             {
@@ -105,6 +112,124 @@ namespace verbum_service_infrastructure.Impl.Service
 
             OrderDetailsResponse orderResponse = mapper.Map<OrderDetailsResponse>(orders);
             return orderResponse;
+        }
+
+        public async Task<string> DoPayment(Guid orderId, bool depositeOrPayment)
+        {
+            var ClientID = Configuration.GetValue<string>("PayPal:Key");
+            var ClientSecret = Configuration.GetValue<string>("PayPal:Secret");
+            var mode = Configuration.GetValue<string>("PayPal:mode");
+            APIContext apiContext = PaypalConfiguration.GetAPIContext(ClientID, ClientSecret, mode);
+            try
+            {
+                Guid receiptId = Guid.NewGuid();
+                //the uri on which paypal send back the data
+                string baseURI = SystemConfig.BE_DOMAIN + "/order/confirm-payment?guid=" + receiptId;
+                var createdPayment = this.CreatePayment(apiContext, baseURI, orderId.ToString());
+                //get links returned from paypal in response to Create function call  
+                var links = createdPayment.links.GetEnumerator();
+                string paypalRedirectUrl = string.Empty;
+                while (links.MoveNext())
+                {
+                    Links lnk = links.Current;
+                    if (lnk.rel.ToLower().Trim().Equals("approval_url"))
+                    {
+                        //saving the payapalredirect URL to which user will be redirected for payment  
+                        paypalRedirectUrl = lnk.href;
+                    }
+                }
+                // saving to receipt
+                context.Receipts.Add(new Receipt
+                {
+                    ReceiptId = receiptId,
+                    OrderId = orderId,
+                    PayDate = DateTime.Now,
+                    DepositeOrPayment = depositeOrPayment,
+                    PaymentId = createdPayment.id,
+                    Amount = createdPayment.transactions.Sum(transaction => decimal.Parse(transaction.amount.total)),
+                    Done = false
+                });
+                await context.SaveChangesAsync();
+                return paypalRedirectUrl;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        private Payment ExecutePayment(APIContext apiContext, string payerId, string paymentId)
+        {
+            var paymentExecution = new PaymentExecution()
+            {
+                payer_id = payerId
+            };
+            this.payment = new Payment()
+            {
+                id = paymentId
+            };
+            return this.payment.Execute(apiContext, paymentExecution);
+        }
+
+        private Payment CreatePayment(APIContext apiContext, string redirectUrl, string orderId)
+        {
+            //create itemlist and add item objects to it  
+
+            var itemList = new ItemList()
+            {
+                items = new List<Item>()
+            };
+            //Adding Item Details like name, currency, price etc  
+            itemList.items.Add(new Item()
+            {
+                name = "Item Detail",
+                currency = "USD",
+                price = "1.00",
+                quantity = "1",
+                sku = "asd"
+            });
+            var payer = new Payer()
+            {
+                payment_method = "paypal"
+            };
+            // Configure Redirect Urls here with RedirectUrls object  
+            var redirUrls = new RedirectUrls()
+            {
+                cancel_url = redirectUrl + "&Cancel=true",
+                return_url = redirectUrl
+            };
+            // Adding Tax, shipping and Subtotal details  
+            //var details = new Details()
+            //{
+            //    tax = "1",
+            //    shipping = "1",
+            //    subtotal = "1"
+            //};
+            //Final amount with details  
+            var amount = new Amount()
+            {
+                currency = "USD",
+                total = "1.00", // Total must be equal to sum of tax, shipping and subtotal.  
+                                //details = details
+            };
+            var transactionList = new List<Transaction>();
+            // Adding description about the transaction  
+            transactionList.Add(new Transaction()
+            {
+                description = "Transaction description",
+                invoice_number = Guid.NewGuid().ToString(), //Generate an Invoice No  
+                amount = amount,
+                item_list = itemList
+            });
+            this.payment = new Payment()
+            {
+                intent = "sale",
+                payer = payer,
+                transactions = transactionList,
+                redirect_urls = redirUrls
+            };
+            // Create a payment using a APIContext  
+            return this.payment.Create(apiContext);
         }
 
         public async Task UpdateOrder(OrderUpdate request)
@@ -124,9 +249,9 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UpdateOrderPrice(Guid orderId, decimal price)
         {
-            Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
+            verbum_service_domain.Models.Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
 
-            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price * (order.Discount.DiscountPercent.GetValueOrDefault()/100);
+            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100);
 
             order.OrderPrice = price;
             int records = await context.SaveChangesAsync();
@@ -149,12 +274,12 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
-            if (OrderStatus.NEW.ToString().Equals(orderStatus) 
+            if (OrderStatus.NEW.ToString().Equals(orderStatus)
                 //|| OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
                 || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
                 || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
             {
-                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "verbum_service_domain.Models.Order Status"));
             }
             if (OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
             {
@@ -186,7 +311,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request)
         {
-            foreach(UploadOrderFileRequest one in request)
+            foreach (UploadOrderFileRequest one in request)
             {
                 if (!Enum.IsDefined(typeof(OrderFileTag), one.Tag))
                 {
@@ -207,7 +332,7 @@ namespace verbum_service_infrastructure.Impl.Service
                     transaction.Rollback();
                     throw;
                 }
-            } 
+            }
         }
 
         public async Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles()
@@ -262,26 +387,35 @@ namespace verbum_service_infrastructure.Impl.Service
                     //await context.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     transaction.Rollback();
                     throw;
                 }
             }
-            
+
         }
 
-        public async Task ConfirmPayment(Guid clientId, string transactionId)
+        public async Task<string> ConfirmPayment(string PayerID, string Cancel, string guid)
         {
-            ClientTransaction transaction = await context.ClientTransactions.FirstOrDefaultAsync(x => x.TransactionId == transactionId && x.ClientId == clientId);
-            if (ObjectUtils.IsEmpty(transaction.Orderid))
+            string ClientID = Configuration.GetValue<string>("PayPal:Key") ?? string.Empty;
+            string ClientSecret = Configuration.GetValue<string>("PayPal:Secret") ?? string.Empty;
+            string mode = Configuration.GetValue<string>("PayPal:mode") ?? string.Empty;
+            APIContext apiContext = PaypalConfiguration.GetAPIContext(ClientID, ClientSecret, mode);
+            // This function exectues after receving all parameters for the payment  
+            Receipt receipt = await context.Receipts.FirstOrDefaultAsync(x => x.ReceiptId.ToString() == guid);
+            var executedPayment = ExecutePayment(apiContext, PayerID, receipt.PaymentId);
+            if (executedPayment.state.ToLower() != "approved")
             {
-                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "transaction"));
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Payment"));
             }
-            string status = transaction.IsDeposit ? OrderStatus.IN_PROGRESS.ToString() : OrderStatus.DELIVERED.ToString();
-            if (await context.Orders.Where(x => x.OrderId == transaction.Orderid)
-                               .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, status)) < 1) 
+            string status = receipt.DepositeOrPayment ? OrderStatus.IN_PROGRESS.ToString() : OrderStatus.DELIVERED.ToString();
+            if (await context.Orders.Where(x => x.OrderId == receipt.OrderId)
+                               .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, status)) < 1
+                               || await context.Receipts.Where(x => x.ReceiptId.ToString() == guid).ExecuteUpdateAsync(x => x.SetProperty(u => u.Done, true)) < 1)
                 throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            //{API_URL}/orders/details/{orderId}
+            return SystemConfig.FE_DOMAIN + "/orders/details/" + receipt.OrderId;
         }
     }
 }

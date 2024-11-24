@@ -31,16 +31,5 @@ namespace verbum_service.Controllers
         {
             return ResponseFilter.OkOrNoContent(await receiptService.GetAllReceipt(), this);
         }
-
-        [HttpPost("add")]
-        [Roles(UserRole.CLIENT)]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> Add([FromBody] CreateReceipRequest request)
-        {
-            await receiptService.CreateReceipt(request);
-            return StatusCode(201);
-        }
     }
 }

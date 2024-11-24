@@ -17,5 +17,7 @@ namespace verbum_service_domain.DTO.Response
         /// </summary>
         public string Status { get; set; }
         public ICollection<UserInfo> AssigneeNames { get; set; }
+        public string TargetLanguageId { get; set; } = null!;
+        public Guid? WorkId { get; set; }
     }
 }

@@ -88,14 +88,13 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("confirm-payment")]
+        [HttpGet("confirm-payment")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ConfirmPayment([Required] Guid clientId, [Required] string transactionId)
+        public async Task<IActionResult> ConfirmPayment([Required] string PayerID, string? Cancel, [Required] string guid)
         {
-            await orderService.ConfirmPayment(clientId, transactionId);
-            return NoContent();
+            return Redirect(await orderService.ConfirmPayment(PayerID, Cancel, guid));
         }
 
         [HttpGet("file")]
@@ -160,6 +159,15 @@ namespace verbum_service.Controllers
         {
             await orderService.CreateRevelancy(orderId);
             return StatusCode(201);
+        }
+
+        [HttpGet("payment")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PayForOrder([Required]Guid orderId, [Required]bool isDeposit)
+        {
+            return Redirect(await orderService.DoPayment(orderId, isDeposit));
         }
     }
 }
