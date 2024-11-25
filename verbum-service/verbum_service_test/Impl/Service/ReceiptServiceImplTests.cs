@@ -80,7 +80,8 @@ namespace verbum_service_test.Impl.Service
                         ReceiptId = Guid.NewGuid(),
                         OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30"),
                         DepositeOrPayment = true,
-                        Amount = 100
+                        Amount = 100,
+                        PaymentId = "PAYID-M5BVLEQ5U784141KJ729161G"
                     });
                 }
                 await dbContext.SaveChangesAsync();
