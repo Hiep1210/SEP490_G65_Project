@@ -12,12 +12,14 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['close', 'confirm'])
 const isOpen = ref(props.open)
-const price = ref(props.price)
+const prices = ref(props.price)
 
 watch(
   () => props.open,
   (newVal) => {
     isOpen.value = newVal
+    prices.value = props.price
+
   }
 )
 
@@ -26,8 +28,8 @@ const closeDialog = () => {
 }
 
 const confirmPrice = () => {
-  if (price.value != null) {
-    emit('confirm', price.value)
+  if (prices.value != null) {
+    emit('confirm', prices.value)
   }
 }
 
@@ -54,6 +56,8 @@ const isSupported = (language: string) => {
     }
   }
 }
+
+
 </script>
 
 <template>
@@ -113,7 +117,7 @@ const isSupported = (language: string) => {
         
         <label class="font-semibold">Price: </label>
         <input
-          v-model="price"
+          v-model="prices"
           class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
           type="number"
         >

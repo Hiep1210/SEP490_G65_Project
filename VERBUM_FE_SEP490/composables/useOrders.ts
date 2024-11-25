@@ -73,38 +73,6 @@ export const useOrders = () => {
     isLoading.value = true
     try {
       await useAPI('/order/change-status', { method: 'PUT', credentials: 'include', params: { orderId: id, orderStatus: status } })
-      if (status === 'ACCEPTED' && order.value) {
-        const payload = {
-          orderId: order.value.orderId,
-          orderName: order.value.orderName,
-          dueDate: order.value.dueDate
-            ? new Date(order.value.dueDate).toISOString().replace('Z', '')
-            : null,
-          hasTranslateService: order.value.hasTranslateService,
-          hasEditService: order.value.hasEditService,
-          hasEvaluateService: order.value.hasEvaluateService
-        }
-        const { data: guidResponse } = await useAPI<string[]>('work/generate', {
-          method: 'POST',
-          credentials: 'include',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' }
-        })
-
-        if (guidResponse?.value?.length) {
-          const payload2 = {
-            workIds: guidResponse.value,
-            documentURLs: order.value.translationFileUrls,
-            targetLanguageIds: order.value.targetLanguageId
-          }
-          await useAPI('job/add', {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify(payload2),
-            headers: { 'Content-Type': 'application/json' }
-          })
-        }
-      }
       toast({
         title: 'Success',
         description: `Status changed successfully`
@@ -167,14 +135,8 @@ export const useOrders = () => {
     }
   }
 
-  const updateSuccessPayment = async (orderId: string, status: string) => {
+  const successPayment = async ( status: string) => {
     try {
-      await useAPI(`/order/change-status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        params: { orderId: orderId, orderStatus: status }
-      })
-
       if (status === 'IN_PROGRESS' && order.value) {
         const payload = {
           orderId: order.value.orderId,
@@ -230,6 +192,6 @@ export const useOrders = () => {
     changeOrderStatus,
     sendRejectOrder,
     setOrderPrice,
-    updateSuccessPayment
+    successPayment
   }
 }
