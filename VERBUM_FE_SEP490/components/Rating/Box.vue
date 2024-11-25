@@ -84,7 +84,7 @@ const confirmAndDeleteRating = async () => {
         <CircleUser class="h-8 w-8 mt-1" />
       </div>
       <div>
-        <p class="text-[1.5rem] font-semibold">Review</p>
+        <p class="text-[1.5rem] font-semibold">Your Review</p>
         <template v-if="!isEditing">
           <div>
             <RatingDisplay :question="'Expectation'" :rating="filteredRating.expectation" />
