@@ -7,6 +7,7 @@ export interface Job {
     updatedAt: string;
     documentUrl: string;
     deliverableUrl: string;
+    previousJobDeliverables: string[];
     targetLanguageId: string;
     workId: string;
     assigneeNames: assigneeNames[];

@@ -2,6 +2,7 @@
 import { getJobBadgeClass } from '@/utils/getBadgeClass'
 import type { Job } from '~/types/job'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { formatToVietnamTimezone } from '#imports';
 
 const props = defineProps<{
   job?: Job | undefined
@@ -77,26 +78,32 @@ const { approve, reject } = useJobs()
           <strong>Job Name:</strong> {{ props.job?.name }}
         </span>
         <div>
-          <p v-if="props.job?.assigneeNames?.length > 0" class="">
+          <p v-if="props.job && props.job?.assigneeNames?.length > 0" class="">
             Assigned to: {{ props.job?.assigneeNames.map((assignee) => assignee.name).join(', ') }}
           </p>
           <p>Target Language: {{ props.job?.targetLanguageId }}</p>
-          <p v-if="props.job?.dueDate" class="">Due Date: {{ props.job?.dueDate }}</p>
-          <p v-if="props.job?.createdAt" class="">Created At: {{ props.job?.createdAt }}</p>
-          <p v-if="props.job?.updatedAt" class="">Updated At: {{ props.job?.updatedAt }}</p>
+          <p v-if="props.job?.dueDate" class="">Due Date: {{ formatToVietnamTimezone(props.job?.dueDate) }}</p>
+          <p v-if="props.job?.createdAt" class="">Created At: {{ formatToVietnamTimezone(props.job?.createdAt) }}</p>
+          <p v-if="props.job?.updatedAt" class="">Updated At: {{ formatToVietnamTimezone(props.job?.updatedAt) }}</p>
         </div>
       </div>
     </section>
 
     <section class="flex justify-end gap-4 mb-4">
       <template v-if="props.role?.includes('MANAGER')">
-        <JobsAssignDialog v-if="props.job?.assigneeNames?.length === 0" :order-due-date="props.job?.dueDate"
+        <JobsAssignDialog
+          v-if="props.job?.assigneeNames?.length === 0 || (props.job?.status &&  ['SUBMITTED', 'APPROVED', 'REJECTED'].includes(props.job?.status))"
+          :order-due-date="props.job?.dueDate || ''"
           @assign="assignLinguists" />
-        <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
+        <Button 
+          variant="outline" 
+          :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
           @click="approve(props.job)">
           Approve
         </Button>
-        <Button variant="outline" :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
+        <Button 
+        variant="outline" 
+        :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
           @click="reject(props.job)">
           Reject
         </Button>

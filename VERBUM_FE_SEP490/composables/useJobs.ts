@@ -4,7 +4,7 @@ import { useToast } from '~/components/ui/toast'
 const { toast } = useToast()
 export const useJobs = () => {
   const jobs = ref<Job[]>([])
-  const job = ref<Job | null>(null)
+  const job = ref<Job | undefined>(undefined)
   const user = useAuthStore().user
   const role = useAuthStore().user?.role
   
