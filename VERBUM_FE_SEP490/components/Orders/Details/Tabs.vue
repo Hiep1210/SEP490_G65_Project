@@ -9,7 +9,8 @@
       </TabsList>
       <TabsContent value="working">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div v-if="
+          <div 
+          v-if="
             !Array.isArray(order.translationFileUrls) ||
             !order.translationFileUrls.length
           " class="p-2 text-center">
@@ -34,7 +35,8 @@
       </TabsContent>
       <TabsContent value="reference">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div v-if="
+          <div 
+          v-if="
             !Array.isArray(order.referenceFileUrls) ||
             !order.referenceFileUrls.length
           " class="p-2 text-center">
@@ -59,7 +61,8 @@
       </TabsContent>
       <TabsContent value="deliverable">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div v-if="
+          <div 
+          v-if="
             !Array.isArray(order.jobDeliverables) ||
             !order.jobDeliverables.length
           " class="p-2 text-center">
@@ -84,7 +87,8 @@
       </TabsContent>
       <TabsContent value="deleted">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
-          <div v-if="
+          <div 
+          v-if="
             !Array.isArray(order.deleteddFileUrls) ||
             !order.deleteddFileUrls.length
           " class="p-2 text-center">
