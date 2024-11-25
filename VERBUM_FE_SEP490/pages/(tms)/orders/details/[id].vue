@@ -2,7 +2,7 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED } from '~/constants/orderSatus'
+import { ORDER_COMPLETED, ORDER_IN_PROGRESS  } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 import { CircleUser } from 'lucide-vue-next'
@@ -324,7 +324,7 @@ provide('role', role)
           <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
             >Edit Order</Button
           >
-          <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')" :order-id="order.orderId">
+          <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED' && order.orderStatus !=='DELIVERED')" :order-id="order.orderId">
               <Button
                 variant="outline"
                 >Cancel Order</Button
@@ -361,7 +361,7 @@ provide('role', role)
       </div>
 
       <!-- Smaller Issues List Section -->
-      <div v-if="order.orderStatus === ORDER_COMPLETED" class="flex-1 space-y-4 border rounded-md">
+      <div v-if="order.orderStatus === ORDER_COMPLETED || order.orderStatus === ORDER_IN_PROGRESS" class="flex-1 space-y-4 border rounded-md">
         <OrdersIssues
           :job-deliverables="order.jobDeliverables"
           :order-id="orderId as string"

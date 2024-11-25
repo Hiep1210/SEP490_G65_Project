@@ -14,7 +14,7 @@ export const useJobs = () => {
       // const { data } = await useAPI(`/job/get-all?$expand=assigneeNames&$filter=assigneeNames/any(a: cast(a/id, Edm.String) eq '${user?.user_id}')`)
       //   jobs.value = data.value as Job[]
       // }
-        const { data } = await useAPI('/job/get-all')
+        const { data } = await useAPI('/job/get-all?$orderby=name desc')
         jobs.value = data.value as Job[]
     } catch (error) {
       console.error('Failed to fetch jobs:', error)
