@@ -325,6 +325,14 @@ const solutionlist = issue.value.issueAttachments.filter(
                   <template v-else>{{ issue.issueName }}</template>
                 </TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">Order:</TableCell>
+                <TableCell>{{ issue.orderName }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">File:</TableCell>
+                <TableCell class="hyper-link"><a :href="issue.documentUrl">{{ getFirebaseFileName(issue.documentUrl) }}</a></TableCell>
+              </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-if="role !== 'CLIENT'">
@@ -344,14 +352,21 @@ const solutionlist = issue.value.issueAttachments.filter(
               <TableRow v-if="role !== 'CLIENT'">
                 <TableCell class="font-semibold">Assign:</TableCell>
                 <TableCell>
-                  <template v-if="
+                  <template 
+                  v-if="
                     isEditing &&
                     ServiceManagersRole.includes(role) &&
-                    issue.status === 'OPEN'
+                    ['OPEN', 'IN_PROGRESS'].includes(issue.status)
                   ">
-                    <Select v-model="issue.assigneeId" class="border border-cyan-700 rounded w-full">
+                    <Select 
+                    v-model="issue.assigneeId"
+                    :value="issue.assigneeId"
+                    class="border border-cyan-700 rounded w-full"
+                    @update:modelValue="(newAssigneeId) =>
+                      issue.assigneeName = assignList.find(user => user.id === newAssigneeId)?.name ?? ''"
+                  >
                       <SelectTrigger class="w-[180px]">
-                        <SelectValue :placeholder="issue.assigneeName" />
+                        <SelectValue :placeholder="issue.assigneeName"/>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
@@ -426,7 +441,7 @@ const solutionlist = issue.value.issueAttachments.filter(
         <div class="p-3 rounded-xl border-2 border-stone-300">
           <div class="flex justify-between">
             <div class="font-semibold">Solution Files:</div>
-            <div v-if="ServiceManagersRole.includes(role) && issue.status !== 'RESOLVED' && solutionlist.length!== 0" class="flex gap-2">
+            <div v-if="ServiceManagersRole.includes(role) && issue.status === 'SUBMITTED' && solutionlist.length!== 0" class="flex gap-2">
               <Button class="bg-gray-500" @click="openRejectDialog">Reject</Button>
               <Button class="bg-red-500" @click="handleReviewResolveIssue">Mark as resolved</Button>
             </div>
@@ -448,6 +463,9 @@ const solutionlist = issue.value.issueAttachments.filter(
           <div v-else>
             <p class="text-primary font-semibold">No solution yet</p>
           </div>
+          <Button v-if="role === 'LINGUIST' && issue.status === 'IN_PROGRESS'" @click="isResolveDialogOpen = true">
+              Upload Solution
+          </Button>
         </div>
       </div>
 
@@ -456,8 +474,8 @@ const solutionlist = issue.value.issueAttachments.filter(
         </Button>
         <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close
         </Button>
-        <Button v-if="!isEditing && issue.status !== 'CANCEL' && issue.status !== 'RESOLVED'"
-          @click="enableEditing">Edit
+        <Button v-if="!isEditing && ((role === 'CLIENT' && issue.status == 'OPEN') || (ServiceManagersRole.includes(role) && (issue.status == 'OPEN' || issue.status == 'IN_PROGRESS')))"
+        @click="enableEditing">Edit
         </Button>
         <Button v-if="isEditing" @click="updateIssueDetail">Update</Button>
       </DialogFooter>
