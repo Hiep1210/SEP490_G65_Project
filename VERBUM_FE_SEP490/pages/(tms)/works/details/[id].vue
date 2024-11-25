@@ -19,6 +19,8 @@ provide('assignList', assignList)
 
 <template>
     <div>
+        <h1 class="text-2xl font-bold">Works Details</h1>
+        <h2 class="text-xl font-semibold">Work's Name</h2>
         <WorksStatusColumn :data="jobs"/>
     </div>
 </template>

@@ -20,5 +20,5 @@ export function formatDate(
 
 export const formatToVietnamTimezone = (date: Date | string) => {
   const adjustedDate = addHours(new Date(date), 7);
-  return format(adjustedDate, 'dd/MM/yyyy HH:mm:ss');
+  return format(adjustedDate, 'dd/MM/yyyy');
 }

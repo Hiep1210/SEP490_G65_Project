@@ -6,6 +6,7 @@ import { ORDER_COMPLETED, ORDER_NEW } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 import { CircleUser } from 'lucide-vue-next'
+import { formatToVietnamTimezone } from '#imports'
 
 const { toast } = useToast()
 
@@ -229,7 +230,7 @@ useSeoMeta({
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
+              <span>Created: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
               <span v-if="order.orderNote"
                 >Note: {{ order.orderNote }}</span
               >
@@ -269,7 +270,7 @@ useSeoMeta({
             <!-- Due Date -->
             <div class="flex items-center space-x-2">
               <span>Due date:</span>
-              <span v-if="!isEditing">{{ order.dueDate?.split(' ')[0] }}</span>
+              <span v-if="!isEditing">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span>
               <Input
                 v-else-if="editedOrder"
                 v-model="editedOrder.dueDate"
