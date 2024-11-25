@@ -18,7 +18,6 @@ onMounted(() => {
 
 const handleUpdate = async (updateIssues: Issue) => {
   await updateIssue(updateIssues)
-  await getIssues()
 }
 </script>
 
