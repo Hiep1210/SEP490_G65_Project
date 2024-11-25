@@ -75,12 +75,56 @@ export const useRating = () => {
     }
   }
 
+  const updateRating = async (rating: Rating) => {
+    try {
+      const payload = rating
+      await useAPI('/rating/update', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      toast({
+        title: 'Your rating updated !!',
+        description: `Your rating has been updated!!`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error updating your rating',
+        description: 'An error occurred while updating the your rating!!'
+      })
+      console.error('Error updating rating:', error)
+    }
+  }
+
+  const deleteRating = async (id: string) => {
+    try {
+      await useAPI(`/rating/delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        params: {guid: id}
+      })
+      toast({
+        title: 'Rating deleted',
+        description: `Rating with ID ${id} has been deleted`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error deleting your rating',
+        description: 'An error occurred while deleting the your rating.'
+      })
+      console.error('Error deleting your rating:', error)
+    }
+  }
+
   return {
     ratings,
     isLoading,
     filteredRating,
     getRatings,
     getRatingByOrderId,
-    createRating
+    createRating,
+    updateRating,
+    deleteRating
   }
 }

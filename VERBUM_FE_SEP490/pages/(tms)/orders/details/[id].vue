@@ -344,7 +344,7 @@ provide('role', role)
          <div v-if="filteredRating && order.orderStatus === 'COMPLETED'" class="flex gap-2 border rounded-md p-5">
           <div>
             <CircleUser class="h-10 w-10" />
-          </div> -->
+          </div>
           <div>
             <p class="text-[1.5rem] font-semibold">Review</p>
             <div class="">
