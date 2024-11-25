@@ -29,7 +29,7 @@ const fetchIssues = async () => {
 
 const handleUpdate = async (updateIssues) => {
   await updateIssue(updateIssues)
-  await fetchIssues()
+  window.location.reload();
 }
 
 onMounted(() => {

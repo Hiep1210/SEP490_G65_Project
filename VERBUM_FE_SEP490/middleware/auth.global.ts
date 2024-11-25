@@ -5,7 +5,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const access_token = useCookie('access_token')
   const unprotectedRoutes = ['/', '/login', '/signup']
   const employeeRoutes = ['/works', '/jobs', '/issues']
+  const adminRoutes = ['/users', '/languages', '/discounts']
   const clientRoutes = ['/orders', '/issues']
+  const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
   // Check if access_token exists
@@ -20,8 +22,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/works')
         else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
           return navigateTo('/works')
-        else if (user?.role.includes('ADMIN') && employeeRoutes.some(route => to.path.includes(route)))
+        else if (user?.role.includes('ADMIN') && !adminRoutes.some(route => to.path.includes(route)))
           return navigateTo('/users')
+        else if (to.path.includes(redirectPath))
+          return navigateTo('/')
         else return
       } else {
         // Invalid token, clear user and redirect to login

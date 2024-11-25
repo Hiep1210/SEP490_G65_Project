@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using verbum_service_domain.Common;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
 using verbum_service_domain.Models;
@@ -41,9 +42,9 @@ namespace verbum_service_application.Mapper
             CreateMap<Order, OrderResponse>().ReverseMap();
             CreateMap<Order, OrderDetailsResponse>()
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
-                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.JobDeliverables, opt => opt.MapFrom(src => src.Works.SelectMany(work => work.Jobs.Select(job => new JobDeliverableResponse
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == OrderFileTag.REFERENCES.ToString() && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == OrderFileTag.TRANSLATION.ToString() && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.JobDeliverables, opt => opt.MapFrom(src => src.Works.SelectMany(work => work.Jobs.Where(j => j.DeliverableUrl != null).Select(job => new JobDeliverableResponse
                 {
                     DeliverableFileUrl = job.DeliverableUrl,
                     ServiceOrder = work.ServiceCodeNavigation.ServiceOrder,
@@ -54,8 +55,8 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.SourceLanguageId, opt => opt.MapFrom(src => src.Order.SourceLanguageId))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Order.OrderStatus))
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.Order.TargetLanguages.Select(t => t.LanguageId).ToList()))
-                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "REFERENCES").Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == "TRANSLATION").Select(t => t.ReferenceFileUrl).ToList()));
+                .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.REFERENCES.ToString()).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.TRANSLATION.ToString()).Select(t => t.ReferenceFileUrl).ToList()));
             CreateMap<Work, WorkCreate>().ReverseMap();
             CreateMap<Work, WorkUpdate>().ReverseMap();
             CreateMap<Discount, DiscountDTO>().ReverseMap();
@@ -64,8 +65,10 @@ namespace verbum_service_application.Mapper
             CreateMap<Rating, RatingCreate>().ReverseMap();
             CreateMap<Rating, RatingUpdate>().ReverseMap();
             CreateMap<Job, JobInfoResponse>()
+                .ForMember(dest => dest.WorkDueDate, opt => opt.MapFrom(src => src.Work.DueDate))
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Work.OrderId))
+                .ForMember(dest => dest.ReferenceUrls, opt => opt.MapFrom(src => src.Work.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.REFERENCES.ToString()).Select(x => x.ReferenceFileUrl).ToList()))
                 .ReverseMap();
             CreateMap<Job, JobListResponse>()
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))

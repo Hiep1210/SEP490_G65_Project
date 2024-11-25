@@ -20,4 +20,20 @@ export type Issue = {
   issueAttachments: IssueAttachments[]
   cancelResponse: string
   rejectResponse: string
+  documentUrl: string
+}
+
+export type IssueUpdatePayload = {
+  issueId: string
+  issueName: string
+  issueDescription: string
+  assigneeId: string
+  issueAttachments: IssueAttachments[]
+}
+
+export type IssueReOpenPayload = {
+    issueId: string
+    issueName: string
+    issueDescription: string
+    issueAttachments: IssueAttachments[]
 }
