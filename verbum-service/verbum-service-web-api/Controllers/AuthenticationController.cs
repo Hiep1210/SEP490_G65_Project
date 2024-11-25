@@ -74,7 +74,7 @@ namespace verbum_service.Controllers
             Tokens tokens = await userService.LoginGoogleCallback();
             tokenService.SetTokensInsideCookie(tokens, HttpContext);
             if(tokens == null) return Redirect("http://localhost:3000/login");
-            return Redirect("http://localhost:3000/orders");
+            return Redirect("http://localhost:3000/redirect");
         }
 
         [HttpPost("signup")]

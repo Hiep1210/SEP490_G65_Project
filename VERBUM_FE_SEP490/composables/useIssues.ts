@@ -1,5 +1,5 @@
 import { useToast } from '~/components/ui/toast'
-import type { Issue } from '~/types/issues'
+import type { Issue, IssueReOpenPayload, IssueUpdatePayload } from '~/types/issues'
 import type { CreateIssuePayload } from '~/types/payload/createIssue'
 import type { ResolveIssuePayload } from '~/types/payload/resolveIssue'
 
@@ -63,7 +63,7 @@ export const useIssues = () => {
     }
   }
 
-  const updateIssue = async (issue: Issue) => {
+  const updateIssue = async (issue: IssueUpdatePayload) => {
     try {
       const payload = issue
       const {data, error} = await useAPI('/issue', {
@@ -71,19 +71,23 @@ export const useIssues = () => {
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       })
-      if(!error.value) {
+      if (error.value) {
         toast({
-          title: 'Issue updated !!',
-          description: `Issue has been updated!!`
+          title: 'Error update issue',
+          description: `Failed to update issue`,
         })
+        console.error('Error update issue')
+        return data
       }
-      return data
+      toast({
+        title: 'Issue updated !!',
+        description: `Issue has been updated!!`
+      })
     } catch {
       toast({
-        title: 'Error updating issue',
+        title: 'Error updated issue',
         description: 'An error occurred while updating the issue!!'
       })
-      console.error('Error updating issue:')
     }
   }
 
@@ -268,6 +272,34 @@ export const useIssues = () => {
     }
   }
 
+  const reOpenIssue = async (reOpenPayload: IssueReOpenPayload) => {
+    try {
+      const payload = reOpenPayload
+      const {error} = await useAPI('/issue/reopen', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (error.value) {
+        toast({
+          title: 'Error approve issue',
+          description: `Failed to approve issue`,
+        })
+        console.error('Error approve issue')
+        return
+      }
+      toast({
+        title: 'Issue approved !!',
+        description: `Issue has been approved!!`
+      })
+    } catch {
+      toast({
+        title: 'Error approve issue',
+        description: 'An error occurred while approving the issue!!'
+      })
+    }
+  }
+
   return {
     isLoading,
     issues,
@@ -280,6 +312,7 @@ export const useIssues = () => {
     resolveIssue,
     approveIssueSolution,
     acceptIssueSolution,
-    sendRejectResponse
+    sendRejectResponse,
+    reOpenIssue
   }
 }

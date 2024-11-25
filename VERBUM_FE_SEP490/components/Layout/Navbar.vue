@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  House,
   FolderOpen,
   FileWarning,
   Book,
@@ -9,6 +8,13 @@ import {
   DollarSign
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
+
+interface NavbarItems {
+  navName: string
+  navLink: string
+  navIcon: unknown
+}
+
 const route = useRoute()
 const auth = useAuthStore()
 
@@ -42,7 +48,7 @@ const roleMenuItems = {
 
 type UserRole = keyof typeof roleMenuItems
 
-const navbarItems = [{ navName: 'Home', navLink: '/', navIcon: House }]
+const navbarItems: NavbarItems[] = []
 
 if (auth.user?.role) {
   const role = auth.user.role as UserRole

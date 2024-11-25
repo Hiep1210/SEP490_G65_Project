@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import { getColumns } from '~/components/Jobs/column';
+useSeoMeta({
+  title: 'Jobs'
+})
+
 const { jobs, getJobs } = useJobs()
 const { assignList, getAssignList } = useUsers()
 const role = useAuthStore().user?.role
+
+const columns = getColumns(role)
+
 onMounted(() => {
     if (!jobs.value.length) {
         getJobs()
@@ -15,7 +23,7 @@ provide('assignList', assignList)
 
 <template>
     <div>
-        <JobsStatusColumn :data="jobs"/>
+        <JobsTable :columns="columns" :data="jobs" />
     </div>
 </template>
 

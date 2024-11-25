@@ -4,20 +4,18 @@ import { useToast } from '~/components/ui/toast'
 const { toast } = useToast()
 export const useJobs = () => {
   const jobs = ref<Job[]>([])
-  const job = ref<Job | null>(null)
+  const job = ref<Job | undefined>(undefined)
   const user = useAuthStore().user
   const role = useAuthStore().user?.role
   
   const getJobs = async () => {
     try {
-      if (role === 'LINGUIST') {
-      const { data } = await useAPI(`/job/get-all?$expand=assigneeNames&$filter=assigneeNames/any(a: cast(a/id, Edm.String) eq '${user?.user_id}')`)
-        jobs.value = data.value as Job[]
-      }
-      else {
+      // if (role === 'LINGUIST') {
+      // const { data } = await useAPI(`/job/get-all?$expand=assigneeNames&$filter=assigneeNames/any(a: cast(a/id, Edm.String) eq '${user?.user_id}')`)
+      //   jobs.value = data.value as Job[]
+      // }
         const { data } = await useAPI('/job/get-all')
         jobs.value = data.value as Job[]
-      }
     } catch (error) {
       console.error('Failed to fetch jobs:', error)
     }
@@ -39,6 +37,34 @@ export const useJobs = () => {
       jobs.value = data.value as Job[]
     } catch (error) {
       console.error('Failed to fetch jobs of work:', error)
+    }
+  }
+  const getJobsDetail = async (jobId: string) => {
+    try {
+      const { data, status } = await useAPI(`/job/get-detail`,{
+        method: 'GET',
+        query: {
+          jobId: jobId
+        }
+      })
+      
+      if (status.value === "error") {
+        toast({
+          title: 'Failed to fetch job detail',
+          description: 'Cannot fetch job detail',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      job.value = data.value as Job
+      
+      toast({
+        title: 'Job detail fetched successfully',
+        description: 'The job detail has been fetched successfully',
+      })
+    } catch (error) {
+      console.error('Failed to fetch job detail:', error)
     }
   }
   const approve = async (job: Partial<Job> | undefined) => {
@@ -99,6 +125,7 @@ export const useJobs = () => {
     getJobs,
     editJob,
     getJobsOfWork,
+    getJobsDetail,
     approve,
     reject,
     jobs,

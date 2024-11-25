@@ -17,6 +17,7 @@ namespace verbum_service_domain.DTO.Response
         /// NEW, IN_PROGRESS, COMPLETED
         /// </summary>
         public string Status { get; set; }
+        public DateTime WorkDueDate { get; set; }
 
         public DateTime? DueDate { get; set; }
 

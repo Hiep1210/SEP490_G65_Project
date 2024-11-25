@@ -2,10 +2,11 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_NEW } from '~/constants/orderSatus'
+import { ORDER_COMPLETED } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 import { CircleUser } from 'lucide-vue-next'
+import { formatToVietnamTimezone } from '#imports'
 
 const { toast } = useToast()
 
@@ -23,11 +24,14 @@ const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const openRatingDialog = ref(false)
-const tempPrice = ref<string>('0') 
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
   getSupportedLanguages()
+  if (order.value) {
+    useSeoMeta({ title: order.value.orderName })
+  }
 })
 
 // Enter edit mode
@@ -97,27 +101,6 @@ const saveEdit = async () => {
     isEditing.value = false
   } catch (error) {
     console.error('Failed to save order:', error)
-  }
-}
-// Add discount
-const openAddDiscount = ref(false)
-const addDiscount = async () => {
-  try {
-    if (editedOrder.value) {
-      const payload = {
-        ...editedOrder.value,
-        discountId: editedOrder.value?.discountId
-      }
-      await useAPI('/order/update', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to add discount:', error)
   }
 }
 
@@ -205,6 +188,13 @@ if (order.value?.orderStatus === 'COMPLETED') {
   getRatingByOrderId(orderId as string)
 }
 
+const orderTitle = computed(() => order.value?.orderName || 'Order Details')
+
+useSeoMeta({
+  title: orderTitle
+})
+provide('role', role)
+
 </script>
 
 <template>
@@ -232,16 +222,16 @@ if (order.value?.orderStatus === 'COMPLETED') {
           </div>
 
           <!-- Order Details -->
-          <div class="flex flex-col space-y-1">
-            <div class="grid grid-cols-2 gap-x-2 text-sm">
+          <div class="flex flex-col">
+            <div class="grid grid-cols-2 gap-x-2">
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
+              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
+              <span>Created: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
               <span v-if="order.orderNote"
                 >Note: {{ order.orderNote }}</span
               >
@@ -281,7 +271,7 @@ if (order.value?.orderStatus === 'COMPLETED') {
             <!-- Due Date -->
             <div class="flex items-center space-x-2">
               <span>Due date:</span>
-              <span v-if="!isEditing">{{ order.dueDate?.split(' ')[0] }}</span>
+              <span v-if="!isEditing">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span>
               <Input
                 v-else-if="editedOrder"
                 v-model="editedOrder.dueDate"
@@ -334,24 +324,18 @@ if (order.value?.orderStatus === 'COMPLETED') {
           <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
             >Edit Order</Button
           >
-          <Button
-            v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')"
-            variant="outline"
-            @click="changeOrderStatus(order.orderId, 'CANCELLED')"
-            >Cancel Order</Button
-          >
+          <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')" :order-id="order.orderId">
+              <Button
+                variant="outline"
+                >Cancel Order</Button
+              >
+          </OrdersDetailsCancelDialog>
           <template v-if="role === 'STAFF'">
             <Button v-if="order.orderStatus === 'NEW'" @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
-          <Button
-            v-if="role === 'CLIENT'"
-            variant="outline"
-            @click="openAddDiscount = true"
-            >Add Discount</Button
-          >
         </div>
 
         <OrdersDetailsTabs :order="order" />
@@ -380,7 +364,7 @@ if (order.value?.orderStatus === 'COMPLETED') {
       <div v-if="order.orderStatus === ORDER_COMPLETED" class="flex-1 space-y-4 border rounded-md">
         <OrdersIssues
           :job-deliverables="order.jobDeliverables"
-          :order-id="orderId"
+          :order-id="orderId as string"
           :role="role"
           :user="user"
         />

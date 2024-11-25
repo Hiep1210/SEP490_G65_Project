@@ -4,8 +4,8 @@
       <DropdownMenuTrigger as-child><Button variant="outline">Options</Button></DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem @click="onClick('Download')">Download</DropdownMenuItem>
-        <DropdownMenuItem v-if="!isDeleted" @click="onClick('Delete')">Delete</DropdownMenuItem>
-        <DropdownMenuItem v-else @click="onClick('Recover')">Recover</DropdownMenuItem>
+        <DropdownMenuItem v-if="beDisplayed" @click="onClick('Delete')">Delete</DropdownMenuItem>
+        <DropdownMenuItem v-if="isDeleted && role === 'CLIENT'" @click="onClick('Recover')">Recover</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
@@ -18,7 +18,18 @@ const props = defineProps<{
   id: string,
   url: string,
   isDeleted?: boolean
+  isDelivered?: boolean
+  isNewOrRejected?: boolean
 }>()
+const role = inject('role') as string | undefined
+
+const beDisplayed = computed(() => {
+  return (!props.isDeleted && !props.isDelivered && role === 'CLIENT' && props.isNewOrRejected)
+}
+);
+
+console.log("beDisplayed", beDisplayed.value);
+
 
 const { toast } = useToast()
 
@@ -86,5 +97,3 @@ const onClick = async (options: string) => {
 };
 
 </script>
-
-<style></style>
