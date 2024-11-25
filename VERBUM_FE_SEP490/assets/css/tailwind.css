@@ -94,4 +94,8 @@
     border-radius: 10px;
     @apply bg-primary;
   }
+
+  .hyper-link {
+    @apply text-primary underline font-bold;
+  }
 }

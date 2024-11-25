@@ -325,6 +325,14 @@ const solutionlist = issue.value.issueAttachments.filter(
                   <template v-else>{{ issue.issueName }}</template>
                 </TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">Order:</TableCell>
+                <TableCell>{{ issue.orderName }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">File:</TableCell>
+                <TableCell class="hyper-link"><a :href="issue.documentUrl">{{ getFirebaseFileName(issue.documentUrl) }}</a></TableCell>
+              </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-if="role !== 'CLIENT'">

@@ -20,6 +20,7 @@ export type Issue = {
   issueAttachments: IssueAttachments[]
   cancelResponse: string
   rejectResponse: string
+  documentUrl: string
 }
 
 export type IssueUpdatePayload = {
