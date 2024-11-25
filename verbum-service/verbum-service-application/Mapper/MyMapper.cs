@@ -43,7 +43,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.TargetLanguages.Select(t => t.LanguageId).ToList()))
                 .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "REFERENCES" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
                 .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.Tag == "TRANSLATION" && t.IsDeleted == false).Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.JobDeliverables, opt => opt.MapFrom(src => src.Works.SelectMany(work => work.Jobs.Select(job => new JobDeliverableResponse
+                .ForMember(dest => dest.JobDeliverables, opt => opt.MapFrom(src => src.Works.SelectMany(work => work.Jobs.Where(j => j.DeliverableUrl != null).Select(job => new JobDeliverableResponse
                 {
                     DeliverableFileUrl = job.DeliverableUrl,
                     ServiceOrder = work.ServiceCodeNavigation.ServiceOrder,
