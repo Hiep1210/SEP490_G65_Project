@@ -85,7 +85,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
             int orderRecords = await context.Orders
                             .Where(o => o.OrderId == request.OrderId)
-                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString()));
 
             if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }

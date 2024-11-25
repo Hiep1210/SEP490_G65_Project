@@ -3,7 +3,9 @@ import { decodeToken } from '~/lib/auth/auth'
 export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   const access_token = useCookie('access_token')
-  const unprotectedRoutes = ['/login', '/signup']
+  const unprotectedRoutes = ['/', '/login', '/signup']
+  const employeeRoutes = ['/works', '/jobs', '/issues']
+  const clientRoutes = ['/orders', '/issues']
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
   // Check if access_token exists
@@ -12,10 +14,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
       const user = decodeToken(access_token.value)
       if (user) {
         useAuthStore().setUser(user)
-        // Redirect to /orders if already authenticated and accessing another route
-        if (!isAuthenticated.value) {
+        if (user?.role.includes('CLIENT') && !clientRoutes.some(route => to.path.includes(route)))
           return navigateTo('/orders')
-        }
+        if (user?.role.includes('MANAGER') && !employeeRoutes.some(route => to.path.includes(route)))
+          return navigateTo('/works')
+        else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
+          return navigateTo('/works')
+        else if (user?.role.includes('ADMIN') && employeeRoutes.some(route => to.path.includes(route)))
+          return navigateTo('/users')
+        else return
       } else {
         // Invalid token, clear user and redirect to login
         useAuthStore().clearUser()

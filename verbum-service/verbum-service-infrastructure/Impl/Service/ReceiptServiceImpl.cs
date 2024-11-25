@@ -18,23 +18,6 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly verbumContext context;
         private readonly IMapper mapper;
 
-        public async Task CreateReceipt(CreateReceipRequest request)
-        {
-            try
-            {
-                Receipt receipt = new Receipt();
-                receipt = mapper.Map<Receipt>(request);
-                receipt.PayDate = DateTime.Now;
-                receipt.ReceiptId = Guid.NewGuid();
-                context.Receipts.Add(receipt);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
         public async Task<List<ReceiptInfoResponse>> GetAllReceipt()
         {
             List<Receipt> listReceipt = await context.Receipts.ToListAsync();

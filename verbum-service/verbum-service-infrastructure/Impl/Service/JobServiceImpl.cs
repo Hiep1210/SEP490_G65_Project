@@ -29,7 +29,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 {
                     foreach (Guid workId in request.WorkIds)
                     {
-                        Work work = await context.Works.FirstOrDefaultAsync(w => w.WorkId == workId);
+                        Work work = await context.Works.Include(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(w => w.WorkId == workId);
                         foreach (string docUrl in request.DocumentUrls)
                         {
                             foreach (string targetLangId in request.TargetLanguageIds)
@@ -37,7 +37,7 @@ namespace verbum_service_infrastructure.Impl.Service
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = "Job_" + targetLangId + "_" + work.ServiceCode + "_" + docUrl.Split("/")[^1].Split(".docx")[0].Replace("%20", " "),
+                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_" + docUrl.Split("/")[^1].Split(".docx")[0].Replace("%20", " "),
                                     Status = JobStatus.NEW.ToString(),
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,

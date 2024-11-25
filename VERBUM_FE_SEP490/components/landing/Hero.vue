@@ -9,7 +9,7 @@
         format="avif"
         width="512"
         height="512"
-      />
+      >
     </div>
 
     <div>

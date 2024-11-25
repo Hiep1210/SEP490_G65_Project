@@ -9,6 +9,7 @@ namespace verbum_service_domain.DTO.Response
     public class JobListResponse
     {
         public Guid Id { get; set; }
+        public Guid WorkId { get; set; }
 
         public string Name { get; set; } = null!;
 
@@ -17,5 +18,6 @@ namespace verbum_service_domain.DTO.Response
         /// </summary>
         public string Status { get; set; }
         public ICollection<UserInfo> AssigneeNames { get; set; }
+        public string TargetLanguageId { get; set; } = null!;
     }
 }

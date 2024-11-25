@@ -23,11 +23,14 @@ const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const openRatingDialog = ref(false)
-const tempPrice = ref<string>('0') 
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
   getSupportedLanguages()
+  if (order.value) {
+    useSeoMeta({ title: order.value.orderName })
+  }
 })
 
 // Enter edit mode
@@ -97,27 +100,6 @@ const saveEdit = async () => {
     isEditing.value = false
   } catch (error) {
     console.error('Failed to save order:', error)
-  }
-}
-// Add discount
-const openAddDiscount = ref(false)
-const addDiscount = async () => {
-  try {
-    if (editedOrder.value) {
-      const payload = {
-        ...editedOrder.value,
-        discountId: editedOrder.value?.discountId
-      }
-      await useAPI('/order/update', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to add discount:', error)
   }
 }
 
@@ -204,6 +186,12 @@ const confirmSetPrices = async () => {
 if (order.value?.orderStatus === 'COMPLETED') {
   getRatingByOrderId(orderId as string)
 }
+
+const orderTitle = computed(() => order.value?.orderName || 'Order Details')
+
+useSeoMeta({
+  title: orderTitle
+})
 
 </script>
 
@@ -346,12 +334,6 @@ if (order.value?.orderStatus === 'COMPLETED') {
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
-          <Button
-            v-if="role === 'CLIENT'"
-            variant="outline"
-            @click="openAddDiscount = true"
-            >Add Discount</Button
-          >
         </div>
 
         <OrdersDetailsTabs :order="order" />
