@@ -83,7 +83,6 @@ export const useIssues = () => {
         title: 'Issue updated !!',
         description: `Issue has been updated!!`
       })
-      await refresh()
     } catch {
       toast({
         title: 'Error updated issue',
