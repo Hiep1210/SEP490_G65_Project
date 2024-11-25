@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="TData, TValue">
+<script setup lang="ts" generic="TData extends {id: string}, TValue">
 import {
   FlexRender,
   getCoreRowModel,
