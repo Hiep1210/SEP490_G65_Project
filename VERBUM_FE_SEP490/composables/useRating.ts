@@ -24,10 +24,10 @@ export const useRating = () => {
       })
 
       if (!ratingData?.value || ratingData.value.length === 0) {
-        toast({
-          title: 'No ratings found!',
-          description: 'There are no ratings available!!'
-        })
+        // toast({
+        //   title: 'No ratings found!',
+        //   description: 'There are no ratings available!!'
+        // })
         ratings.value = []
       } else {
         ratings.value = ratingData.value
@@ -44,14 +44,15 @@ export const useRating = () => {
   }
 
   const getRatingByOrderId = async (orderId: string) => {
-    await getRatings()
-    filteredRating.value = ratings.value.find(rating => rating.orderId === orderId) || null
-
-    if (!filteredRating.value) {
-      toast({
-        title: 'No ratings found!',
-        description: `No ratings available for order ID: ${orderId}.`
-      })
+    try {
+      if (!filteredRating.value) {
+        await getRatings()
+        filteredRating.value = ratings.value.find(rating => rating.orderId === orderId) || null
+        
+      }
+      
+    } catch (error) {
+      console.error('Error fetching rating by orderId:', error)
     }
   }
 
@@ -106,7 +107,7 @@ export const useRating = () => {
       })
       toast({
         title: 'Rating deleted',
-        description: `Rating with ID ${id} has been deleted`
+        description: `Rating has been deleted`
       })
     } catch (error) {
       toast({
