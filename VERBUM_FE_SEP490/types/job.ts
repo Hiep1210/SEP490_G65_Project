@@ -5,11 +5,18 @@ export interface Job {
     dueDate: string;
     createdAt: string;
     updatedAt: string;
-    wordCount: number;
     documentUrl: string;
     deliverableUrl: string;
     targetLanguageId: string;
     workId: string;
-    assigneeNames: object[];
+    assigneeNames: assigneeNames[];
     orderId: string;
+}
+
+interface assigneeNames {
+    id: string;
+    name: string;
+    email: string;
+    roleCode: string;
+    revelancies: string[];
 }
