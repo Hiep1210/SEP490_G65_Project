@@ -135,6 +135,16 @@ namespace verbum_service_infrastructure.Impl.Service
             updateIssue.IssueAttachments = mapper.Map<List<IssueAttachment>>(request.IssueAttachments);
             updateIssue.CancelResponse = null;
             context.Issues.Update(updateIssue);
+
+            Guid orderId = await context.Issues.Where(x => x.IssueId ==  request.IssueId)
+                        .Include(x => x.Job)
+                        .ThenInclude(x => x.Work)
+                        .ThenInclude(x => x.Order).Select(x => x.Job.Work.Order.OrderId).FirstOrDefaultAsync();
+
+            await context.Orders
+                            .Where(o => o.OrderId == orderId)
+                            .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString()));
+
             int records = await context.SaveChangesAsync();
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
