@@ -40,8 +40,11 @@ import type { Job } from '~/types/job';
 
 defineProps({
   job: {
-    type: Object as PropType<Job>,
-    default: () => ({})
+    type: Object as PropType<Job> | undefined,
+    default: () => ({
+      documentUrl: '',
+      deliverableUrl: '',
+    })
   }
 })
 </script>

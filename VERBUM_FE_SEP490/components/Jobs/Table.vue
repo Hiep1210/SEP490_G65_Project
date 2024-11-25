@@ -83,7 +83,7 @@ const table = useVueTable({
             v-for="row in table.getRowModel().rows" :key="row.id"
             :data-state="row.getIsSelected() ? 'selected' : undefined"
           >
-            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" @click="useRouter().push(`/job/details/${row.original.id}`)">
+            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" @click="useRouter().push(`/jobs/details/${row.original.id}`)">
               <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
             </TableCell>
           </TableRow>
