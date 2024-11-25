@@ -52,12 +52,12 @@ export const useIssues = () => {
         return issuesData.value
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error fetching issues!!',
         description: 'An error occurred while fetching issues!!'
       })
-      console.log('Error fetching issues: ', error)
+      console.log('Error fetching issues')
     } finally {
       isLoading.value = false
     }
@@ -78,18 +78,18 @@ export const useIssues = () => {
         })
       }
       return data
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error updating issue',
         description: 'An error occurred while updating the issue!!'
       })
-      console.error('Error updating issue:', error)
+      console.error('Error updating issue:')
     }
   }
 
   const createIssue = async (payload: CreateIssuePayload) => {
     try {
-      const {error, refresh} = await useAPI('/issue', {
+      const {data, error} = await useAPI('/issue', {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
@@ -97,22 +97,20 @@ export const useIssues = () => {
       if (error.value) {
         toast({
           title: 'Error creating issue',
-          description: `Failed to create issue: ${error.value}`,
+          description: `Failed to create issue`,
         })
-        console.error('Error creating issue:', error.value)
         return
       }
       toast({
         title: 'Issue created !!',
         description: `Issue has been created!!`
       })
-      await refresh()
-    } catch (error) {
+      return data
+    } catch {
       toast({
         title: 'Error creating issue',
         description: 'An error occurred while creating the issue!!'
       })
-      console.error('Error creating issue:', error)
     }
   }
 
@@ -129,12 +127,12 @@ export const useIssues = () => {
         title: 'Issue status updated !!',
         description: `Issue status has been updated!!`
       })
-    } catch (error) {
+    } catch{
       toast({
         title: 'Error updating issue status',
         description: 'An error occurred while updating the issue status!!'
       })
-      console.error('Error updating issue status:', error)
+      console.error('Error updating issue status:')
     }
   }
 
@@ -156,12 +154,12 @@ export const useIssues = () => {
         title: 'Issue status updated !!',
         description: `Issue status has been updated!!`
       })
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error updating issue status',
         description: 'An error occurred while updating the issue status!!'
       })
-      console.error('Error updating issue status:', error)
+      console.error('Error updating issue status:')
     }
   }
 
@@ -183,12 +181,12 @@ export const useIssues = () => {
         title: 'Issue rejected !!',
         description: `Issue solution has been rejected!!`
       })
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error reject issue solution',
         description: 'An error occurred while reject the issue solution!!'
       })
-      console.error('Error updating issue status:', error)
+      console.error('Error updating issue status:')
     }
   }
 
@@ -206,12 +204,12 @@ export const useIssues = () => {
         title: 'Issue status updated !!',
         description: `Issue status has been updated!!`
       })
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error updating issue status',
         description: 'An error occurred while updating the issue status!!'
       })
-      console.error('Error updating issue status:', error)
+      console.error('Error updating issue status:')
     }
   }
 
@@ -224,9 +222,8 @@ export const useIssues = () => {
       if (error.value) {
         toast({
           title: 'Error approve issue',
-          description: `Failed to approve issue: ${error.value}`,
+          description: `Failed to approve issue`,
         })
-        console.error('Error approve issue:', error.value)
         return
       }
       toast({
@@ -235,12 +232,12 @@ export const useIssues = () => {
       })
       await refresh()
       return data
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error approve issue',
         description: 'An error occurred while approving the issue!!'
       })
-      console.error('Error approve issue:', error)
+      console.error('Error approve issue:')
     }
   }
 
@@ -253,9 +250,9 @@ export const useIssues = () => {
       if (error.value) {
         toast({
           title: 'Error approve issue',
-          description: `Failed to approve issue: ${error.value}`,
+          description: `Failed to approve issue`,
         })
-        console.error('Error approve issue:', error.value)
+        console.error('Error approve issue')
         return
       }
       toast({
@@ -263,12 +260,11 @@ export const useIssues = () => {
         description: `Issue has been approved!!`
       })
       await refresh()
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error approve issue',
         description: 'An error occurred while approving the issue!!'
       })
-      console.error('Error approve issue:', error)
     }
   }
 

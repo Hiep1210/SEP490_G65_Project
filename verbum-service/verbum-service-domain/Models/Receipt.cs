@@ -14,9 +14,13 @@ public partial class Receipt
 
     public Guid? OrderId { get; set; }
 
-    public bool? DepositeOrPayment { get; set; }
+    public bool DepositeOrPayment { get; set; }
 
     public decimal? Amount { get; set; }
+
+    public bool Done { get; set; }
+
+    public string PaymentId { get; set; } = null!;
 
     public virtual Order? Order { get; set; }
 }

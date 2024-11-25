@@ -1,0 +1,106 @@
+<template>
+  <div>
+    <Dialog>
+      <DialogTrigger as-child>
+        <slot />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Assign Job</DialogTitle>
+          <DialogDescription class="text-black space-y-2">
+            Choose linguists and due date
+          </DialogDescription>
+        </DialogHeader>
+        <Form v-slot="{ meta, values, validate }" as="form" keep-values :validation-schema="schema">
+          <form class="space-y-2" @submit="(e) => {
+            e.preventDefault()
+            validate()
+            console.log(meta.valid)
+            if (meta.valid) {
+              onSubmit(values)
+            }
+          }">
+            <FormField v-slot="{ componentField, errorMessage }" name="assignee_id">
+              <FormItem class="flex flex-col">
+                <FormLabel>Linguist</FormLabel>
+                <JobsLinguistSelector v-bind="componentField" v-model:selected-linguists="selectedLinguists"
+                  :error="!!errorMessage" :linguists="assignList"
+                  @update:selected-linguists="updateSelectedLinguists" />
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField, value }" name="dueDate">
+              <FormItem class="flex flex-col">
+                <FormLabel>Due date</FormLabel>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <Button variant="outline" :class="cn(
+                      'w-[280px] justify-start text-left font-normal',
+                      !value && 'text-muted-foreground',
+                    )">
+                      <CalendarIcon class="mr-2 h-4 w-4" />
+                      {{ value ? value.toLocaleDateString() : "Pick a date" }}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent class="w-auto p-0">
+                    <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)" />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <DialogFooter>
+              <Button type="submit" variant="outline" :disabled="!meta.valid">Confirm</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+
+  </div>
+</template>
+
+<script lang="ts" setup>
+import * as z from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import type { Linguist } from '@/types/user'
+import { cn } from '@/lib/utils'
+import { CalendarIcon } from 'lucide-vue-next'
+import { CalendarDate } from "@internationalized/date"
+import { format } from 'date-fns'
+
+const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
+const selectedLinguists = ref<string[]>([])
+
+const schema = toTypedSchema(z.object({
+  assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
+  dueDate: z.coerce.date().min(new Date(), 'Due date is required')
+}))
+
+const { handleSubmit, setFieldValue } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    assignee_id: [],
+    dueDate: new Date()
+  }
+})
+
+
+const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
+  selectedLinguists.value = newSelectedLinguists
+  setFieldValue('assignee_id', newSelectedLinguists)
+}
+
+const emit = defineEmits(['edit'])
+
+const onSubmit = handleSubmit((values) => {
+  const payload = {
+    assigneesId: values.assignee_id,
+    dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
+  }
+  console.log(JSON.stringify(payload, null, 2))
+  emit('edit', payload)
+})
+</script>
+
+<style></style>

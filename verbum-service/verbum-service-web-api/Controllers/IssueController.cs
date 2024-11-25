@@ -113,14 +113,14 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("approve")]
-        [Roles(UserRole.MANAGER)]
+        [HttpPut("reopen")]
+        [Roles(UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ApproveIssue([FromQuery][Required] Guid issueId, [FromQuery][Required] Guid orderId)
+        public async Task<IActionResult> ReopenIssue([FromBody] ReopenIssueRequest request)
         {
-            await issueService.ApproveIssue(issueId, orderId);
+            await issueService.ReopenIssue(request);
             return NoContent();
         }
     }

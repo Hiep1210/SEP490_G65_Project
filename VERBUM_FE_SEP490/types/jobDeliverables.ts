@@ -1,4 +1,4 @@
 export interface JobDeliverables {
-    "deliverableFileUrl": string | undefined
+    "deliverableFileUrl": string
     "serviceOrder": number 
 }

@@ -124,6 +124,9 @@ public partial class verbumContext : DbContext
             entity.Property(e => e.RejectResponse)
                 .HasColumnType("character varying")
                 .HasColumnName("reject_response");
+            entity.Property(e => e.SrcDocumentUrl)
+                .HasColumnType("character varying")
+                .HasColumnName("src_document_url");
             entity.Property(e => e.Status)
                 .HasComment("CANCEL, OPEN, RESOLVED, ACCEPTED, IN-PROGRESS")
                 .HasColumnType("character varying")
@@ -362,10 +365,16 @@ public partial class verbumContext : DbContext
                 .HasColumnName("receipt_id");
             entity.Property(e => e.Amount).HasColumnName("amount");
             entity.Property(e => e.DepositeOrPayment).HasColumnName("deposite_or_payment");
+            entity.Property(e => e.Done)
+                .HasDefaultValue(false)
+                .HasColumnName("done");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.PayDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("pay_date");
+            entity.Property(e => e.PaymentId)
+                .HasColumnType("character varying")
+                .HasColumnName("payment_id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Receipts)
                 .HasForeignKey(d => d.OrderId)

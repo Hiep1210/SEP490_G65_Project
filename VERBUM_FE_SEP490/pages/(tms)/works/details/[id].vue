@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 const { jobs, getJobsOfWork } = useJobs()
 const {assignList, getAssignList} = useUsers()
 const role = useAuthStore().user?.role as string | undefined
@@ -18,7 +19,7 @@ provide('assignList', assignList)
 
 <template>
     <div>
-        <JobsStatusColumn :data="jobs"/>
+        <WorksStatusColumn :data="jobs"/>
     </div>
 </template>
 

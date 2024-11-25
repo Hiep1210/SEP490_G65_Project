@@ -43,6 +43,8 @@ public partial class Issue
 
     public Guid JobId { get; set; }
 
+    public string SrcDocumentUrl { get; set; } = null!;
+
     public virtual User? Assignee { get; set; }
 
     public virtual User? Client { get; set; }

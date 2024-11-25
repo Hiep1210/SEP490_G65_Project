@@ -17,5 +17,6 @@ export interface Order {
   translationFileUrls?: string[]
   referenceFileUrls?: string[]
   jobDeliverables?: JobDeliverables[]
+  deleteddFileUrls?: string[]
   paymentStatus?: string
 }

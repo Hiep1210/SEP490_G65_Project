@@ -23,12 +23,14 @@ const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const openRatingDialog = ref(false)
-const tempPrice = ref<string>('0') 
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
   getSupportedLanguages()
-  getRatingByOrderId(orderId as string);
+  if (order.value) {
+    useSeoMeta({ title: order.value.orderName })
+  }
 })
 
 // Enter edit mode
@@ -38,7 +40,7 @@ const enableEdit = () => {
     const {
       translationFileUrls,
       referenceFileUrls,
-      deliverableFileUrls,
+      jobDeliverables,
       createdDate,
       discountId,
       paymentStatus,
@@ -98,27 +100,6 @@ const saveEdit = async () => {
     isEditing.value = false
   } catch (error) {
     console.error('Failed to save order:', error)
-  }
-}
-// Add discount
-const openAddDiscount = ref(false)
-const addDiscount = async () => {
-  try {
-    if (editedOrder.value) {
-      const payload = {
-        ...editedOrder.value,
-        discountId: editedOrder.value?.discountId
-      }
-      await useAPI('/order/update', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to add discount:', error)
   }
 }
 
@@ -201,6 +182,17 @@ const confirmSetPrices = async () => {
     console.error('Failed to set price:', error) // Log error if API call fails
   }
 }
+
+if (order.value?.orderStatus === 'COMPLETED') {
+  getRatingByOrderId(orderId as string)
+}
+
+const orderTitle = computed(() => order.value?.orderName || 'Order Details')
+
+useSeoMeta({
+  title: orderTitle
+})
+
 </script>
 
 <template>
@@ -331,7 +323,7 @@ const confirmSetPrices = async () => {
             >Edit Order</Button
           >
           <Button
-            v-if="role === 'CLIENT' && order.orderStatus === 'NEW'"
+            v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')"
             variant="outline"
             @click="changeOrderStatus(order.orderId, 'CANCELLED')"
             >Cancel Order</Button
@@ -342,19 +334,13 @@ const confirmSetPrices = async () => {
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
-          <Button
-            v-if="role === 'CLIENT'"
-            variant="outline"
-            @click="openAddDiscount = true"
-            >Add Discount</Button
-          >
         </div>
 
         <OrdersDetailsTabs :order="order" />
 
         <!-- Rating -->
-         <div v-if="filteredRating && order.orderStatus === 'ACCEPTED'" class="flex gap-2 border rounded-md p-5">
-          <!-- <div>
+         <div v-if="filteredRating && order.orderStatus === 'COMPLETED'" class="flex gap-2 border rounded-md p-5">
+          <div>
             <CircleUser class="h-10 w-10" />
           </div> -->
           <div>
