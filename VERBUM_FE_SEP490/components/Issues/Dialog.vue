@@ -33,7 +33,7 @@ import {
 import { ServiceManagersRole } from '~/constants/userRole'
 
 const { assignList, getAssignList } = useUsers()
-const { updateIssueStatus, sendCancelResponse, updateIssue, resolveIssue, approveIssueSolution, acceptIssueSolution, sendRejectResponse } =
+const { updateIssueStatus, sendCancelResponse, updateIssue, resolveIssue, approveIssueSolution, acceptIssueSolution, sendRejectResponse, reOpenIssue } =
   useIssues()
 
 const props = defineProps<{
@@ -50,13 +50,16 @@ const isStatusEditing = ref(false)
 const previousStatus = ref('')
 const titleStatusConfirm = 'Change status'
 const descriptionStatusConfirm =
-  'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
+  'Are you really want to cancel this issue?'
 const rejectSolutionDescription =
-  'Are you sure you want to reject the solution?'
-  const isConfirmDialogOpen = ref(false)
+  'Are you really want to re-open the issue on this file?'
+const descriptionStatusReOpen =
+  'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
+const isConfirmDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
 const isResolveDialogOpen = ref(false)
 const isRejectSolutionDialogOpen = ref(false)
+const isReOpenDialogOpen = ref(false)
 const reasonForCancellation = ref('')
 const reasonForRejectSolution = ref('')
 
@@ -110,7 +113,6 @@ onMounted(() => {
   if (!assignList.value.length) {
     getAssignList()
   }
-  console.log({ assignList })
 })
 
 async function refreshPage() {
@@ -167,8 +169,6 @@ const handleResolveIssue = async () => {
     issueAttachments: updatedIssueAttachments
   }
 
-  console.log(payload)
-
   await resolveIssue(payload)
   await updateIssueStatus(issue.value.issueId, 'SUBMITTED')
   isResolveDialogOpen.value = false
@@ -191,6 +191,18 @@ const handleConfirmStatus = async () => {
   await updateIssueStatus(issue.value.issueId, 'CANCEL')
   isCancelDialogOpen.value = false
   refreshPage()
+}
+
+const handleConfirmReOpen = async () => {
+  issue.value.status = 'OPEN'
+  await reOpenIssue(issue.value)
+  isCancelDialogOpen.value = false
+  // await refreshPage()
+}
+
+const handleCancelReOpen = () => {
+  selectedStatus.value = previousStatus.value
+  isReOpenDialogOpen.value = false
 }
 
 const handleCancelStatus = () => {
@@ -223,6 +235,9 @@ const handleStatusChange = async (
   } else if (newStatus === 'SUBMITTED') {
     isResolveDialogOpen.value = true
     previousStatus.value = oldStatus
+  } else if (newStatus === 'OPEN') {
+    isReOpenDialogOpen.value = true
+    previousStatus.value = oldStatus
   } else {
     await updateIssueStatus(issuesId, newStatus)
     issue.value.status = newStatus
@@ -232,23 +247,24 @@ const handleStatusChange = async (
 
 const handleReviewResolveIssue = async () => {
   const response = await approveIssueSolution(issue.value.issueId, issue.value.orderId)
-  if(response) {
+  if (response) {
     await acceptIssueSolution(issue.value.issueId)
   }
   await updateIssueStatus(issue.value.issueId, 'RESOLVED')
-  refreshPage()
+  await refreshPage()
 }
 
 const closeDialog = () => {
   emit('close')
   isEditing.value = false
+  isOpen.value = false
 }
 
 // Compute allowed statuses based on the role
 const filteredIssueStatuses = computed(() => {
   switch (props.role) {
     case 'CLIENT':
-      return ['CANCEL']
+      return ['CANCEL', 'OPEN']
     case 'EDIT_MANAGER':
     case 'EVALUATE_MANAGER':
     case 'TRANSLATE_MANAGER':
@@ -270,262 +286,193 @@ watch(
     }
   }
 )
+
+const solutionlist = issue.value.issueAttachments.filter(
+  (attachment) => attachment.tag === 'SOLUTION'
+)
 </script>
 
 <template>
-  <Dialog :open="isOpen" @click-outside="closeDialog">
-    <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
+  <Dialog :open="isOpen">
+    <DialogContent class="max-w-[1000px] max-h-[750px]">
       <DialogHeader>
         <DialogTitle class="font-semibold text-4xl text-cyan-700">
           {{ issue.issueName }}
         </DialogTitle>
       </DialogHeader>
 
-      <div
-        v-if="issue.cancelResponse"
-        class="p-3 rounded-xl border-2 border-stone-300"
-      >
-        <div class="font-semibold text-red-600">Cancellation Reason:</div>
-        <p>{{ issue.cancelResponse }}</p>
-      </div>
+      <div class="flex flex-col gap-3 h-[600px] overflow-scroll">
+        <div v-if="issue.cancelResponse" class="p-3 rounded-xl border-2 border-stone-300">
+          <div class="font-semibold text-red-600">Cancellation Reason:</div>
+          <p>{{ issue.cancelResponse }}</p>
+        </div>
 
-      <div
-        v-if="issue.rejectResponse && (role === 'CLIENT' || ServiceManagersRole.includes(role)) && issue.status !== 'RESOLVED'"
-        class="p-3 rounded-xl border-2 border-stone-300"
-      >
-        <div class="font-semibold text-red-600">Reject Solution Reason:</div>
-        <p>{{ issue.rejectResponse }}</p>
-      </div>
+        <div
+          v-if="issue.rejectResponse && (role === 'CLIENT' || ServiceManagersRole.includes(role)) && issue.status !== 'RESOLVED'"
+          class="p-3 rounded-xl border-2 border-stone-300">
+          <div class="font-semibold text-red-600">Reject Solution Reason:</div>
+          <p>{{ issue.rejectResponse }}</p>
+        </div>
 
-      <div class="p-3 rounded-xl border-2 border-stone-300">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableCell class="font-semibold">Issue name:</TableCell>
-              <TableCell>
-                <template v-if="isEditing && role === 'CLIENT'">
-                  <Input v-model="issue.issueName" class="rounded p-1 w-full" />
-                </template>
-                <template v-else>{{ issue.issueName }}</template>
-              </TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="role !== 'CLIENT'">
-              <TableCell class="font-semibold">Created by:</TableCell>
-              <TableCell>
-                {{ issue.clientName }}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-semibold">Created date:</TableCell>
-              <TableCell>{{ formatDate(issue.createdAt) }}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-semibold">Updated date:</TableCell>
-              <TableCell>{{ formatDate(issue.updatedAt) }}</TableCell>
-            </TableRow>
-            <TableRow v-if="role !== 'CLIENT'">
-              <TableCell class="font-semibold">Assign:</TableCell>
-              <TableCell>
-                <template
-                  v-if="
+        <div class="p-3 rounded-xl border-2 border-stone-300">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableCell class="font-semibold">Issue name:</TableCell>
+                <TableCell>
+                  <template v-if="isEditing && role === 'CLIENT'">
+                    <Input v-model="issue.issueName" class="rounded p-1 w-full" />
+                  </template>
+                  <template v-else>{{ issue.issueName }}</template>
+                </TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-if="role !== 'CLIENT'">
+                <TableCell class="font-semibold">Created by:</TableCell>
+                <TableCell>
+                  {{ issue.clientName }}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">Created date:</TableCell>
+                <TableCell>{{ formatDate(issue.createdAt) }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">Updated date:</TableCell>
+                <TableCell>{{ formatDate(issue.updatedAt) }}</TableCell>
+              </TableRow>
+              <TableRow v-if="role !== 'CLIENT'">
+                <TableCell class="font-semibold">Assign:</TableCell>
+                <TableCell>
+                  <template v-if="
                     isEditing &&
                     ServiceManagersRole.includes(role) &&
                     issue.status === 'OPEN'
-                  "
-                >
-                  <Select
-                    v-model="issue.assigneeId"
-                    class="border border-cyan-700 rounded w-full"
-                  >
-                    <SelectTrigger class="w-[180px]">
-                      <SelectValue :placeholder="issue.assigneeName" />
+                  ">
+                    <Select v-model="issue.assigneeId" class="border border-cyan-700 rounded w-full">
+                      <SelectTrigger class="w-[180px]">
+                        <SelectValue :placeholder="issue.assigneeName" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem v-for="user in assignList" :key="user.id" :value="user.id">
+                            {{ user.name }}
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </template>
+                  <template v-else>{{ issue.assigneeName }}</template>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-semibold">Status:</TableCell>
+                <TableCell><Select v-model="selectedStatus" @update:modelValue="(newStatus) =>
+                    handleStatusChange(issue.issueId, issue.status, newStatus)
+                  ">
+                    <SelectTrigger class="max-w-fit p-0 border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden">
+                      <SelectValue>
+                        <Badge :class="getIssueBadgeClass(selectedStatus)">{{ selectedStatus }}
+                        </Badge>
+                      </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent v-if="filteredIssueStatuses.length !== 0">
                       <SelectGroup>
                         <SelectItem
-                          v-for="user in assignList"
-                          :key="user.id"
-                          :value="user.id"
-                        >
-                          {{ user.name }}
+                          v-for="issueStatus in filteredIssueStatuses.filter(issue => selectedStatus === 'RESOLVED' ? issue === 'OPEN' : issue !== selectedStatus)"
+                          :key="issueStatus" :value="issueStatus">
+                          <Badge :class="getIssueBadgeClass(issueStatus)">{{ issueStatus }}
+                          </Badge>
                         </SelectItem>
                       </SelectGroup>
                     </SelectContent>
-                  </Select>
-                </template>
-                <template v-else>{{ issue.assigneeName }}</template>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-semibold">Status:</TableCell>
-              <TableCell
-                ><Select
-                  v-model="selectedStatus"
-                  @update:modelValue="
-                    (newStatus) =>
-                      handleStatusChange(issue.issueId, issue.status, newStatus)
-                  "
-                >
-                  <SelectTrigger
-                    class="max-w-fit p-0 border-none focus:ring-0 focus:ring-offset-0 [&_svg]:hidden"
-                  >
-                    <SelectValue>
-                      <Badge :class="getIssueBadgeClass(selectedStatus)"
-                        >{{ selectedStatus }}
-                      </Badge>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem
-                        v-for="issueStatus in filteredIssueStatuses"
-                        :key="issueStatus"
-                        :value="issueStatus"
-                      >
-                        <Badge :class="getIssueBadgeClass(issueStatus)"
-                          >{{ issueStatus }}
-                        </Badge>
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select></TableCell
-              >
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
+                  </Select></TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
 
-      <div class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="font-semibold">Description:</div>
-        <p>
-          <template v-if="isEditing && role === 'CLIENT'">
-            <Textarea
-              v-model="issue.issueDescription"
-              class="border border-cyan-700 rounded p-1 w-full"
-            />
-          </template>
-          <template v-else>{{ issue.issueDescription }}</template>
-        </p>
-      </div>
+        <div class="p-3 rounded-xl border-2 border-stone-300">
+          <div class="font-semibold">Description:</div>
+          <p>
+            <template v-if="isEditing && role === 'CLIENT'">
+              <Textarea v-model="issue.issueDescription" class="border border-cyan-700 rounded p-1 w-full" />
+            </template>
+            <template v-else>{{ issue.issueDescription }}</template>
+          </p>
+        </div>
 
-      <div class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="font-semibold">Issue Attachment Files:</div>
-        <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
-          <div
-            v-for="attachment in issue.issueAttachments"
-            :key="attachment.attachmentUrl"
-          >
-            <a
-            v-if="attachment.tag === 'ATTACHMENT'"
-              :href="attachment.attachmentUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
-              :title="getFirebaseFileName(attachment.attachmentUrl)"
-            >
-              <img
-                src="~/assets/img/file_icon.png"
-                loading="eager"
-                format="avif"
-                width="100"
-                height="50"
-                alt="file icon"
-              />
-              <h1
-                class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
-              >
-                {{ getFirebaseFileName(attachment.attachmentUrl) }}
-              </h1>
-            </a>
+        <div class="p-3 rounded-xl border-2 border-stone-300">
+          <div class="font-semibold">Issue Attachment Files:</div>
+          <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
+            <div v-for="attachment in issue.issueAttachments" :key="attachment.attachmentUrl">
+              <a v-if="attachment.tag === 'ATTACHMENT'" :href="attachment.attachmentUrl" target="_blank"
+                rel="noopener noreferrer"
+                class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+                :title="getFirebaseFileName(attachment.attachmentUrl)">
+                <img src="~/assets/img/file_icon.png" loading="eager" format="avif" width="100" height="50"
+                  alt="file icon" />
+                <h1 class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2">
+                  {{ getFirebaseFileName(attachment.attachmentUrl) }}
+                </h1>
+              </a>
+            </div>
+          </div>
+          <div v-else>
+            <p class="text-primary font-semibold">No attachments found</p>
           </div>
         </div>
-        <div v-else>
-          <p class="text-primary font-semibold">No attachments found</p>
-        </div>
-      </div>
 
-      <div class="p-3 rounded-xl border-2 border-stone-300">
-        <div class="flex justify-between">
-          <div class="font-semibold">Solution Files:</div>
-          <div v-if="ServiceManagersRole.includes(role) && issue.status !== 'RESOLVED'" class="flex gap-2">
-            <Button class="bg-gray-500" @click="openRejectDialog"
-              >Reject</Button
-            >
-            <Button class="bg-red-500" @click="handleReviewResolveIssue"
-              >Mark as resolved</Button
-            >
+        <div class="p-3 rounded-xl border-2 border-stone-300">
+          <div class="flex justify-between">
+            <div class="font-semibold">Solution Files:</div>
+            <div v-if="ServiceManagersRole.includes(role) && issue.status !== 'RESOLVED' && solutionlist.length!== 0" class="flex gap-2">
+              <Button class="bg-gray-500" @click="openRejectDialog">Reject</Button>
+              <Button class="bg-red-500" @click="handleReviewResolveIssue">Mark as resolved</Button>
+            </div>
           </div>
-        </div>
-        <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
-          <div
-            v-for="attachment in issue.issueAttachments"
-            :key="attachment.attachmentUrl"
-          >
-            <a
-            v-if="attachment.tag === 'SOLUTION'"
-              :href="attachment.attachmentUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
-              :title="getFirebaseFileName(attachment.attachmentUrl)"
-            >
-              <img
-                src="~/assets/img/file_icon.png"
-                loading="eager"
-                format="avif"
-                width="100"
-                height="50"
-                alt="file icon"
-              />
-              <h1
-                class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
-              >
-                {{ getFirebaseFileName(attachment.attachmentUrl) }}
-              </h1>
-            </a>
+          <div v-if="solutionlist.length !== 0" class="flex gap-3">
+            <div v-for="attachment in solutionlist" :key="attachment.attachmentUrl">
+              <a :href="attachment.attachmentUrl" target="_blank"
+                rel="noopener noreferrer"
+                class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+                :title="getFirebaseFileName(attachment.attachmentUrl)">
+                <img src="~/assets/img/file_icon.png" loading="eager" format="avif" width="100" height="50"
+                  alt="file icon" />
+                <h1 class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2">
+                  {{ getFirebaseFileName(attachment.attachmentUrl) }}
+                </h1>
+              </a>
+            </div>
           </div>
-        </div>
-        <div v-else>
-          <p class="text-primary font-semibold">No attachments found</p>
+          <div v-else>
+            <p class="text-primary font-semibold">No solution yet</p>
+          </div>
         </div>
       </div>
 
       <DialogFooter>
-        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog"
-          >Cancel
+        <Button v-if="isEditing" class="bg-slate-500" @click="closeDialog">Cancel
         </Button>
-        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog"
-          >Close
+        <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close
         </Button>
-        <Button
-          v-if="!isEditing && issue.status !== 'CANCEL' && issue.status !== 'RESOLVED'"
-          @click="enableEditing"
-          >Edit
+        <Button v-if="!isEditing && issue.status !== 'CANCEL' && issue.status !== 'RESOLVED'"
+          @click="enableEditing">Edit
         </Button>
         <Button v-if="isEditing" @click="updateIssueDetail">Update</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
-  <IssuesConfirmDialog
-    :title="titleStatusConfirm"
-    :description="descriptionStatusConfirm"
-    :open="isConfirmDialogOpen"
-    @close="handleCancelStatus"
-    @confirm="handleConfirmStatus"
-  />
+  <IssuesConfirmDialog :title="titleStatusConfirm" :description="descriptionStatusConfirm" :open="isConfirmDialogOpen"
+    @close="handleCancelStatus" @confirm="handleConfirmStatus" />
 
   <Dialog :open="isCancelDialogOpen" @close="handleCancelStatus">
     <DialogContent class="max-w-md">
       <DialogHeader>
         <DialogTitle>Provide Cancellation Reason</DialogTitle>
       </DialogHeader>
-      <Input
-        v-model="reasonForCancellation"
-        placeholder="Enter reason for cancellation"
-        class="w-full"
-      />
+      <Input v-model="reasonForCancellation" placeholder="Enter reason for cancellation" class="w-full" />
       <DialogDescription class="text-red-500 font-semibold">
         {{ descriptionStatusConfirm }}
       </DialogDescription>
@@ -541,11 +488,7 @@ watch(
       <DialogHeader>
         <DialogTitle>Provide Reject Reason</DialogTitle>
       </DialogHeader>
-      <Input
-        v-model="reasonForRejectSolution"
-        placeholder="Enter reason for cancellation"
-        class="w-full"
-      />
+      <Input v-model="reasonForRejectSolution" placeholder="Enter reason for cancellation" class="w-full" />
       <DialogDescription class="text-red-500 font-semibold">
         {{ rejectSolutionDescription }}
       </DialogDescription>
@@ -561,11 +504,7 @@ watch(
       <DialogHeader>
         <DialogTitle>Upload Issues Solution</DialogTitle>
       </DialogHeader>
-      <Button
-        class="block"
-        type="button"
-        @click="openFileSelect({ accept: '*', multiple: true })"
-      >
+      <Button class="block" type="button" @click="openFileSelect({ accept: '*', multiple: true })">
         Upload Files
       </Button>
       <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
@@ -573,11 +512,8 @@ watch(
           <CardDescription>Uploaded files</CardDescription>
         </CardHeader>
         <CardContent class="grid gap-3">
-          <div
-            v-for="(file, index) in files"
-            :key="file.name"
-            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
-          >
+          <div v-for="(file, index) in files" :key="file.name"
+            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0">
             <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
             <div class="flex flex-col gap-1">
               <p class="text-sm font-medium leading-none">
@@ -599,4 +535,20 @@ watch(
       </DialogFooter>
     </DialogContent>
   </Dialog>
+
+  <Dialog :open="isReOpenDialogOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Re-open issue</DialogTitle>
+      </DialogHeader>
+      <DialogDescription class="text-red-500 font-semibold">
+        {{ descriptionStatusReOpen }}
+      </DialogDescription>
+      <DialogFooter>
+        <Button class="bg-gray-500" @click="handleCancelReOpen">Cancel</Button>
+        <Button class="bg-red-500" @click="handleConfirmReOpen">Confirm</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
 </template>

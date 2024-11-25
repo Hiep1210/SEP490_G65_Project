@@ -23,7 +23,7 @@ const openSetPricesDialog = ref(false)
 const openPaymentDialog = ref(false)
 const openConfirmDialog = ref(false)
 const openRatingDialog = ref(false)
-const tempPrice = ref<string>('0') 
+const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
@@ -100,27 +100,6 @@ const saveEdit = async () => {
     isEditing.value = false
   } catch (error) {
     console.error('Failed to save order:', error)
-  }
-}
-// Add discount
-const openAddDiscount = ref(false)
-const addDiscount = async () => {
-  try {
-    if (editedOrder.value) {
-      const payload = {
-        ...editedOrder.value,
-        discountId: editedOrder.value?.discountId
-      }
-      await useAPI('/order/update', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to add discount:', error)
   }
 }
 
@@ -241,12 +220,12 @@ useSeoMeta({
           </div>
 
           <!-- Order Details -->
-          <div class="flex flex-col space-y-1">
-            <div class="grid grid-cols-2 gap-x-2 text-sm">
+          <div class="flex flex-col">
+            <div class="grid grid-cols-2 gap-x-2">
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
+              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
@@ -355,12 +334,6 @@ useSeoMeta({
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
-          <Button
-            v-if="role === 'CLIENT'"
-            variant="outline"
-            @click="openAddDiscount = true"
-            >Add Discount</Button
-          >
         </div>
 
         <OrdersDetailsTabs :order="order" />
