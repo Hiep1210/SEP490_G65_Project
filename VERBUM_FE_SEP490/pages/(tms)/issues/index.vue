@@ -1,8 +1,10 @@
 <script setup lang="ts">
-// middleware: false
-
 import { useIssues } from '~/composables/useIssues'
 import type { Issue } from '~/types/issues'
+
+useSeoMeta({
+  title: 'Issues'
+})
 
 const { issues, getIssues, updateIssue } = useIssues()
 const { user } = useAuthStore()

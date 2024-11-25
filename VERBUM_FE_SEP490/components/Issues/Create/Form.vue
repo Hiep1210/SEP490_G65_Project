@@ -22,7 +22,7 @@ import { getFirebaseFileName } from '~/utils/getFirebaseFileName'
 
 const props = defineProps({
   jobDeliverables: {
-    type: Array,
+    type: Array<JobDeliverables>,
     default: () => []
   }
 })
@@ -123,6 +123,7 @@ const getElementsWithHighestServiceOrder = (
               v-for="item in getElementsWithHighestServiceOrder(
                 props.jobDeliverables
               )"
+              :key="item.deliverableFileUrl"
               :value="String(item.deliverableFileUrl)"
             >
               {{ getFirebaseFileName(item.deliverableFileUrl) }}

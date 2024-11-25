@@ -20,6 +20,10 @@ import { useToast } from '~/components/ui/toast'
 const { toast } = useToast()
 const router = useRouter()
 
+useSeoMeta({
+  title: 'Create Order'
+})
+
 const formSchema = [
   z.object({
     sourceLanguageId: z.string(),

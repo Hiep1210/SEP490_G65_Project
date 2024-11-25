@@ -28,6 +28,9 @@ const tempPrice = ref<string>('0')
 onMounted(() => {
   getOrder(orderId)
   getSupportedLanguages()
+  if (order.value) {
+    useSeoMeta({ title: order.value.orderName })
+  }
 })
 
 // Enter edit mode
@@ -204,6 +207,12 @@ const confirmSetPrices = async () => {
 if (order.value?.orderStatus === 'COMPLETED') {
   getRatingByOrderId(orderId as string)
 }
+
+const orderTitle = computed(() => order.value?.orderName || 'Order Details')
+
+useSeoMeta({
+  title: orderTitle
+})
 
 </script>
 

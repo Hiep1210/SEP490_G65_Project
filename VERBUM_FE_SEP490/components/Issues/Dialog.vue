@@ -95,7 +95,7 @@ async function uploadFiles() {
     )
 
     const urls = await Promise.all(promises)
-    downloadUrls.value = [...downloadUrls.value, ...urls]
+    downloadUrls.value = [...urls]
   }
 }
 

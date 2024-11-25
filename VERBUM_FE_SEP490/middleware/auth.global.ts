@@ -3,7 +3,7 @@ import { decodeToken } from '~/lib/auth/auth'
 export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   const access_token = useCookie('access_token')
-  const unprotectedRoutes = ['/login', '/signup']
+  const unprotectedRoutes = ['/', '/login', '/signup']
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
   // Check if access_token exists
