@@ -20,7 +20,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<ReceiptInfoResponse>> GetAllReceipt()
         {
-            List<Receipt> listReceipt = await context.Receipts.ToListAsync();
+            List<Receipt> listReceipt = await context.Receipts.Include(r => r.Order).ToListAsync();
 
             if (listReceipt == null)
             {
