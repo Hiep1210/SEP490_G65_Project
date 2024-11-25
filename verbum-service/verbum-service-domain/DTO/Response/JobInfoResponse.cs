@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using verbum_service_domain.DTO.Request;
 using verbum_service_domain.Models;
 
 namespace verbum_service_domain.DTO.Response
@@ -37,5 +38,6 @@ namespace verbum_service_domain.DTO.Response
         public IssueResponse? Issue { get; set; }
         public ICollection<UserInfo> AssigneeNames { get; set; }
         public ICollection<string> PreviousJobDeliverables { get; set; }
+        public List<string> ReferenceUrls { get; set; }
     }
 }

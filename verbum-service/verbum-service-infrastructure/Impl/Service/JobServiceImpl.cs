@@ -69,7 +69,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<JobInfoResponse> GetJobById(Guid jobId)
         {
-            JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
+            JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ThenInclude(x => x.Order).ThenInclude(x => x.OrderReferences).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
             List<string> urls = await context.Jobs.Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation).Where(x => x.DocumentUrl.Equals(job.DocumentUrl) && x.Id != job.Id).OrderBy(x => x.Work.ServiceCodeNavigation.ServiceOrder).Select(x => x.DeliverableUrl).ToListAsync();
             job.PreviousJobDeliverables = urls;
             return job;
