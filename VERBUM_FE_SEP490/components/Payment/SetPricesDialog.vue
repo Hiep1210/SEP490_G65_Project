@@ -120,7 +120,7 @@ const isSupported = (language: string) => {
           v-model="prices"
           class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
           type="number"
-        >
+        > <span>USD</span>
       </div>
       <DialogFooter>
         <Button @click="closeDialog">Cancel</Button>

@@ -133,9 +133,7 @@ onMounted(async () => {
     console.error('Failed to fetch language list:', error)
   }
 })
-const payStatus = ref('')
-const handlePay = (status: string) => {
-  payStatus.value = status
+const handlePay = () => {
   openPaymentDialog.value = true
 }
 
@@ -211,10 +209,10 @@ provide('role', role)
               {{ order?.orderName }}
             </p>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('IN_PROGRESS')">Deposit </Button>
+              <Button @click="handlePay()">Deposit </Button>
             </div>
             <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('DELIVERED')">Paying Remaining </Button>
+              <Button @click="handlePay()">Paying Remaining </Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
               <Button @click="handleSetPrices">Set prices </Button>
@@ -396,7 +394,7 @@ provide('role', role)
 
       <PaymentDialog
         :order="order"
-        :status="payStatus"
+        :status="order.orderStatus === 'ACCEPTED'? 'IN_PROGRESS' : 'DELIVERED'"
         :open="openPaymentDialog"
         @close="handlePaymentClose"
       />

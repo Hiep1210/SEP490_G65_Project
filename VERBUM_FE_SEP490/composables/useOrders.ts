@@ -135,8 +135,12 @@ export const useOrders = () => {
     }
   }
 
-  const successPayment = async ( status: string) => {
+  const successPayment = async ( status: string, orderId: string) => {
     try {
+      if(status === 'IN_PROGRESS'){
+        await getOrder(orderId);
+      }
+      console.log(order)
       if (status === 'IN_PROGRESS' && order.value) {
         const payload = {
           orderId: order.value.orderId,
