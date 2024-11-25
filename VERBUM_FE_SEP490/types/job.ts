@@ -3,9 +3,11 @@ export interface Job {
     name: string;
     status: string;
     dueDate: string;
+    workDueDate: string;
     createdAt: string;
     updatedAt: string;
     documentUrl: string;
+    referenceUrls: string[];
     deliverableUrl: string;
     previousJobDeliverables: string[];
     targetLanguageId: string;

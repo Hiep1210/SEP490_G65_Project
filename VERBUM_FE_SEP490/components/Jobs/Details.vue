@@ -23,8 +23,9 @@ const canEdit = computed(() => {
 
   const hasRequiredFields = props.job.dueDate && props.job.assigneeNames?.length > 0
   const isPermitted = props.role?.includes('MANAGER')
+  const isStatusValid = !['SUBMITTED', 'APPROVED'].includes(props.job.status)
 
-  return hasRequiredFields && isPermitted
+  return hasRequiredFields && isPermitted && isStatusValid
 })
 
 const { toast } = useToast()
@@ -61,9 +62,9 @@ const { approve, reject } = useJobs()
 <template>
   <div class="container mx-auto p-4">
     <header class="mb-6 flex justify-between">
-      <div>
-        <h1 class="text-3xl font-semibold">
-          {{ props.job?.assigneeNames?.map((assignee: any) => assignee.name).join(', ') || 'Job Details' }}
+      <div class="space-y-2">
+        <h1 class="text-3xl font-semibold text-primary">
+          {{props.job?.name }}
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
@@ -74,14 +75,12 @@ const { approve, reject } = useJobs()
 
     <section class="mb-6">
       <div class="mt-4 space-y-2">
-        <span>
-          <strong>Job Name:</strong> {{ props.job?.name }}
-        </span>
         <div>
           <p v-if="props.job && props.job?.assigneeNames?.length > 0" class="">
             Assigned to: {{ props.job?.assigneeNames.map((assignee) => assignee.name).join(', ') }}
           </p>
           <p>Target Language: {{ props.job?.targetLanguageId }}</p>
+          <p v-if="props.job?.workDueDate">Work's Due Date: {{ formatToVietnamTimezone(props.job?.workDueDate) }}</p>
           <p v-if="props.job?.dueDate" class="">Due Date: {{ formatToVietnamTimezone(props.job?.dueDate) }}</p>
           <p v-if="props.job?.createdAt" class="">Created At: {{ formatToVietnamTimezone(props.job?.createdAt) }}</p>
           <p v-if="props.job?.updatedAt" class="">Updated At: {{ formatToVietnamTimezone(props.job?.updatedAt) }}</p>
@@ -92,12 +91,12 @@ const { approve, reject } = useJobs()
     <section class="flex justify-end gap-4 mb-4">
       <template v-if="props.role?.includes('MANAGER')">
         <JobsAssignDialog
-          v-if="props.job?.assigneeNames?.length === 0 || (props.job?.status &&  ['SUBMITTED', 'APPROVED', 'REJECTED'].includes(props.job?.status))"
-          :order-due-date="props.job?.dueDate || ''"
+          v-if="props.job?.assigneeNames?.length === 0 || (props.job?.status &&  ['NEW'].includes(props.job?.status))"
+          :work-due-date="props.job?.workDueDate || ''"
           @assign="assignLinguists" />
         <Button 
           variant="outline" 
-          :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
+          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
           @click="approve(props.job)">
           Approve
         </Button>

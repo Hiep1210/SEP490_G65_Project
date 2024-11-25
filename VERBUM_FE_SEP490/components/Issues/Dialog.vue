@@ -245,11 +245,10 @@ const handleStatusChange = async (
 }
 
 const handleReviewResolveIssue = async () => {
-  const response = await approveIssueSolution(issue.value.issueId, issue.value.orderId)
+  const response = await approveIssueSolution(issue.value.issueId)
   if (response) {
     await acceptIssueSolution(issue.value.issueId)
   }
-  await updateIssueStatus(issue.value.issueId, 'RESOLVED')
   await refreshPage()
 }
 

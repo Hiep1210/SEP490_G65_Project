@@ -69,6 +69,7 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Work.OrderId))
                 .ForMember(dest => dest.ReferenceUrls, opt => opt.MapFrom(src => src.Work.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.REFERENCES.ToString()).Select(x => x.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.ServiceOrder, opt => opt.MapFrom(src => src.Work.ServiceCodeNavigation.ServiceOrder))
                 .ReverseMap();
             CreateMap<Job, JobListResponse>()
                 .ForMember(dest => dest.AssigneeNames, opt => opt.MapFrom(src => src.Assignees.ToList()))
@@ -76,7 +77,9 @@ namespace verbum_service_application.Mapper
             CreateMap<Job, UpdateJobRequest>()
                 .ForMember(dest => dest.AssigneesId, opt => opt.MapFrom(src => src.Assignees.Select(x => x.Id).ToList()))
                 .ReverseMap();
-            CreateMap<Receipt, ReceiptInfoResponse>().ReverseMap();
+            CreateMap<Receipt, ReceiptInfoResponse>()
+                .ForMember(dest => dest.OrderName, opt => opt.MapFrom(src => src.Order.OrderName))
+                .ReverseMap();
             CreateMap<Receipt, CreateReceipRequest>().ReverseMap();
         }
     }

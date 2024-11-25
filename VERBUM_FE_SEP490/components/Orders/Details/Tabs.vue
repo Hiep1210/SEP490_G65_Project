@@ -155,5 +155,4 @@ const getElementsWithHighestServiceOrder = (
 }
 
 const isNewOrRejected = computed(() => props.order.orderStatus === 'NEW' || props.order.orderStatus === 'REJECTED')
-
 </script>

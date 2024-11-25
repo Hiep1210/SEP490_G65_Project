@@ -37,7 +37,7 @@ namespace verbum_service_infrastructure.Impl.Service
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_" + docUrl.Split("/")[^1].Split(".")[0],
+                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_" + docUrl.Split("/")[^1].Split(".")[0].Split("uploads")[1],
                                     Status = JobStatus.NEW.ToString(),
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
@@ -63,14 +63,19 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<JobListResponse>> GetAllJob()
         {
-            List<JobListResponse> allJobs = mapper.Map<List<JobListResponse>>(await context.Jobs.Include(x => x.Assignees).ToListAsync()); 
+            List<JobListResponse> allJobs = mapper.Map<List<JobListResponse>>(await context.Jobs.Include(x => x.Assignees).ToListAsync());
             return allJobs;
         }
 
         public async Task<JobInfoResponse> GetJobById(Guid jobId)
         {
-            JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ThenInclude(x => x.Order).ThenInclude(x => x.OrderReferences).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
-            List<string> urls = await context.Jobs.Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation).Where(x => x.DocumentUrl.Equals(job.DocumentUrl) && x.Id != job.Id).OrderBy(x => x.Work.ServiceCodeNavigation.ServiceOrder).Select(x => x.DeliverableUrl).ToListAsync();
+            JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation).Include(x => x.Work).ThenInclude(x => x.Order).ThenInclude(x => x.OrderReferences).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
+            Dictionary<string, string> urls = await context.Jobs
+                .Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation)
+                .Where(x => x.DocumentUrl == job.DocumentUrl && x.Work.ServiceCodeNavigation.ServiceOrder < job.ServiceOrder && !string.IsNullOrEmpty(x.DeliverableUrl))
+                .OrderBy(x => x.Work.ServiceCodeNavigation.ServiceOrder)
+                .Select(x => new { x.DeliverableUrl, x.Work.ServiceCodeNavigation.ServiceName }) 
+                .ToDictionaryAsync(x => x.DeliverableUrl ?? "", x => x.ServiceName);
             job.PreviousJobDeliverables = urls;
             return job;
         }
