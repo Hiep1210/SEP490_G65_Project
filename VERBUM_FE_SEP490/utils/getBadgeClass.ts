@@ -30,3 +30,14 @@ export const getJobBadgeClass = (status: string) => {
       return 'bg-gray-300 text-black'
   }
 }
+
+export const getReceiptBadgeClass = (status: string) => {
+  switch (status) {
+    case 'Deposit':
+      return 'bg-blue-500 text-white'
+    case 'Payment':
+      return 'bg-green-500 text-white'
+    default:
+      return 'bg-gray-300 text-black'
+  }
+}
