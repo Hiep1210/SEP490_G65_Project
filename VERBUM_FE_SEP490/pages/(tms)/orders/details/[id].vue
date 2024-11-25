@@ -220,12 +220,12 @@ useSeoMeta({
           </div>
 
           <!-- Order Details -->
-          <div class="flex flex-col space-y-1">
-            <div class="grid grid-cols-2 gap-x-2 text-sm">
+          <div class="flex flex-col">
+            <div class="grid grid-cols-2 gap-x-2">
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
+              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >

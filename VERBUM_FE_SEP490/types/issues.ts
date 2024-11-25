@@ -21,3 +21,18 @@ export type Issue = {
   cancelResponse: string
   rejectResponse: string
 }
+
+export type IssueUpdatePayload = {
+  issueId: string
+  issueName: string
+  issueDescription: string
+  assigneeId: string
+  issueAttachments: IssueAttachments[]
+}
+
+export type IssueReOpenPayload = {
+    issueId: string
+    issueName: string
+    issueDescription: string
+    issueAttachments: IssueAttachments[]
+}
