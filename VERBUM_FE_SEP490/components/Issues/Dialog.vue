@@ -73,6 +73,7 @@ const { files, open: openFileSelect } = useFileDialog()
 
 async function uploadFiles() {
   if (files.value?.length) {
+    downloadUrls.value = []
     const promises = Array.from(files.value).map(
       (file, index) =>
         new Promise<string>((resolve, reject) => {
@@ -98,7 +99,7 @@ async function uploadFiles() {
     )
 
     const urls = await Promise.all(promises)
-    downloadUrls.value = [...urls]
+    downloadUrls.value = urls
   }
 }
 
@@ -149,6 +150,7 @@ const getUserIdByName = (users: User[], name: string): string => {
 }
 
 const handleResolveIssue = async () => {
+  console.log('resolve issue', downloadUrlsString.value)
   const solutionAttachment: IssueAttachments = {
     issueId: issue.value.issueId,
     attachmentUrl: downloadUrlsString.value,
@@ -157,7 +159,6 @@ const handleResolveIssue = async () => {
   }
 
   const updatedIssueAttachments = [
-    ...issue.value.issueAttachments,
     solutionAttachment
   ]
 
@@ -182,8 +183,6 @@ const handleCancelResolve = () => {
 
 const openRejectDialog = () => {
   isRejectSolutionDialogOpen.value = true
-  // selectedStatus.value = previousStatus.value
-  // await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
 }
 
 const handleConfirmStatus = async () => {
@@ -197,7 +196,7 @@ const handleConfirmReOpen = async () => {
   issue.value.status = 'OPEN'
   await reOpenIssue(issue.value)
   isCancelDialogOpen.value = false
-  // await refreshPage()
+  await refreshPage()
 }
 
 const handleCancelReOpen = () => {
