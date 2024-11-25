@@ -5,14 +5,13 @@ import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 import { ORDER_COMPLETED, ORDER_IN_PROGRESS  } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
-import { CircleUser } from 'lucide-vue-next'
 import { formatToVietnamTimezone } from '#imports'
+const { getRatingByOrderId, filteredRating } = useRating()
 
 const { toast } = useToast()
 
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
 const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
-const { getRatingByOrderId, filteredRating } = useRating()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -32,7 +31,14 @@ onMounted(() => {
   if (order.value) {
     useSeoMeta({ title: order.value.orderName })
   }
+  getRating();
 })
+
+
+const getRating = () => {
+  getRatingByOrderId(orderId as string);
+  console.log({filteredRating})
+}
 
 // Enter edit mode
 const enableEdit = () => {
@@ -133,9 +139,7 @@ onMounted(async () => {
     console.error('Failed to fetch language list:', error)
   }
 })
-const payStatus = ref('')
-const handlePay = (status: string) => {
-  payStatus.value = status
+const handlePay = () => {
   openPaymentDialog.value = true
 }
 
@@ -152,14 +156,19 @@ const handlePaymentClose = () => {
   }
 }
 
+const handleRatingOpen = () => {
+  openRatingDialog.value = true
+
+}
+
 const handleRatingClose = () => {
   openRatingDialog.value = false
   refreshOrder()
 }
 
-const handleRatingSubmit = () => {
+const handleRatingSubmit = async () => {
   openRatingDialog.value = false
-  refreshOrder()
+  await refreshOrder()
 }
 
 const refreshOrder = async () => {
@@ -184,9 +193,7 @@ const confirmSetPrices = async () => {
   }
 }
 
-if (order.value?.orderStatus === 'COMPLETED') {
-  getRatingByOrderId(orderId as string)
-}
+
 
 const orderTitle = computed(() => order.value?.orderName || 'Order Details')
 
@@ -211,10 +218,10 @@ provide('role', role)
               {{ order?.orderName }}
             </p>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('IN_PROGRESS')">Deposit </Button>
+              <Button @click="handlePay()">Deposit </Button>
             </div>
             <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('DELIVERED')">Paying Remaining </Button>
+              <Button @click="handlePay()">Paying Remaining </Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
               <Button @click="handleSetPrices">Set prices </Button>
@@ -336,26 +343,16 @@ provide('role', role)
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
+          <Button v-if="role === 'CLIENT' && (order.orderStatus === 'DELIVERED') && !filteredRating" @click="handleRatingOpen"
+            >Rating your order</Button
+          >
         </div>
 
         <OrdersDetailsTabs :order="order" />
 
         <!-- Rating -->
-         <div v-if="filteredRating && order.orderStatus === 'COMPLETED'" class="flex gap-2 border rounded-md p-5">
-          <div>
-            <CircleUser class="h-10 w-10" />
-          </div>
-          <div>
-            <p class="text-[1.5rem] font-semibold">Your Review</p>
-            <div class="">
-              <RatingDisplay :question="'Expectation '" :rating="filteredRating.expectation"/>
-              <RatingDisplay :question="'In Time '" :rating="filteredRating.inTime"/>
-              <RatingDisplay :question="'Issues Resolved '" :rating="filteredRating.issueResolved"/>
-            </div>
-            <div class="mt-3">
-               {{ filteredRating.moreThought }}
-            </div>
-          </div>
+         <div v-if="order.orderStatus === 'DELIVERED'" >
+          <RatingBox :order-id="orderId as string"/>
          </div>
 
       </div>
@@ -396,7 +393,7 @@ provide('role', role)
 
       <PaymentDialog
         :order="order"
-        :status="payStatus"
+        :status="order.orderStatus === 'ACCEPTED'? 'IN_PROGRESS' : 'DELIVERED'"
         :open="openPaymentDialog"
         @close="handlePaymentClose"
       />

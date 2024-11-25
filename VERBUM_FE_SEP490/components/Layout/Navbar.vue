@@ -5,7 +5,8 @@ import {
   Book,
   User,
   ChartBar,
-  DollarSign
+  DollarSign,
+  ReceiptText
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 
@@ -21,7 +22,8 @@ const auth = useAuthStore()
 const roleMenuItems = {
   CLIENT: [
     { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },
-    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
+    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning },
+    { navName: 'Receipt', navLink: '/receipts', navIcon: ReceiptText }
   ],
   ADMIN: [
     { navName: 'Categories', navLink: '/categories', navIcon: FileWarning },
