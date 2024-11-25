@@ -86,7 +86,6 @@ const { approve, reject } = useJobs()
             <p v-if="props.job?.assigneeNames && props.job.assigneeNames.length > 0" class="text-sm">Assigned to: {{
               props.job?.assigneeNames.map(assignee => assignee.name).join(', ') }}</p>
             <p class="text-sm">Target Language: {{ props.job?.targetLanguageId }} </p>
-            <p class="text-sm">Word Count: {{ props.job?.wordCount }} </p>
             <p v-if="props.job?.dueDate" class="text-sm">Due Date: {{ props.job?.dueDate }} </p>
             <p v-if="props.job?.createdAt" class="text-sm">Created At: {{ props.job?.createdAt }} </p>
             <p v-if="props.job?.updatedAt" class="text-sm">Updated At: {{ props.job?.updatedAt }} </p>
