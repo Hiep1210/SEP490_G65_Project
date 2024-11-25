@@ -80,7 +80,6 @@ const previousPage = (status: Status) => {
     status.currentPage--
   }
 }
-const role = useAuthStore().user?.role as string | undefined
 </script>
 
 <template>
@@ -104,12 +103,11 @@ const role = useAuthStore().user?.role as string | undefined
       </p>
       <div :class="item.class" class="p-2 rounded-xl h-5/6 overflow-y-auto">
         <div v-for="job in paginatedJobs(item)" :key="job.id">
-          <JobsDialog :job="job" :role="role">
             <JobsCard
               v-if="job.status === item.status || (item.status === 'NEW' && job.status === null)"
               :data="job"
+              @click="useRouter().push(`/jobs/details/${job.id}`)"
             />
-          </JobsDialog>
         </div>
       </div>
       <div class="flex justify-center">
