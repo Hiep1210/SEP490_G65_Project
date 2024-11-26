@@ -9,7 +9,7 @@ export interface Job {
     documentUrl: string;
     referenceUrls: string[];
     deliverableUrl: string;
-    previousJobDeliverables: string[];
+    previousJobDeliverables: Record<string, string>;
     targetLanguageId: string;
     workId: string;
     assigneeNames: assigneeNames[];
