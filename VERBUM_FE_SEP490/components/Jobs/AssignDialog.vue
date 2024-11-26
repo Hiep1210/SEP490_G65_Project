@@ -8,14 +8,14 @@ import { CalendarDate } from "@internationalized/date"
 import { format } from 'date-fns'
 
 const props = defineProps<{
-  orderDueDate: string
+  workDueDate: string
 }>()
 const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
 
 const schema = toTypedSchema(z.object({
   assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(), 'Due date is required').max(new Date(props.orderDueDate), {
-    message: 'Due date must be before the order due date'
+  dueDate: z.coerce.date().min(new Date(), 'Due date is required').max(new Date(props.workDueDate), {
+    message: 'Due date must be before the works due date'
   }
   )
 }))
@@ -89,7 +89,7 @@ const onSubmit = handleSubmit((values) => {
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
                     <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)"
-                      :max-value="orderDueDate" />
+                      :max-value="new Date(workDueDate)" />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />

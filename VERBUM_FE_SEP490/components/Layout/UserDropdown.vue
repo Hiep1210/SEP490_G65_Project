@@ -33,8 +33,6 @@ const handleLogout = () => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{{user?.name }} - <span class="text-primary">{{user?.role}}</span></DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem @click="handleLogout">Logout</DropdownMenuItem>
       </DropdownMenuContent>

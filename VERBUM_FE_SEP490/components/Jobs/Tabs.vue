@@ -3,8 +3,9 @@
     <Tabs default-value="document" class="w-full">
       <TabsList class="grid w-full" :class="grids" >
         <TabsTrigger value="document">Document</TabsTrigger>
+        <TabsTrigger value="references">References</TabsTrigger>
         <TabsTrigger value="deliverable">Deliverable</TabsTrigger>
-        <TabsTrigger value="prevDeli">Previous Deliverables</TabsTrigger>
+        <TabsTrigger v-if="Object.keys(job.previousJobDeliverables).length > 0" value="prevDeli">Previous Deliverables</TabsTrigger>
       </TabsList>
       <TabsContent value="document">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
@@ -14,9 +15,26 @@
             "
             class="p-2 text-center"
           >
-            There are no working files, try refreshing the page
+            There are no working files
           </div>
-          <div v-else class="p-2">{{ getFirebaseFileName(job.documentUrl) }}</div>
+          <div v-else class="p-2"><a class="hyper-link" :href="job.documentUrl">{{ getFirebaseFileName(job.documentUrl) }}</a></div>
+        </div>
+      </TabsContent>
+      <TabsContent value="references">
+        <div class="border rounded-md h-max-[18rem] overflow-auto">
+          <div
+            v-if="
+            !job.referenceUrls || job.referenceUrls.length === 0
+            "
+            class="p-2 text-center"
+          >
+            There are no reference files
+          </div>
+          <div v-else class="p-2">
+            <a v-for="file in job.referenceUrls" :key="file" class="hyper-link">
+              {{ getFirebaseFileName(file) }}
+            </a>
+          </div>
         </div>
       </TabsContent>
       <TabsContent value="deliverable">
@@ -27,24 +45,27 @@
             "
             class="p-2 text-center"
           >
-            There are no deliverables, try refreshing the page
+            There are no deliverables
           </div>
-          <div v-else class="p-2">{{ getFirebaseFileName(job.deliverableUrl) }}</div>
+          <div v-else class="p-2"><a class="hyper-link" :href="job.deliverableUrl">{{ getFirebaseFileName(job.deliverableUrl) }}</a></div>
         </div>
       </TabsContent>
       <TabsContent value="prevDeli">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
-              !job.previousJobDeliverables
+              !(Object.keys(job.previousJobDeliverables).length > 0)
             "
             class="p-2 text-center"
           >
-            There are no previous deliverables, try refreshing the page
+            Previous service's deliverable has not been completed
           </div>
           <div v-else class="p-2">
-            <div v-for="file in job.previousJobDeliverables" :key="file">
-              {{ getFirebaseFileName(file) }}
+            <div v-for="(label, file) in job.previousJobDeliverables" :key="file">
+              <div class="space-x-6">
+                <Badge>{{ label }}</Badge>
+                <a :href="file" class="hyper-link">{{ getFirebaseFileName(file) }}</a>
+              </div>
             </div>
           </div>
         </div>
@@ -62,12 +83,12 @@ const props = defineProps({
     default: () => ({
       documentUrl: '',
       deliverableUrl: '',
-      previousJobDeliverables: '',
+      previousJobDeliverables: {},
     })
   }
 })
 const grids = computed(() => {
-  return props.job?.previousJobDeliverables?.length ? 'grid-cols-3' : 'grid-cols-2'
+  return Object.keys(props.job.previousJobDeliverables).length > 0 ? 'grid-cols-4' : 'grid-cols-3'
 })
 </script>
 

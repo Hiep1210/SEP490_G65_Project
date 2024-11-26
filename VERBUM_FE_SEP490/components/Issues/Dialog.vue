@@ -52,12 +52,13 @@ const titleStatusConfirm = 'Change status'
 const descriptionStatusConfirm =
   'Are you really want to cancel this issue?'
 const rejectSolutionDescription =
-  'Are you really want to re-open the issue on this file?'
+  'Are you sure you want to reject this solution, the Status of this issue will change to In Progress.'
 const descriptionStatusReOpen =
-  'If you change status to CANCEL, you CAN NOT reopen it. Are you sure you want to change status?'
+  'Are you really want to re-open the issue on this file? You can provides us new issue information after clicking "Confirm"'
 const isConfirmDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
 const isResolveDialogOpen = ref(false)
+const isUploadAttachmentDialogOpen = ref(false)
 const isRejectSolutionDialogOpen = ref(false)
 const isReOpenDialogOpen = ref(false)
 const reasonForCancellation = ref('')
@@ -125,18 +126,23 @@ const issueStatuses = ['OPEN', 'IN_PROGRESS', 'CANCEL', 'SUBMITTED', 'RESOLVED']
 const selectedStatus = ref(issue.value.status)
 
 const updateIssueDetail = async () => {
+  const issueAttachment: IssueAttachments[] = [{
+    attachmentUrl: downloadUrlsString.value,
+    tag: 'ATTACHMENT',
+  }]
+
   const payload = {
     issueId: issue.value.issueId,
     issueName: issue.value.issueName,
     issueDescription: issue.value.issueDescription,
     assigneeId: issue.value.assigneeId,
-    issueAttachments: issue.value.issueAttachments
+    issueAttachments: issueAttachment[0].attachmentUrl.length > 0 ? issueAttachment : issue.value.issueAttachments
   }
   await updateIssue(payload)
-  if (issue.value.status === 'OPEN') {
+  if (issue.value.status === 'OPEN' && ServiceManagersRole.includes(props.role)) {
     await updateIssueStatus(issue.value.issueId, 'IN_PROGRESS')
-    refreshPage()
   }
+  refreshPage()
   isEditing.value = false
 }
 
@@ -150,12 +156,9 @@ const getUserIdByName = (users: User[], name: string): string => {
 }
 
 const handleResolveIssue = async () => {
-  console.log('resolve issue', downloadUrlsString.value)
   const solutionAttachment: IssueAttachments = {
-    issueId: issue.value.issueId,
     attachmentUrl: downloadUrlsString.value,
     tag: 'SOLUTION',
-    isDeleted: false
   }
 
   const updatedIssueAttachments = [
@@ -223,6 +226,12 @@ const handleCancelRejectSolution = () => {
   reasonForRejectSolution.value = ''
 }
 
+const handleUploadIssueAttachment = () => {
+  selectedStatus.value = previousStatus.value
+  isUploadAttachmentDialogOpen.value = true
+  reasonForRejectSolution.value = ''
+}
+
 const handleStatusChange = async (
   issuesId: string,
   oldStatus: string,
@@ -245,11 +254,10 @@ const handleStatusChange = async (
 }
 
 const handleReviewResolveIssue = async () => {
-  const response = await approveIssueSolution(issue.value.issueId, issue.value.orderId)
+  const response = await approveIssueSolution(issue.value.issueId)
   if (response) {
     await acceptIssueSolution(issue.value.issueId)
   }
-  await updateIssueStatus(issue.value.issueId, 'RESOLVED')
   await refreshPage()
 }
 
@@ -307,7 +315,7 @@ const solutionlist = issue.value.issueAttachments.filter(
         </div>
 
         <div
-          v-if="issue.rejectResponse && (role === 'CLIENT' || ServiceManagersRole.includes(role)) && issue.status !== 'RESOLVED'"
+          v-if="issue.rejectResponse && (role === 'LINGUIST' || ServiceManagersRole.includes(role)) && issue.status !== 'RESOLVED'"
           class="p-3 rounded-xl border-2 border-stone-300">
           <div class="font-semibold text-red-600">Reject Solution Reason:</div>
           <p>{{ issue.rejectResponse }}</p>
@@ -419,6 +427,7 @@ const solutionlist = issue.value.issueAttachments.filter(
 
         <div class="p-3 rounded-xl border-2 border-stone-300">
           <div class="font-semibold">Issue Attachment Files:</div>
+          <Button v-if="isEditing" @click="handleUploadIssueAttachment">Upload Issue Attachment</Button>
           <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
             <div v-for="attachment in issue.issueAttachments" :key="attachment.attachmentUrl">
               <a v-if="attachment.tag === 'ATTACHMENT'" :href="attachment.attachmentUrl" target="_blank"
@@ -474,8 +483,13 @@ const solutionlist = issue.value.issueAttachments.filter(
         </Button>
         <Button v-if="!isEditing" class="bg-slate-500" @click="closeDialog">Close
         </Button>
-        <Button v-if="!isEditing && ((role === 'CLIENT' && issue.status == 'OPEN') || (ServiceManagersRole.includes(role) && (issue.status == 'OPEN' || issue.status == 'IN_PROGRESS')))"
+        <Button
+          v-if="!isEditing && ((role === 'CLIENT' && issue.status == 'OPEN') || (ServiceManagersRole.includes(role) && issue.status == 'IN_PROGRESS'))"
         @click="enableEditing">Edit
+        </Button>
+        <Button 
+          v-if="ServiceManagersRole.includes(role) && issue.status == 'OPEN'"
+        @click="updateIssueDetail">Accept Issue
         </Button>
         <Button v-if="isEditing" @click="updateIssueDetail">Update</Button>
       </DialogFooter>
@@ -549,6 +563,43 @@ const solutionlist = issue.value.issueAttachments.filter(
       <DialogFooter>
         <Button class="bg-gray-500" @click="handleCancelResolve">Cancel</Button>
         <Button class="bg-red-500" @click="handleResolveIssue">Submit</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <Dialog :open="isUploadAttachmentDialogOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Upload Issues Attachment</DialogTitle>
+      </DialogHeader>
+      <Button class="block" type="button" @click="openFileSelect({ accept: '*', multiple: true })">
+        Upload Files
+      </Button>
+      <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
+        <CardHeader>
+          <CardDescription>Uploaded files</CardDescription>
+        </CardHeader>
+        <CardContent class="grid gap-3">
+          <div v-for="(file, index) in files" :key="file.name"
+            class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0">
+            <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div class="flex flex-col gap-1">
+              <p class="text-sm font-medium leading-none">
+                {{ file.name }}
+              </p>
+              <div class="flex gap-5 max-w-sm">
+                <Progress v-model="uploadProgress[index]" />
+                <p class="text-sm font-medium leading-none">
+                  {{ uploadProgress[index] || 0 }}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <DialogFooter>
+        <Button class="bg-gray-500" @click="handleCancelResolve">Cancel</Button>
+        <Button class="bg-red-500" @click="updateIssueDetail">Submit</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

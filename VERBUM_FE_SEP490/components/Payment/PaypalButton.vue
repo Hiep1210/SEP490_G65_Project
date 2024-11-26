@@ -1,10 +1,10 @@
-<script lang="ts" setup>
+<!-- <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { loadScript } from '@paypal/paypal-js';
 import type { PayPalScriptOptions, OnApproveActions, OnApproveData, PayPalNamespace } from '@paypal/paypal-js';
 import { useToast } from '../ui/toast';
 const paypalButton = ref<HTMLDivElement | null>(null);
-const { updateSuccessPayment } = useOrders();
+const { successPayment } = useOrders();
 const { createReceipt } = useReceipt();
 
 const props = defineProps<{
@@ -79,4 +79,4 @@ onMounted(async () => {
 
 <style scoped>
 /* Add any custom styling if needed */
-</style>
+</style> -->

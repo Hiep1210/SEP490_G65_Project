@@ -28,9 +28,6 @@ const beDisplayed = computed(() => {
 }
 );
 
-console.log("beDisplayed", beDisplayed.value);
-
-
 const { toast } = useToast()
 
 const onClick = async (options: string) => {

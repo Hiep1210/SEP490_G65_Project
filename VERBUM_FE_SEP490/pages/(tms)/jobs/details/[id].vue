@@ -2,7 +2,7 @@
 const route = useRoute()
 const jobId = route.params.id as string
 
-const { job, getJobsDetail } = useJobs()
+const { isLoading, job, getJobsDetail } = useJobs()
 const { assignList, getAssignList } = useUsers()
 const role = useAuthStore().user?.role as string | undefined
 
@@ -16,7 +16,10 @@ provide('assignList', assignList)
 </script>
 <template>
   <div>
-    <JobsDetails :job="job" :role="role" />
+      <div v-if="isLoading" class="space-y-2">
+        <Skeleton class="h-[10rem] w-full" />
+      </div>
+    <JobsDetails v-else :job="job" :role="role" />
   </div>
 </template>
 

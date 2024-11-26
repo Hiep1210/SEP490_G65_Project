@@ -217,9 +217,10 @@ export const useIssues = () => {
     }
   }
 
-  const approveIssueSolution= async (issueId: string, orderId: string) => {
+  const approveIssueSolution= async (issueId: string) => {
     try {
-      const {data, error, refresh} = await useAPI(`/issue/approve?issueId=${issueId}&orderId=${orderId}`, {
+      const {data, error, refresh} = await useAPI(`/issue/accept-issue-solution`, {
+        query: { issueId },
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -247,7 +248,7 @@ export const useIssues = () => {
 
   const acceptIssueSolution= async (issueId: string) => {
     try {
-      const {error, refresh} = await useAPI(`/issue/accept-issue-solution?issueId=${issueId}`, {
+      const {error} = await useAPI(`/issue/accept-issue-solution?issueId=${issueId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -263,7 +264,6 @@ export const useIssues = () => {
         title: 'Issue approved !!',
         description: `Issue has been approved!!`
       })
-      await refresh()
     } catch {
       toast({
         title: 'Error approve issue',

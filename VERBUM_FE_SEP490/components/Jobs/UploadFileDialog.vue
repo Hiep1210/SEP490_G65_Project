@@ -28,7 +28,7 @@
           </div>
         </div>
         <DialogFooter>
-          <Button @click="open()" :disabled="isUploading">Upload</Button>
+          <Button @click="open()" :disabled="isUploading">Select File</Button>
           <Button @click="uploadDeliverable" :disabled="isUploading || !downloadUrl">
             Submit
           </Button>
@@ -100,7 +100,7 @@ const uploadDeliverable = async () => {
   const payload = {
     ...props.job,
     status: "SUBMITTED",
-    assigneesId: props.job?.assigneeNames.map((assignee: any) => assignee.id),
+    assigneesId: props.job?.assigneeNames.map((assignee) => assignee.id),
     deliverableUrl: downloadUrl.value
   }
   console.log(JSON.stringify(payload, null, 2))

@@ -1,8 +1,6 @@
 export type IssueAttachments = {
-  issueId: string
   attachmentUrl: string
   tag:string
-  isDeleted: boolean
 }
 
 export type Issue = {

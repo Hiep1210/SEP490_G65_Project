@@ -3,6 +3,7 @@
     public class ReceiptInfoResponse
     {
         public Guid ReceiptId { get; set; }
+        public string OrderName { get; set; }
 
         public DateTime PayDate { get; set; }
 

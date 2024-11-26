@@ -3,11 +3,13 @@ export interface Job {
     name: string;
     status: string;
     dueDate: string;
+    workDueDate: string;
     createdAt: string;
     updatedAt: string;
     documentUrl: string;
+    referenceUrls: string[];
     deliverableUrl: string;
-    previousJobDeliverables: string[];
+    previousJobDeliverables: Record<string, string>;
     targetLanguageId: string;
     workId: string;
     assigneeNames: assigneeNames[];
