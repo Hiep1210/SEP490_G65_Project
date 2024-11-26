@@ -16,9 +16,7 @@ provide('assignList', assignList)
 </script>
 <template>
   <div>
-      <div v-if="isLoading" class="space-y-2">
-        <Skeleton class="h-[10rem] w-full" />
-      </div>
+    <JobsSkeleton v-if="isLoading" />  
     <JobsDetails v-else :job="job" :role="role" />
   </div>
 </template>
