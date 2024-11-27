@@ -170,7 +170,7 @@ namespace verbum_service
                 //.WithOrigins(SystemConfig.FE_DOMAIN)
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowCredentials()
+                //.AllowCredentials()
                 .AllowAnyHeader();
             });
             // Configure the HTTP request pipeline.
