@@ -4,7 +4,7 @@ const { toast } = useToast()
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const access_token = useCookie('access_token')
-  const router = useRouter()
+
   const api = $fetch.create({
     baseURL: config.public.baseUrl + '/api',
     retry: 1,
@@ -18,44 +18,60 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     },
     async onResponseError({ response }) {
-      if (response.status === 401) {
-        const oldToken = localStorage.getItem('access_token')
-        const res = await fetch(
-          `${config.public.baseUrl}/api/auth/refresh-token`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${oldToken}`
-            },
-            credentials: 'include'
-          }
-        )
-        if (res.ok) {
-          const data = await res.json()
-          localStorage.setItem('access_token', data.access_token)
-        } else {
-          await nuxtApp.runWithContext(() => {
-            if (confirm('Your session has expired. Please login again.')) {
-              useAuth().logout()
+      switch (response.status) {
+        case 401:
+          await nuxtApp.runWithContext(async () => {
+            const res = await fetch(
+              `${config.public.baseUrl}/api/auth/refresh-token`,
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${access_token.value}`
+                },
+                credentials: 'include'
+              }
+            )
+            if (res.ok) {
+              const data = await res.json()
+              console.log('New access token:', data.access_token)
+              access_token.value = data.access_token
+            } else {
+              toast({
+                title: 'Unauthorized',
+                description: 'Please log in again',
+                variant: 'destructive'
+              })
+              access_token.value = null
+              if (confirm('Session expired. Please log in again.')) {
+                useAuth().logout()
+              }
             }
           })
-        }
-      }
-      if (response.status === 403) {
-        await nuxtApp.runWithContext(() => {
-          if (confirm('You are not authorized to access this resource.')) {
-            router.back()
-          }
-        })
-      }
-      if (response.status === 404) {
-        await nuxtApp.runWithContext(() => {
+          break
+        case 403:
+          await nuxtApp.runWithContext(() => {
+            toast({
+              title: 'Access Denied',
+              description:
+                'You do not have permission to access this resource.',
+              variant: 'destructive'
+            })
+          })
+          break
+        case 404:
           toast({
             title: 'Not Found',
             description: 'The resource you are looking for does not exist.',
             variant: 'destructive'
           })
-        })
+          break
+        default:
+          toast({
+            title: 'Error',
+            description: `An error occurred: ${response.statusText}`,
+            variant: 'destructive'
+          })
+          break
       }
     }
   })
