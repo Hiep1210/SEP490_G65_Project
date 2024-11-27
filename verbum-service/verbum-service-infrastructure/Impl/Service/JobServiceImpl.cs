@@ -72,7 +72,7 @@ namespace verbum_service_infrastructure.Impl.Service
             JobInfoResponse job = mapper.Map<JobInfoResponse>(await context.Jobs.Include(x => x.Assignees).Include(x => x.Issue).Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation).Include(x => x.Work).ThenInclude(x => x.Order).ThenInclude(x => x.OrderReferences).FirstOrDefaultAsync(x => x.Id.Equals(jobId)));
             Dictionary<string, string> urls = await context.Jobs
                 .Include(x => x.Work).ThenInclude(x => x.ServiceCodeNavigation)
-                .Where(x => x.DocumentUrl == job.DocumentUrl && x.Work.ServiceCodeNavigation.ServiceOrder < job.ServiceOrder && !string.IsNullOrEmpty(x.DeliverableUrl))
+                .Where(x => x.DocumentUrl == job.DocumentUrl && x.Work.ServiceCodeNavigation.ServiceOrder < job.ServiceOrder && !string.IsNullOrEmpty(x.DeliverableUrl) && x.TargetLanguageId.Equals(job.TargetLanguageId))
                 .OrderBy(x => x.Work.ServiceCodeNavigation.ServiceOrder)
                 .Select(x => new { x.DeliverableUrl, x.Work.ServiceCodeNavigation.ServiceName }) 
                 .ToDictionaryAsync(x => x.DeliverableUrl ?? "", x => x.ServiceName);
