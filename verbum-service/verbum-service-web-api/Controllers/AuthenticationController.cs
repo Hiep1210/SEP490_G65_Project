@@ -103,7 +103,7 @@ namespace verbum_service.Controllers
             }
             Tokens newTokens = await userService.RefreshAccessToken(tokens);
             tokenService.SetTokensInsideCookie(tokens, HttpContext);
-            return Ok();
+            return Ok(tokens);
         }
 
         [HttpGet("confirm-email")]
