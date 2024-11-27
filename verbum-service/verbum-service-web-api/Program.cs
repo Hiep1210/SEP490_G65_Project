@@ -167,7 +167,7 @@ namespace verbum_service
             app.UseCors(builder =>
             {
                 builder
-                .WithOrigins("http://localhost:3000")
+                .WithOrigins(SystemConfig.FE_DOMAIN)
                 .AllowAnyMethod()
                 .AllowCredentials()
                 .AllowAnyHeader();
