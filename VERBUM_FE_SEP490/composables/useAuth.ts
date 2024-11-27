@@ -28,8 +28,7 @@ export const useAuth = () => {
             title: 'Invalid credentials',
             description: 'Please check your email and password'
           })
-        }
-        else {
+        } else {
           toast({
             title: 'Login error',
             description: 'An error occurred while logging in'
@@ -95,28 +94,6 @@ export const useAuth = () => {
     authStore.clearUser()
     useRouter().push('/login')
   }
-   const refreshAccessToken = async () => {
-    try {
-      const response = await fetch(`${config.public.baseUrl}/api/auth/refresh-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        if(confirm('Your session has expired. Please login again.')) {
-          logout()
-        }
-        throw new Error('Failed to refresh token')
-      }
-    } catch (error) {
-      console.error('Failed to refresh token:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to refresh token'
-      })
-    }
-  }
 
   const googleAuth = async () => {
     window.open(`${config.public.baseUrl}/auth/google-login`)
@@ -127,7 +104,6 @@ export const useAuth = () => {
     login,
     logout,
     signup,
-    googleAuth,
-    refreshAccessToken
+    googleAuth
   }
 }
