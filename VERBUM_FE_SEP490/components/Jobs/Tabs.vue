@@ -5,7 +5,7 @@
         <TabsTrigger value="document">Document</TabsTrigger>
         <TabsTrigger value="references">References</TabsTrigger>
         <TabsTrigger value="deliverable">Deliverable</TabsTrigger>
-        <TabsTrigger v-if="Object.keys(job.previousJobDeliverables).length > 0" value="prevDeli">Previous Deliverables</TabsTrigger>
+        <TabsTrigger v-if="Object.keys(job.previousJobDeliverables).length > 0" value="relatedJob">Related Jobs</TabsTrigger>
       </TabsList>
       <TabsContent value="document">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </TabsContent>
-      <TabsContent value="deliverable">
+      <TabsContent value="relatedJob">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
