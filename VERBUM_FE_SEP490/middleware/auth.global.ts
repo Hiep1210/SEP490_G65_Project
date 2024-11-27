@@ -1,8 +1,9 @@
-import { decodeToken } from '~/lib/auth/auth'
+import { decodeToken, isTokenExpired } from '~/lib/auth/auth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   const access_token = useCookie('access_token')
+  const user = decodeToken(access_token.value)
   const unprotectedRoutes = ['/', '/login', '/signup']
   const employeeRoutes = ['/works', '/jobs', '/issues']
   const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
@@ -10,12 +11,25 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
-  // Check if access_token exists
-  if (access_token?.value) {
+
+  if (access_token?.value ) {
     try {
-      const user = decodeToken(access_token.value)
+      if (isTokenExpired(access_token?.value)) {
+        const config = useRuntimeConfig()
+        const res = await fetch(`${config.public.baseUrl}/api/auth/refresh-token`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${access_token.value}` },
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          access_token.value = data.access_token;
+        } else {
+          abortNavigation()
+          useAuth().logout();
+        }
+      }
       if (user) {
-        localStorage.setItem('access_token', access_token.value)
         useAuthStore().setUser(user)
         if (user?.role.includes('CLIENT') && !clientRoutes.some(route => to.path.includes(route)))
           return navigateTo('/orders')
@@ -23,7 +37,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/works')
         else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
           return navigateTo('/works')
-        else if (user?.role.includes('ADMIN') && !adminRoutes.some(route => to.path.includes(route)))
+        else if (user?.role.includes('ADMINISTRATOR') && !adminRoutes.some(route => to.path.includes(route)))
           return navigateTo('/users')
         else if (to.path.includes(redirectPath))
           return navigateTo('/')
