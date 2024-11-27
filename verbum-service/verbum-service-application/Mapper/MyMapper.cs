@@ -49,7 +49,8 @@ namespace verbum_service_application.Mapper
                     DeliverableFileUrl = job.DeliverableUrl,
                     ServiceOrder = work.ServiceCodeNavigation.ServiceOrder,
                 }))))
-                .ForMember(dest => dest.DeleteddFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.IsDeleted == true).Select(t => t.ReferenceFileUrl).ToList()));
+                .ForMember(dest => dest.DeleteddFileUrls, opt => opt.MapFrom(src => src.OrderReferences.Where(t => t.IsDeleted == true).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.CompletedDate, opt => opt.MapFrom(src => src.Receipts.Where(t => t.DepositeOrPayment == false).Select(t => t.PayDate)));
             CreateMap<OrderReference, UploadOrderFileRequest>().ReverseMap();
             CreateMap<Work, WorkResponse>()
                 .ForMember(dest => dest.SourceLanguageId, opt => opt.MapFrom(src => src.Order.SourceLanguageId))

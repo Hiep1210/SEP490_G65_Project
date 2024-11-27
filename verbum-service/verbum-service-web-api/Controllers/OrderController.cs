@@ -35,7 +35,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpGet("get-details")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(OrderDetailsResponse), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]

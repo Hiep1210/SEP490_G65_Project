@@ -97,20 +97,11 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
         {
             verbum_service_domain.Models.Order orders = new verbum_service_domain.Models.Order();
-            orders = await context.Orders.Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
+            orders = await context.Orders.Include(x => x.TargetLanguages).Include(x => x.OrderReferences).Include(x => x.Receipts).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
             if (ObjectUtils.IsEmpty(orders))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
             }
-
-            await context.Entry(orders)
-                    .Collection(o => o.TargetLanguages)
-                    .LoadAsync();
-
-            await context.Entry(orders)
-                    .Collection(o => o.OrderReferences)
-                    .LoadAsync();
-
             OrderDetailsResponse orderResponse = mapper.Map<OrderDetailsResponse>(orders);
             return orderResponse;
         }
