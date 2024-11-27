@@ -168,6 +168,7 @@ namespace verbum_service
             {
                 builder
                 //.WithOrigins(SystemConfig.FE_DOMAIN)
+                .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowCredentials()
                 .AllowAnyHeader();
