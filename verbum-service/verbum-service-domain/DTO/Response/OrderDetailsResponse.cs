@@ -27,5 +27,6 @@ namespace verbum_service_domain.DTO.Response
         /// 255 char
         /// </summary>
         public string? OrderNote { get; set; }
+        public DateTime? CompletedDate { get; set; }
     }
 }
