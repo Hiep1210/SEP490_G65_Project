@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const access_token = useCookie('access_token')
   const unprotectedRoutes = ['/', '/login', '/signup']
   const employeeRoutes = ['/works', '/jobs', '/issues']
-  const adminRoutes = ['/users', '/languages', '/discounts']
+  const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
   const clientRoutes = ['/orders', '/issues', '/receipts']
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
@@ -15,6 +15,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     try {
       const user = decodeToken(access_token.value)
       if (user) {
+        localStorage.setItem('access_token', access_token.value)
         useAuthStore().setUser(user)
         if (user?.role.includes('CLIENT') && !clientRoutes.some(route => to.path.includes(route)))
           return navigateTo('/orders')

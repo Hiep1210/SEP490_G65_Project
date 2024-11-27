@@ -7,7 +7,7 @@ const { toast } = useToast()
 
 export const useAuth = () => {
   const user = ref<User | null>(null)
-  const accessToken = ref<string | null>(null)
+  const accessToken = ref<string | null | undefined>(null)
   const refreshToken = ref<string | null>(null)
   const authStore = useAuthStore()
 
@@ -23,22 +23,26 @@ export const useAuth = () => {
       })
 
       if (!response.ok) {
-        toast({
-          title: 'Failed to login',
-          description: 'An error occurred while logging in'
-        })
-        throw new Error('Failed to login')
+        if (response.status === 400) {
+          toast({
+            title: 'Invalid credentials',
+            description: 'Please check your email and password'
+          })
+        }
+        else {
+          toast({
+            title: 'Login error',
+            description: 'An error occurred while logging in'
+          })
+        }
       }
 
-      accessToken.value =
-        document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('access_token'))
-          ?.split('=')[1] || null
+      accessToken.value = useCookie('access_token').value
 
       if (!accessToken.value) {
         throw new Error('No access token found')
       }
+
       const decodedUser = decodeToken(accessToken.value as string)
       if (!decodedUser) {
         throw new Error('Invalid access token')
@@ -86,11 +90,10 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    user.value = null
     accessToken.value = null
     refreshToken.value = null
     authStore.clearUser()
-    navigateTo('/login')
+    useRouter().push('/login')
   }
    const refreshAccessToken = async () => {
     try {
@@ -106,11 +109,6 @@ export const useAuth = () => {
         }
         throw new Error('Failed to refresh token')
       }
-
-      const data = await response.json()
-      accessToken.value = data.accessToken
-      refreshToken.value = data.refreshToken
-      const decodedUser = decodeToken(accessToken.value as string)
     } catch (error) {
       console.error('Failed to refresh token:', error)
       toast({
