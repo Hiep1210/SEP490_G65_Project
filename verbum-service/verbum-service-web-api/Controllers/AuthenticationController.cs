@@ -102,7 +102,7 @@ namespace verbum_service.Controllers
                 return BadRequest();
             }
             Tokens newTokens = await userService.RefreshAccessToken(tokens);
-            tokenService.SetTokensInsideCookie(tokens, HttpContext);
+            tokenService.SetTokensInsideCookie(newTokens, HttpContext);
             return Ok();
         }
 
