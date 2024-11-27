@@ -167,10 +167,10 @@ namespace verbum_service
             app.UseCors(builder =>
             {
                 builder
-                //.WithOrigins(SystemConfig.FE_DOMAIN)
+                .WithOrigins(SystemConfig.FE_DOMAIN)
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                //.AllowCredentials()
+                .AllowCredentials()
                 .AllowAnyHeader();
             });
             // Configure the HTTP request pipeline.
