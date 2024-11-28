@@ -128,7 +128,7 @@ namespace verbum_service_test
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
 
             var newOrder = new Order
             {
@@ -226,7 +226,7 @@ namespace verbum_service_test
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
@@ -279,7 +279,7 @@ namespace verbum_service_test
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
 
             //Act
             var result = orderService.GetOrderDetails(Guid.Parse("e5a521cc-ec2d-4034-bf83-68035577bed9"));
@@ -335,7 +335,7 @@ namespace verbum_service_test
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
 
             var newOrder = new Order
             {
