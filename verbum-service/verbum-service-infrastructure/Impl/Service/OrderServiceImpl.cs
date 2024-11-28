@@ -389,15 +389,15 @@ namespace verbum_service_infrastructure.Impl.Service
 
         }
 
-        public async Task<string> ConfirmPayment(string PayerID, string Cancel, string guid)
+        public async Task<string> ConfirmPayment(ConfirmPaymentDTO request)
         {
             string ClientID = Configuration.GetValue<string>("PayPal:Key") ?? string.Empty;
             string ClientSecret = Configuration.GetValue<string>("PayPal:Secret") ?? string.Empty;
             string mode = Configuration.GetValue<string>("PayPal:mode") ?? string.Empty;
             APIContext apiContext = PaypalConfiguration.GetAPIContext(ClientID, ClientSecret, mode);
             // This function exectues after receving all parameters for the payment  
-            Receipt receipt = await context.Receipts.FirstOrDefaultAsync(x => x.ReceiptId.ToString() == guid);
-            var executedPayment = ExecutePayment(apiContext, PayerID, receipt.PaymentId);
+            Receipt receipt = await context.Receipts.FirstOrDefaultAsync(x => x.ReceiptId.ToString() == request.guid);
+            var executedPayment = ExecutePayment(apiContext, request.PayerID, receipt.PaymentId);
             if (executedPayment.state.ToLower() != "approved")
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Payment"));
@@ -405,7 +405,7 @@ namespace verbum_service_infrastructure.Impl.Service
             string status = receipt.DepositeOrPayment ? OrderStatus.IN_PROGRESS.ToString() : OrderStatus.DELIVERED.ToString();
             if (await context.Orders.Where(x => x.OrderId == receipt.OrderId)
                                .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, status)) < 1
-                               || await context.Receipts.Where(x => x.ReceiptId.ToString() == guid).ExecuteUpdateAsync(x => x.SetProperty(u => u.Done, true)) < 1)
+                               || await context.Receipts.Where(x => x.ReceiptId.ToString() == request.guid).ExecuteUpdateAsync(x => x.SetProperty(u => u.Done, true)) < 1)
                 throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
             //{API_URL}/orders/details/{orderId}
             return SystemConfig.FE_DOMAIN + "/orders/details/" + receipt.OrderId;

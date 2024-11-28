@@ -20,7 +20,7 @@ namespace verbum_service_application.Service
         Task UpdateOrderPrice(Guid orderId, decimal price);
         Task UpdateOrderRejectResponse(ResponseRequest request);
         Task CreateRevelancy(Guid orderId);
-        Task<string> ConfirmPayment(string PayerID, string Cancel, string guid);
+        Task<string> ConfirmPayment(ConfirmPaymentDTO request);
         Task<string> DoPayment(Guid orderId, bool depositeOrPayment);
     }
 }

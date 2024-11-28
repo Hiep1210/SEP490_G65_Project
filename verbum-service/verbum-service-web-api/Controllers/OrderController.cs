@@ -22,6 +22,7 @@ namespace verbum_service.Controllers
         private readonly OrderService orderService;
         private readonly CreateOrderWorkflow createOrderWorkflow;
         private readonly UpdateOrderWorkflow updateOrderWorkflow;
+        private readonly ConfirmPaymentWorkflow confirmPaymentWorkflow;
 
         [HttpGet("get-all")]
         [EnableQuery]
@@ -94,7 +95,13 @@ namespace verbum_service.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> ConfirmPayment([Required] string PayerID, string? Cancel, [Required] string guid)
         {
-            return Redirect(await orderService.ConfirmPayment(PayerID, Cancel, guid));
+            await confirmPaymentWorkflow.process(new ConfirmPaymentDTO()
+            {
+                PayerID = PayerID,
+                Cancel = Cancel,
+                guid = guid
+            });
+            return Redirect(confirmPaymentWorkflow.GetResult());
         }
 
         [HttpGet("file")]
