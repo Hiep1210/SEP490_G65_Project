@@ -8,13 +8,14 @@ export interface Work {
   translationFileUrls: string[]
   referenceFileUrls: string[]
   orderStatus: string
+  dueDate: string
 }
 const { toast } = useToast()
 
 export const useWorks = () => {
   const works = ref<Work[]>([])
+  const work = ref<Work>()
   const isLoading = ref(false)
-
 
   const getWorks = async () => {
     isLoading.value = true
@@ -41,10 +42,40 @@ export const useWorks = () => {
       isLoading.value = false
     }
   }
+  const getWorkById = async (workId: string) => {
+    isLoading.value = true
+    try {
+      const { data: workData } = await useAPI<Record<string, Work>>(
+        `/work/get-all?filter=WorkId eq ${workId}`,
+        { method: 'GET' }
+      )
+
+      if (workData?.value) {
+        const workArray = Object.values(workData.value) // Extract all values
+        work.value = workArray[0] // Assign the first work
+      } else {
+        toast({
+          title: 'No work found!',
+          description: 'No data available for the given ID!'
+        })
+        work.value = undefined
+      }
+    } catch (error) {
+      toast({
+        title: 'Error fetching work!',
+        description: 'An error occurred!'
+      })
+      console.error('Error:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
 
   return {
     works,
+    work,
     isLoading,
-    getWorks
+    getWorks,
+    getWorkById
   }
 }
