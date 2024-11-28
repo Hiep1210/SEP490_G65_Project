@@ -44,16 +44,6 @@ namespace verbum_service.Controllers
             return ResponseFilter.OkOrNoContent(await jobService.GetJobById(jobId), this);
         }
 
-        [HttpPost("add")]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> CreateJobs([FromBody] CreateJobsRequest request)
-        {
-            await jobService.CreateJobs(request);
-            return StatusCode(201);
-        }
-
         [HttpPut("edit")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]

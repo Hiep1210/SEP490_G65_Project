@@ -41,15 +41,5 @@ namespace verbum_service.Controllers
             await updateWorkWorkflow.process(work);
             return NoContent();
         }
-
-        [HttpPost("generate")]
-        //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
-        [ProducesResponseType(typeof(List<Guid>),201)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GenerateWork([FromBody] GenerateWork request)
-        {
-            return Created(string.Empty, await workService.GenerateWork(request));
-        }
     }
 }
