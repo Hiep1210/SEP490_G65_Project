@@ -69,6 +69,7 @@ namespace VNH.Infrastructure
             services.AddScoped<UpdateWorkWorkflow>();
             services.AddScoped<CreateRatingWorkflow>();
             services.AddScoped<UpdateRatingWorkflow>();
+            services.AddScoped<ConfirmPaymentWorkflow>();
 
             //validation dependency
             services.AddScoped<UserSignUpValidation>();
