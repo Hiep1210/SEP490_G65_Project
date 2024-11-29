@@ -49,22 +49,31 @@ const toCreate = () => {
 <template>
   <div>
     <div class="flex justify-between space-x-4 pb-4">
-      <div class="space-x-2">
+      <div class="flex space-x-2">
         <Input 
-          class="max-w-sm" 
-          placeholder="Filter orders..."
+          class="max-w-sm" placeholder="Filter orders..."
           :model-value="table.getColumn('orderName')?.getFilterValue() as string"
           @update:model-value=" table.getColumn('orderName')?.setFilterValue($event)" />
-          <select
-            class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-            :model-value="table.getColumn('orderStatus')?.getFilterValue() as string"
-            @update:model-value="table.getColumn('orderStatus')?.setFilterValue($event)"
-          >
-            <option value="">All Statuses</option>
-            <option value="ACCEPTED">ACCEPTED</option>
-            <option value="IN_PROGRESS">IN PROGRESS</option>
-            <option value="NEW">NEW</option>
-          </select>
+        <Select 
+          :model-value="table.getColumn('orderStatus')?.getFilterValue() as string"
+          @update:model-value="table.getColumn('orderStatus')?.setFilterValue($event)">
+          <SelectTrigger class="w-[20rem]">
+            <SelectValue placeholder="Select a status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="NEW">New</SelectItem>
+              <SelectItem value="ACCEPTED">Accepted</SelectItem>
+              <SelectItem value="REJECTED">Rejected</SelectItem>
+              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+              <SelectItem value="COMPLETED">Completed</SelectItem>
+              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            </SelectGroup>
+            <SelectSeparator />
+            <Button variant="outline" @click="table.getColumn('orderStatus')?.setFilterValue('')">Clear Status
+              Filter</Button>
+          </SelectContent>
+        </Select>
       </div>
       <Button variant="outline" @click="toCreate">Create an Order</Button>
     </div>
@@ -74,14 +83,16 @@ const toCreate = () => {
         <TableHeader>
           <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
             <TableHead v-for="header in headerGroup.headers" :key="header.id">
-              <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+              <FlexRender 
+              v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
                 :props="header.getContext()" />
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
-            <TableRow v-for="row in table.getRowModel().rows" :key="row.id" class="cursor-pointer"
+            <TableRow 
+            v-for="row in table.getRowModel().rows" :key="row.id" class="cursor-pointer"
               :data-state="row.getIsSelected() ? 'selected' : undefined"
               @click="navigateTo(`/orders/details/${row.original.orderId}`)">
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
