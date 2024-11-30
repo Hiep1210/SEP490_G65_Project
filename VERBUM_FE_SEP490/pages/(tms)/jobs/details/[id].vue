@@ -15,10 +15,8 @@ onMounted(() => {
 provide('assignList', assignList)
 </script>
 <template>
-  <div>
-    <JobsSkeleton v-if="isLoading" />  
+    <LoadingSpinner v-if="isLoading"/>
     <JobsDetails v-else :job="job" :role="role" />
-  </div>
 </template>
 
 <style>

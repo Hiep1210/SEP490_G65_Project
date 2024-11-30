@@ -56,6 +56,7 @@ const table = useVueTable({
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
+            <SelectItem value="NEW">New</SelectItem>
             <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
             <SelectItem value="COMPLETED">Completed</SelectItem>
             <SelectItem value="CANCELLED">Cancelled</SelectItem>

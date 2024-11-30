@@ -196,7 +196,6 @@ namespace verbum_service_infrastructure.Impl.Service
                     user.Name = request.Data.Name;
                     user.Email = request.Data.Email;
                     user.UpdatedAt = DateTime.Now;
-                    //update relevancy
                     await context.SaveChangesAsync();
                     transaction.Commit();
                 }

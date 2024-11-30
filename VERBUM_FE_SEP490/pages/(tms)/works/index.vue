@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'default'
 })
 
-const { works, getWorks } = useWorks()
+const { works, isLoading, getWorks } = useWorks()
 
 // Fetch works on mount
 onMounted(() => {
@@ -19,11 +19,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="h-[60vh]">
-      <WorksTable :columns="columns" :data="works" />
-    </div>
-  </div>
+  <LoadingSpinner v-if="isLoading" />
+  <WorksTable v-else :columns="columns" :data="works" />
 </template>
-
-<style></style>

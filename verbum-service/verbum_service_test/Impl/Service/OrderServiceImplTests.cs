@@ -98,7 +98,7 @@ namespace verbum_service_test
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
             var mockCurrentUser = new Mock<CurrentUser>();
-            var mailService = new Mock<MailService>(); 
+            var mailService = new Mock<MailService>();
 
             var orderService = new OrderServiceImpl(dbContext,mockMapper.Object,mockCurrentUser.Object, null, null, mailService.Object);
 
@@ -131,7 +131,7 @@ namespace verbum_service_test
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
             var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             var newOrder = new Order
             {
@@ -232,7 +232,7 @@ namespace verbum_service_test
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
             var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
@@ -287,7 +287,7 @@ namespace verbum_service_test
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
             var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             //Act
             var result = orderService.GetOrderDetails(Guid.Parse("e5a521cc-ec2d-4034-bf83-68035577bed9"));
@@ -345,7 +345,7 @@ namespace verbum_service_test
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
             var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             var newOrder = new Order
             {
