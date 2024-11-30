@@ -32,6 +32,7 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             try
             {
+                if (ObjectUtils.IsEmpty(info)) info.DiscountId = null;
                 info.ClientId = currentUser.Id;
                 context.Orders.Add(info);
                 await context.SaveChangesAsync();
