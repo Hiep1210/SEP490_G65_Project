@@ -5,9 +5,10 @@ namespace verbum_service_application.Service
 {
     public interface JobService
     {
-        Task<List<JobInfoResponse>> GetAllJob();
+        Task<List<JobListResponse>> GetAllJob();
         Task CreateJobs(CreateJobsRequest request);
         Task UpdateJob(UpdateJobRequest request);
-        Task ApproveJob(Guid jobId, Guid orderId);
+        Task<JobInfoResponse> GetJobById (Guid jobId);
+        Task ApproveJob(Guid jobId);
     }
 }

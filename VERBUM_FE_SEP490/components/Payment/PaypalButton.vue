@@ -1,16 +1,11 @@
-<script lang="ts" setup>
-import { onMounted, ref } from 'vue'
-import { loadScript } from '@paypal/paypal-js'
-import type {
-  PayPalScriptOptions,
-  OnApproveActions,
-  OnApproveData,
-  PayPalNamespace
-} from '@paypal/paypal-js'
-import { useToast } from '../ui/toast'
-const paypalButton = ref<HTMLDivElement | null>(null)
-const { confirmPayment } = useOrders()
-const { createReceipt } = useReceipt()
+<!-- <script lang="ts" setup>
+import { onMounted, ref } from 'vue';
+import { loadScript } from '@paypal/paypal-js';
+import type { PayPalScriptOptions, OnApproveActions, OnApproveData, PayPalNamespace } from '@paypal/paypal-js';
+import { useToast } from '../ui/toast';
+const paypalButton = ref<HTMLDivElement | null>(null);
+const { successPayment } = useOrders();
+const { createReceipt } = useReceipt();
 
 const props = defineProps<{
   orderId: string
@@ -97,4 +92,4 @@ onMounted(async () => {
 
 <style scoped>
 /* Add any custom styling if needed */
-</style>
+</style> -->

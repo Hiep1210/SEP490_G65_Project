@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using verbum_service_domain.DTO.Request;
 using verbum_service_domain.Models;
 
 namespace verbum_service_domain.DTO.Response
@@ -17,6 +18,7 @@ namespace verbum_service_domain.DTO.Response
         /// NEW, IN_PROGRESS, COMPLETED
         /// </summary>
         public string Status { get; set; }
+        public DateTime WorkDueDate { get; set; }
 
         public DateTime? DueDate { get; set; }
 
@@ -33,7 +35,10 @@ namespace verbum_service_domain.DTO.Response
 
         public Guid? WorkId { get; set; }
         public Guid OrderId { get; set; }
+        public int ServiceOrder { get; set; }
         public IssueResponse? Issue { get; set; }
-        public ICollection<string> AssigneeNames { get; set; }
+        public ICollection<UserInfo> AssigneeNames { get; set; }
+        public Dictionary<string, string> PreviousJobDeliverables { get; set; }
+        public List<string> ReferenceUrls { get; set; }
     }
 }

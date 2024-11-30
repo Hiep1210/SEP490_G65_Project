@@ -1,26 +1,35 @@
 <script setup lang="ts">
 import {
-  House,
   FolderOpen,
   FileWarning,
   Book,
   User,
   ChartBar,
-  DollarSign
+  DollarSign,
+  ReceiptText
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
+
+interface NavbarItems {
+  navName: string
+  navLink: string
+  navIcon: unknown
+}
+
 const route = useRoute()
 const auth = useAuthStore()
 
 const roleMenuItems = {
   CLIENT: [
     { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },
-    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
+    { navName: 'Issues', navLink: '/issues', navIcon: FileWarning },
+    { navName: 'Receipt', navLink: '/receipts', navIcon: ReceiptText }
   ],
   ADMIN: [
     { navName: 'Categories', navLink: '/categories', navIcon: FileWarning },
     { navName: 'Users', navLink: '/users', navIcon: User },
-    { navName: 'Languages', navLink: '/languages', navIcon: Book }
+    { navName: 'Languages', navLink: '/languages', navIcon: Book },
+    { navName: 'Discounts', navLink: '/discounts', navIcon: DollarSign }
   ],
   MANAGER: [
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
@@ -34,7 +43,6 @@ const roleMenuItems = {
     { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
   ],
   DIRECTOR: [
-    { navName: 'Statistics', navLink: '/statistics', navIcon: ChartBar },
     { navName: 'Prices', navLink: '/prices', navIcon: DollarSign },
     { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
   ]
@@ -42,7 +50,7 @@ const roleMenuItems = {
 
 type UserRole = keyof typeof roleMenuItems
 
-const navbarItems = [{ navName: 'Home', navLink: '/', navIcon: House }]
+const navbarItems: NavbarItems[] = []
 
 if (auth.user?.role) {
   const role = auth.user.role as UserRole

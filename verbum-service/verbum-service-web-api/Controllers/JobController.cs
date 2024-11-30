@@ -23,23 +23,25 @@ namespace verbum_service.Controllers
         [HttpGet("get-all")]
         [EnableQuery]
         [Roles(UserRole.LINGUIST, UserRole.MANAGER)]
-        [ProducesResponseType(typeof(List<JobInfoResponse>), 200)]
+        [ProducesResponseType(typeof(List<JobListResponse>), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll()
         {
             return ResponseFilter.OkOrNoContent(await jobService.GetAllJob(), this);
         }
 
-        [HttpPost("add")]
-        [ProducesResponseType(201)]
+        [HttpGet("get-detail")]
+        [EnableQuery]
+        [Roles(UserRole.LINGUIST, UserRole.MANAGER)]
+        [ProducesResponseType(typeof(JobInfoResponse), 200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> CreateJobs([FromBody] CreateJobsRequest request)
+        public async Task<IActionResult> GetAll([FromQuery][Required] Guid jobId)
         {
-            await jobService.CreateJobs(request);
-            return StatusCode(201);
+            return ResponseFilter.OkOrNoContent(await jobService.GetJobById(jobId), this);
         }
 
         [HttpPut("edit")]
@@ -56,9 +58,9 @@ namespace verbum_service.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ApproveJob([Required] Guid jobId, [Required] Guid orderId)
+        public async Task<IActionResult> ApproveJob([FromQuery][Required] Guid jobId)
         {
-            await jobService.ApproveJob(jobId,orderId);
+            await jobService.ApproveJob(jobId);
             return NoContent();
         }
     }

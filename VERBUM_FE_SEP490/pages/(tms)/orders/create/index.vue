@@ -15,12 +15,20 @@ import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { useAPI } from '@/composables/useCustomFetch'
+import { useToast } from '~/components/ui/toast'
+
+const { toast } = useToast()
+const router = useRouter()
+
+useSeoMeta({
+  title: 'Create Order'
+})
 
 const formSchema = [
   z.object({
     sourceLanguageId: z.string(),
     targetLanguageIdList: z.string(),
-    translationFileURL: z.string(),
+    translationFileURL: z.string().min(1, { message: 'Required' }),
     dueDate: z.coerce.date()
   }),
   z.object({
@@ -90,21 +98,35 @@ async function onSubmit(values: FormValues) {
 
   try {
     // Send the payload to the backend using a POST request
-    const { data, error } = await useAPI('/order/add', {
+    const { status } = await useAPI('/order/add', {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json'
       }
     })
-
-    if (error.value) {
-      console.error('Error submitting form:', error.value)
-    } else {
-      console.log('Form submitted successfully:', data.value)
+    toast({
+      title: 'Order Created !!',
+      description: `Order has been created successfully!!`
+    })
+    if (status.value === "success") {
+      const response = await repo(useNuxtApp().$api).getOrders()
+      if (!response){
+        toast({
+          title: 'Error Fetching Orders',
+          description: 'An error occurred while fetching the Orders!!'
+        })
+        return
+      }
+      const createdOrder = response[0]
+      router.push('/orders/details/' + createdOrder.orderId)
     }
   } catch (err) {
     console.error('Request failed:', err)
+    toast({
+      title: 'Error create Order',
+      description: 'An error occurred while creating the Order!!'
+    })
   }
 }
 </script>

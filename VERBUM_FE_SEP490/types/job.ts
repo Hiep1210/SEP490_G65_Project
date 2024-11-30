@@ -3,12 +3,23 @@ export interface Job {
     name: string;
     status: string;
     dueDate: string;
+    workDueDate: string;
     createdAt: string;
     updatedAt: string;
-    wordCount: number;
     documentUrl: string;
+    referenceUrls: string[];
     deliverableUrl: string;
+    previousJobDeliverables: Record<string, string>;
     targetLanguageId: string;
     workId: string;
-    assigneeNames: string[];
+    assigneeNames: assigneeNames[];
+    orderId: string;
+}
+
+interface assigneeNames {
+    id: string;
+    name: string;
+    email: string;
+    roleCode: string;
+    revelancies: string[];
 }

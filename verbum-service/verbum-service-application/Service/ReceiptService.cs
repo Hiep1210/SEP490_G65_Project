@@ -7,6 +7,5 @@ namespace verbum_service_application.Service
     public interface ReceiptService
     {
         Task<List<ReceiptInfoResponse>> GetAllReceipt();
-        Task CreateReceipt(CreateReceipRequest request);
     }
 }

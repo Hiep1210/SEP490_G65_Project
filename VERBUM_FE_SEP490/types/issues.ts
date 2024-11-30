@@ -1,6 +1,6 @@
-export type IssueAttachment = {
-  issueId: string
+export type IssueAttachments = {
   attachmentUrl: string
+  tag:string
 }
 
 export type Issue = {
@@ -15,6 +15,23 @@ export type Issue = {
   issueDescription: string
   assigneeName: string
   assigneeId: string
-  issueAttachments: IssueAttachment[]
+  issueAttachments: IssueAttachments[]
   cancelResponse: string
+  rejectResponse: string
+  documentUrl: string
+}
+
+export type IssueUpdatePayload = {
+  issueId: string
+  issueName: string
+  issueDescription: string
+  assigneeId: string
+  issueAttachments: IssueAttachments[]
+}
+
+export type IssueReOpenPayload = {
+    issueId: string
+    issueName: string
+    issueDescription: string
+    issueAttachments: IssueAttachments[]
 }

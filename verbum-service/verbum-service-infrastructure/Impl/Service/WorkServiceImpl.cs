@@ -52,12 +52,6 @@ namespace verbum_service_infrastructure.Impl.Service
             await context.SaveChangesAsync();
         }
 
-        public async Task CreateWork(Work work)
-        {
-            context.Works.Add(work);
-            await context.SaveChangesAsync();
-        }
-
         public async Task<List<WorkResponse>> GetAllWork()
         {
             List<Work> orders = new List<Work>();
@@ -93,16 +87,6 @@ namespace verbum_service_infrastructure.Impl.Service
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
             }
             List<WorkResponse> list = mapper.Map<List<WorkResponse>>(orders);
-            return list;
-        }
-
-        public async Task<List<Guid>> GetWorkIdsListByOrderId(Guid orderId)
-        {
-            List<Guid> list = await context.Works
-                .Where(w => w.OrderId == orderId)
-                .Select(w => w.WorkId)
-                .ToListAsync();
-
             return list;
         }
 

@@ -16,6 +16,7 @@ export const useAuthStore = defineStore({
     clearUser() {
       this.user = null
       this.isAuthenticated = false
+      localStorage.removeItem('access_token')
     }
   },
   persist: {

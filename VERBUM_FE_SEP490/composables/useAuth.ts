@@ -7,10 +7,9 @@ const { toast } = useToast()
 
 export const useAuth = () => {
   const user = ref<User | null>(null)
-  const accessToken = ref<string | null>(null)
+  const accessToken = ref<string | null | undefined>(null)
   const refreshToken = ref<string | null>(null)
   const authStore = useAuthStore()
-  let refreshInterval: number | null = null
 
   const router = useRouter()
   const config = useRuntimeConfig()
@@ -24,22 +23,25 @@ export const useAuth = () => {
       })
 
       if (!response.ok) {
-        toast({
-          title: 'Failed to login',
-          description: 'An error occurred while logging in'
-        })
-        throw new Error('Failed to login')
+        if (response.status === 400) {
+          toast({
+            title: 'Invalid credentials',
+            description: 'Please check your email and password'
+          })
+        } else {
+          toast({
+            title: 'Login error',
+            description: 'An error occurred while logging in'
+          })
+        }
       }
 
-      accessToken.value =
-        document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('access_token'))
-          ?.split('=')[1] || null
+      accessToken.value = useCookie('access_token').value
 
       if (!accessToken.value) {
         throw new Error('No access token found')
       }
+
       const decodedUser = decodeToken(accessToken.value as string)
       if (!decodedUser) {
         throw new Error('Invalid access token')
@@ -87,69 +89,21 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    user.value = null
     accessToken.value = null
     refreshToken.value = null
     authStore.clearUser()
-    router.push('/login')
+    useRouter().push('/login')
   }
 
   const googleAuth = async () => {
     window.open(`${config.public.baseUrl}/auth/google-login`)
   }
   // Refresh token silently
-  const silentTokenRefresh = async () => {
-    if (!authStore.user) {
-      console.log('No user logged in, skipping refresh')
-      return // Skip if no user is logged in
-    }
-
-    const response = await fetch(
-      `${config.public.baseUrl}/auth/refresh-token`,
-      {
-        method: 'POST',
-        credentials: 'include'
-      }
-    )
-
-    if (response.ok) {
-      const data = await response.json()
-      console.log(data)
-    } else {
-      useAuthStore().clearUser()
-      router.push('/login')
-    }
-  }
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      startSilentRefresh()
-    } else {
-      stopSilentRefresh()
-    }
-  }
-
-  const startSilentRefresh = () => {
-    if (!useAuthStore().user || refreshInterval !== null) return // Skip if no user or refresh already running
-    // silentTokenRefresh() // Do an immediate refresh
-    refreshInterval = window.setInterval(silentTokenRefresh, 60 * 60 * 1000) // Refresh every 60 minutes
-  }
-
-  const stopSilentRefresh = () => {
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval)
-      refreshInterval = null
-    }
-  }
-
   return {
     user: user.value,
     login,
     logout,
     signup,
-    googleAuth,
-    handleVisibilityChange,
-    startSilentRefresh,
-    stopSilentRefresh
+    googleAuth
   }
 }

@@ -27,6 +27,7 @@ namespace verbum_service_domain.DTO.Response
 
         public Guid? JobId { get; set; }
         public Guid OrderId { get; set; }
+        public string OrderName { get; set; }
         public string? DocumentUrl { get; set; }
 
         public string? IssueDescription { get; set; }

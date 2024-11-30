@@ -22,19 +22,19 @@ const allStatus = ref<Status[]>([
     itemsPerPage: 5 // Set the number of items to show per page for each status
   },
   {
-    status: 'IN-PROGRESS',
+    status: 'IN_PROGRESS',
     class: 'bg-teal-200 text-black',
     currentPage: 1,
     itemsPerPage: 5
   },
   {
-    status: 'COMPLETED',
+    status: 'SUBMITTED',
     class: 'bg-emerald-200 text-black',
     currentPage: 1,
     itemsPerPage: 5
   },
   {
-    status: 'CANCEL',
+    status: 'APPROVED',
     class: 'bg-gray-200 text-black',
     currentPage: 1,
     itemsPerPage: 5
@@ -42,7 +42,7 @@ const allStatus = ref<Status[]>([
 ])
 
 // Search query for filtering works by name
-const searchQuery = ref('')
+const searchQuery = ref<string>('')
 
 // Function to calculate total pages for a specific status
 const totalPages = (status: Status) => {
@@ -56,7 +56,7 @@ const filteredJobsByStatus = (status: Status) => {
     const matchesStatus =
       job.status === status.status ||
       (status.status === 'NEW' && job.status === null)
-    const matchesQuery = job.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesQuery = job.name && job.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     return matchesStatus && matchesQuery
   })
 }
@@ -80,7 +80,6 @@ const previousPage = (status: Status) => {
     status.currentPage--
   }
 }
-const role = useAuthStore().user?.role as string | undefined
 </script>
 
 <template>
@@ -104,12 +103,11 @@ const role = useAuthStore().user?.role as string | undefined
       </p>
       <div :class="item.class" class="p-2 rounded-xl h-5/6 overflow-y-auto">
         <div v-for="job in paginatedJobs(item)" :key="job.id">
-          <JobsDialog :job="job" :role="role">
             <JobsCard
               v-if="job.status === item.status || (item.status === 'NEW' && job.status === null)"
               :data="job"
+              @click="useRouter().push(`/jobs/details/${job.id}`)"
             />
-          </JobsDialog>
         </div>
       </div>
       <div class="flex justify-center">

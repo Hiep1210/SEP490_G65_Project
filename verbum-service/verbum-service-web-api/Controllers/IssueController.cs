@@ -46,7 +46,8 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        //note
+        [Roles(UserRole.CLIENT, UserRole.MANAGER, UserRole.LINGUIST)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -57,7 +58,8 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("change-status")]
-        [Roles(UserRole.CLIENT, UserRole.MANAGER)]
+        //note
+        [Roles(UserRole.CLIENT, UserRole.MANAGER, UserRole.LINGUIST)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -101,7 +103,7 @@ namespace verbum_service.Controllers
         }
 
         [HttpPut("accept-issue-solution")]
-        [Roles(UserRole.LINGUIST)]
+        [Roles(UserRole.MANAGER)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
@@ -111,14 +113,14 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("approve")]
-        [Roles(UserRole.MANAGER)]
+        [HttpPut("reopen")]
+        [Roles(UserRole.CLIENT)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> ApproveIssue([FromQuery][Required] Guid issueId, [FromQuery][Required] Guid orderId)
+        public async Task<IActionResult> ReopenIssue([FromBody] ReopenIssueRequest request)
         {
-            await issueService.ApproveIssue(issueId, orderId);
+            await issueService.ReopenIssue(request);
             return NoContent();
         }
     }

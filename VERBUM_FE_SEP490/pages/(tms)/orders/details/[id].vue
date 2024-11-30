@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import type { Issue } from '~/types/issues'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
+import { ORDER_COMPLETED, ORDER_IN_PROGRESS  } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
+import { formatToVietnamTimezone } from '#imports'
+const { getRatingByOrderId, filteredRating } = useRating()
 
 const { toast } = useToast()
-const { issues, getIssues, updateIssue, getIssuesByOrders } = useIssues()
+
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
-const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
+const { order, isLoading ,getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -26,11 +28,18 @@ const tempPrice = ref<string>('0')
 
 onMounted(() => {
   getOrder(orderId)
-  if (!issues.value.length) {
-    getIssuesByOrders(orderId as string)
-  }
   getSupportedLanguages()
+  if (order.value) {
+    useSeoMeta({ title: order.value.orderName })
+  }
+  getRating();
 })
+
+
+const getRating = () => {
+  getRatingByOrderId(orderId as string);
+  console.log({filteredRating})
+}
 
 // Enter edit mode
 const enableEdit = () => {
@@ -39,7 +48,7 @@ const enableEdit = () => {
     const {
       translationFileUrls,
       referenceFileUrls,
-      deliverableFileUrls,
+      jobDeliverables,
       createdDate,
       discountId,
       paymentStatus,
@@ -100,27 +109,6 @@ const saveEdit = async () => {
     console.error('Failed to save order:', error)
   }
 }
-// Add discount
-const openAddDiscount = ref(false)
-const addDiscount = async () => {
-  try {
-    if (editedOrder.value) {
-      const payload = {
-        ...editedOrder.value,
-        discountId: editedOrder.value?.discountId
-      }
-      await useAPI('/order/update', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to add discount:', error)
-  }
-}
 
 const changeSourceLanguage = (languageId: string) => {
   if (editedOrder.value) {
@@ -141,14 +129,6 @@ interface Language {
 }
 const languageList = ref<Language[]>([])
 
-const showIssuesDialog = ref(false)
-const selectedData = ref()
-
-const handleUpdate = async (updateIssues: Issue) => {
-  await updateIssue(updateIssues)
-  await getIssues()
-}
-
 const orderRepo = repo(useNuxtApp().$api)
 
 onMounted(async () => {
@@ -159,22 +139,26 @@ onMounted(async () => {
     console.error('Failed to fetch language list:', error)
   }
 })
-const payStatus = ref('')
-const handlePay = (status: string) => {
-  payStatus.value = status
+const handlePay = () => {
   openPaymentDialog.value = true
 }
 
 const handleSetPrices = () => {
   openSetPricesDialog.value = true
+  refreshOrder()
   tempPrice.value = order.value?.orderPrice || '0'
 }
 
 const handlePaymentClose = () => {
   openPaymentDialog.value = false
-  if(order.value?.orderStatus === 'ACCEPTED'){
+  if(order.value?.orderStatus === 'DELIVERED'){
     openRatingDialog.value = true
   }
+}
+
+const handleRatingOpen = () => {
+  openRatingDialog.value = true
+
 }
 
 const handleRatingClose = () => {
@@ -182,9 +166,9 @@ const handleRatingClose = () => {
   refreshOrder()
 }
 
-const handleRatingSubmit = () => {
+const handleRatingSubmit = async () => {
   openRatingDialog.value = false
-  refreshOrder()
+  await refreshOrder()
 }
 
 const refreshOrder = async () => {
@@ -208,26 +192,36 @@ const confirmSetPrices = async () => {
     console.error('Failed to set price:', error) // Log error if API call fails
   }
 }
+
+
+
+const orderTitle = computed(() => order.value?.orderName || 'Order Details')
+
+useSeoMeta({
+  title: orderTitle
+})
+provide('role', role)
+
 </script>
 
 <template>
-  <div>
-    <div v-if="!order">
-      <NuxtLoadingIndicator />
-    </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5">
+  <LoadingSpinner v-if="isLoading" />
+  <div v-else>
+    <div v-if="order" class="md:grid-cols-2 gap-5 pb-5">
+      <OrdersStepper :order-status="order.orderStatus"/>
       <!-- Order Information and File URLs Section -->
-      <div class="space-y-4">
-        <div class="container p-4 space-y-2 orderDetails border rounded-md">
+      <div class="mt-3 flex gap-3">
+        <div class="flex-1 space-y-4">
+        <div class="p-4 space-y-2 orderDetails border rounded-md">
           <div class="flex">
             <p class="text-[2rem] font-semibold flex-auto">
               {{ order?.orderName }}
             </p>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('IN_PROGRESS')">Deposit </Button>
+              <Button @click="handlePay()">Deposit </Button>
             </div>
             <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay('DELIVERED')">Paying Remaining </Button>
+              <Button @click="handlePay()">Paying Remaining </Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
               <Button @click="handleSetPrices">Set prices </Button>
@@ -235,18 +229,18 @@ const confirmSetPrices = async () => {
           </div>
 
           <!-- Order Details -->
-          <div class="flex flex-col space-y-1">
-            <div class="grid grid-cols-2 gap-x-2 text-sm">
+          <div class="flex flex-col">
+            <div class="grid grid-cols-2 gap-x-2">
               <span class="text-gray-500"
                 >Status: {{ order?.orderStatus }}</span
               >
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }}</span>
+              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ order.createdDate?.split('T')[0] }}</span>
-              <span v-if="order.reference"
-                >Reference: {{ order.reference }}</span
+              <span>Created: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
+              <span v-if="order.orderNote"
+                >Note: {{ order.orderNote }}</span
               >
             </div>
 
@@ -284,7 +278,7 @@ const confirmSetPrices = async () => {
             <!-- Due Date -->
             <div class="flex items-center space-x-2">
               <span>Due date:</span>
-              <span v-if="!isEditing">{{ order.dueDate?.split(' ')[0] }}</span>
+              <span v-if="!isEditing">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span>
               <Input
                 v-else-if="editedOrder"
                 v-model="editedOrder.dueDate"
@@ -337,48 +331,41 @@ const confirmSetPrices = async () => {
           <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
             >Edit Order</Button
           >
-          <Button
-            v-if="role === 'CLIENT' && order.orderStatus === 'NEW'"
-            variant="outline"
-            @click="changeOrderStatus(order.orderId, 'CANCELLED')"
-            >Cancel Order</Button
-          >
+          <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED' && order.orderStatus !=='DELIVERED')" :order-id="order.orderId">
+              <Button
+                variant="outline"
+                >Cancel Order</Button
+              >
+          </OrdersDetailsCancelDialog>
           <template v-if="role === 'STAFF'">
             <Button v-if="order.orderStatus === 'NEW'" @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
               >Accept Order</Button
             >
             <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
           </template>
-          <Button
-            v-if="role === 'CLIENT'"
-            variant="outline"
-            @click="openAddDiscount = true"
-            >Add Discount</Button
+          <Button v-if="role === 'CLIENT' && (order.orderStatus === 'DELIVERED') && !filteredRating" @click="handleRatingOpen"
+            >Rating your order</Button
           >
         </div>
 
         <OrdersDetailsTabs :order="order" />
+
+        <!-- Rating -->
+         <div v-if="order.orderStatus === 'DELIVERED'" >
+          <RatingBox :order-id="orderId as string"/>
+         </div>
+
       </div>
 
       <!-- Smaller Issues List Section -->
-      <div class="space-y-4 border rounded-md">
-        <div class="flex justify-between items-center p-3 border-b">
-          <span class="text-lg font-semibold">Issues</span>
-          <IssuesCreate v-if="role === 'CLIENT'" :order-id="orderId" />
-        </div>
-        <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
-          <IssuesTable
-            :issues="issues"
-            :role="user?.role as string"
-            @update="handleUpdate"
-          />
-        </div>
-        <div v-else class="w-full h-full flex justify-center items-center">
-          <p class="font-bold">
-            Have issues with the order?
-            <span class="text-primary">Let us know.</span>
-          </p>
-        </div>
+      <div v-if="order.orderStatus === ORDER_COMPLETED || order.orderStatus === ORDER_IN_PROGRESS" class="flex-1 space-y-4 border rounded-md">
+        <OrdersIssues
+          :job-deliverables="order.jobDeliverables"
+          :order-id="orderId as string"
+          :role="role"
+          :user="user"
+        />
+      </div>
       </div>
 
       <!-- Set Prices Dialog -->
@@ -408,7 +395,7 @@ const confirmSetPrices = async () => {
       <PaymentDialog
         :order="order"
         :client-id="clientId as string"
-        :status="payStatus"
+        :status="order.orderStatus === 'ACCEPTED'? 'IN_PROGRESS' : 'DELIVERED'"
         :open="openPaymentDialog"
         @close="handlePaymentClose"
       />

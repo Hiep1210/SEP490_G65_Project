@@ -1,13 +1,17 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'VERBUM Translation Center'
+})
+
 definePageMeta({
   title: 'Home',
-  layout: 'landing'
+  layout: 'landing',
 })
 
 const pricing = [
   {
     name: 'Personal',
-    price: 'Translte',
+    price: 'Translate',
     popular: true,
     features: [
       'Translate the document(s) from one to another language.',
@@ -61,8 +65,8 @@ onMounted(async () => {})
       </p>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-10 mx-auto max-w-screen-lg mt-12">
-      <LandingPricing v-for="item of pricing" :plan="item" />
+    <div class="flex gap-10 w-screen-lg mt-12">
+      <LandingPricing v-for="item of pricing" :key="item.name" :plan="item" />
     </div>
     <LandingFooter />
   </LandingContainer>

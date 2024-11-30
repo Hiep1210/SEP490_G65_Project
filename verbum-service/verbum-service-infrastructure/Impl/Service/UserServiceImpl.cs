@@ -41,18 +41,17 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             var emailToken = tokenService.GenerateEmailToken(email);
             //send mail
-            string body = await BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/confirm-email" + "?access_token=" + emailToken);
-            return await mailService.SendEmailAsync(email, string.Format(MailConstant.SUBJECT, email), body);
+            string body = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/confirm-email" + "?access_token=" + emailToken, String.Empty ,"mail");
+            return await mailService.SendEmailAsync(email, string.Format(MailConstant.CONFIRM_EMAIL_HEADER, email), body);
         }
-        private async Task<string> BuildVerificationEmail(string link)
-        {
-            //string path = Path.Combine(Directory.GetCurrentDirectory(),"..", "verbum-service-domain", "Common", "HTMLTemplate", "mail.html");
-            string path = Path.Combine("wwwroot", "assets", "HTMLTemplate", "mail.html");
-            Console.WriteLine(path);
-            string body = await File.ReadAllTextAsync(path);
-            body = body.Replace("{link}", link);
-            return body;
-        }
+        //private async Task<string> BuildVerificationEmail(string link)
+        //{
+        //    string path = Path.Combine("wwwroot", "assets", "HTMLTemplate", "mail.html");
+        //    Console.WriteLine(path);
+        //    string body = await File.ReadAllTextAsync(path);
+        //    body = body.Replace("{link}", link);
+        //    return body;
+        //}
         public async Task<Tokens> Login(UserLogin loginCredentials)
         {
             List<string> alerts = new List<string>();
@@ -197,7 +196,6 @@ namespace verbum_service_infrastructure.Impl.Service
                     user.Name = request.Data.Name;
                     user.Email = request.Data.Email;
                     user.UpdatedAt = DateTime.Now;
-                    //update relevancy
                     await context.SaveChangesAsync();
                     transaction.Commit();
                 }

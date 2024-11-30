@@ -73,8 +73,8 @@ namespace verbum_service.Controllers
         {
             Tokens tokens = await userService.LoginGoogleCallback();
             tokenService.SetTokensInsideCookie(tokens, HttpContext);
-            if(tokens == null) return Redirect("http://localhost:3000/login");
-            return Redirect("http://localhost:3000/orders");
+            if(tokens == null) return Redirect(SystemConfig.FE_DOMAIN + "/login");
+            return Redirect(SystemConfig.FE_DOMAIN + "/redirect");
         }
 
         [HttpPost("signup")]
@@ -102,7 +102,7 @@ namespace verbum_service.Controllers
                 return BadRequest();
             }
             Tokens newTokens = await userService.RefreshAccessToken(tokens);
-            tokenService.SetTokensInsideCookie(tokens, HttpContext);
+            tokenService.SetTokensInsideCookie(newTokens, HttpContext);
             return Ok();
         }
 

@@ -15,7 +15,7 @@ const props = defineProps<{
   open: boolean
 }>()
 
-const emit = defineEmits(['close', 'confirm']) // Emit update event
+const emit = defineEmits(['close', 'confirm', 'refresh']) // Emit update event
 const isOpen = ref(props.open)
 
 watch(
@@ -27,6 +27,11 @@ watch(
 
 const closeDialog = () => {
   emit('close') // Emit close event
+}
+
+function handleConfirm() {
+  emit('confirm');
+  emit('refresh');
 }
 </script>
 
@@ -46,7 +51,7 @@ const closeDialog = () => {
         <Button class="bg-slate-500 hover:bg-slate-600" @click="$emit('close')"
           >Cancel</Button
         >
-        <Button @click="$emit('confirm')">Confirm</Button>
+        <Button @click="handleConfirm">Confirm</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

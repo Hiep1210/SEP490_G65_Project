@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { columns } from '~/components/Orders/column';
+
 useSeoMeta({
   title: 'Orders'
 })
@@ -6,7 +8,7 @@ definePageMeta({
   layout: 'default'
 })
 
-const { orders, getOrders } = useOrders()
+const { orders, isLoading, getOrders } = useOrders()
 
 onMounted(async () => {
   if (!orders.value.length) {
@@ -18,7 +20,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ClientOnly>
-    <LazyOrdersTable :orders="orders" @update:orders="orders = $event" />
-  </ClientOnly>
+  <LoadingSpinner v-if="isLoading"/>
+  <LazyOrdersTable v-else :columns="columns" :data="orders" />
 </template>
