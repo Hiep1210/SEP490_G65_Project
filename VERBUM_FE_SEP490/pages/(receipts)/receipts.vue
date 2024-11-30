@@ -20,7 +20,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="">
-     <ReceiptsTable :receipts="receipts"/>
-  </div>
+  <LoadingSpinner v-if="!receipts"/>
+     <ReceiptsTable v-else :receipts="receipts"/>
 </template>

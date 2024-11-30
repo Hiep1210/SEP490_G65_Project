@@ -22,7 +22,8 @@ const handleUpdate = async (updateIssues: Issue) => {
 </script>
 
 <template>
-  <div class="flex flex-col space-y-4">
+  <LoadingSpinner v-if="!issues.length" />
+  <div v-else class="flex flex-col space-y-4">
     <IssuesCarousel :issues="issues" :role="currentUserRole"/>
     <h1 class="text-2xl font-semibold">All issues</h1>
     <IssuesTable
