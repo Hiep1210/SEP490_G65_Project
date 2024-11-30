@@ -13,6 +13,7 @@ using verbum_service_domain.Common.ErrorModel;
 using verbum_service_domain.DTO.Response;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using verbum_service_application.Service;
 
 namespace verbum_service_test
 {
@@ -97,8 +98,9 @@ namespace verbum_service_test
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
             var mockCurrentUser = new Mock<CurrentUser>();
+            var mailService = new Mock<MailService>(); 
 
-            var orderService = new OrderServiceImpl(dbContext,mockMapper.Object,mockCurrentUser.Object, null, null);
+            var orderService = new OrderServiceImpl(dbContext,mockMapper.Object,mockCurrentUser.Object, null, null, mailService.Object);
 
             var newOrder = new Order
             {
@@ -127,8 +129,9 @@ namespace verbum_service_test
             var mockCurrentUser = new Mock<CurrentUser>();
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             var newOrder = new Order
             {
@@ -161,8 +164,9 @@ namespace verbum_service_test
             };
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
@@ -197,8 +201,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
@@ -225,8 +230,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
@@ -252,8 +258,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<OrderDetailsResponse>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new OrderDetailsResponse
@@ -278,8 +285,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             //Act
             var result = orderService.GetOrderDetails(Guid.Parse("e5a521cc-ec2d-4034-bf83-68035577bed9"));
@@ -298,8 +306,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             var newOrder = new Order
             {
@@ -334,8 +343,9 @@ namespace verbum_service_test
             var mockCurrentUser = new Mock<CurrentUser>();
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             var newOrder = new Order
             {
@@ -367,8 +377,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             List<string> languageList = new List<string> { "EN" };
 
@@ -404,8 +415,9 @@ namespace verbum_service_test
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<UploadOrderFileRequest>>(It.IsAny<IEnumerable<OrderReference>>()))
                       .Returns(new List<UploadOrderFileRequest>

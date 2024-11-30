@@ -24,7 +24,7 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "due date"));
             }
-            if (!Enum.IsDefined(typeof(JobStatus), request.Status))
+            if (!Enum.IsDefined(typeof(JobStatus), request.Status) || request.Status.Equals(JobStatus.IN_PROGRESS))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "job status"));
             }

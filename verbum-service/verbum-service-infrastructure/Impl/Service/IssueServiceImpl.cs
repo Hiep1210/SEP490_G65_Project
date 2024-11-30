@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Lombok.NET;
+using MailKit;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using PayPal.Api;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -19,6 +22,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly verbumContext context;
         private readonly CurrentUser currentUser;
+        private readonly verbum_service_application.Service.MailService mailService;
 
         public async Task AcceptIssueSolution(Guid issueId)
         {
@@ -26,7 +30,7 @@ namespace verbum_service_infrastructure.Impl.Service
             {
                 try
                 {
-                    Guid jobId = await context.Issues.Where(x => x.IssueId == issueId).Select(x => x.JobId).FirstOrDefaultAsync();
+                    Issue issue = await context.Issues.Include(x => x.Assignee).FirstOrDefaultAsync(x => x.IssueId == issueId);
                     Guid orderId = await context.Issues.Where(x => x.IssueId == issueId)
                         .Include(x => x.Job)
                         .ThenInclude(x => x.Work)
@@ -36,7 +40,7 @@ namespace verbum_service_infrastructure.Impl.Service
 
                     if (ObjectUtils.IsEmpty(solutionUrl)) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "solution for this issue"));
 
-                    await context.Jobs.Where(x => x.Id.Equals(jobId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.DeliverableUrl, solutionUrl));
+                    await context.Jobs.Where(x => x.Id.Equals(issue.JobId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.DeliverableUrl, solutionUrl));
                     await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, IssueStatusEnum.RESOLVED.ToString()));
                     await context.Issues.Where(x => x.IssueId.Equals(issueId)).ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectResponse, (string?)null));
 
@@ -50,6 +54,10 @@ namespace verbum_service_infrastructure.Impl.Service
                     job.Status == JobStatus.APPROVED.ToString() &&
                     (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString() || job.Issue.Status == IssueStatusEnum.CANCEL.ToString()));
 
+                    //send mail
+                    string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/issues?issueId=" + issueId, "accept_issue_solution");
+                    _ = Task.Run(() => mailService.SendEmailAsync(issue.Assignee.Email, string.Format(MailConstant.ACCEPT_ISSUE_HEADER, issue.IssueName), mailBody));
+
                     if (allCompleted)
                     {
                         int orderRecords = await context.Orders
@@ -57,6 +65,10 @@ namespace verbum_service_infrastructure.Impl.Service
                             .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
 
                         if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+                        verbum_service_domain.Models.Order order = await context.Orders.Include(x => x.Client).FirstAsync(x => x.OrderId == orderId);
+                        string body = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/orders/details/" + order.OrderId, "complete_order_mail");
+                        _ = Task.Run(() => mailService.SendEmailAsync(order.Client.Email, string.Format(MailConstant.COMPLETE_ORDER_HEADER, order.OrderName), mailBody));
                     }
 
                     transaction.Commit();
@@ -153,12 +165,18 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             if (await context.Issues.Where(x => x.IssueId == request.Id)
                 .ExecuteUpdateAsync(o => o.SetProperty(x => x.CancelResponse, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            Issue issue = await context.Issues.Include(x => x.Assignee).FirstAsync(x => x.IssueId == request.Id);
+            string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/issues?issueId=" + request.Id, "cancel_issue_mail", request.ResponseContent);
+            _ = Task.Run(() => mailService.SendEmailAsync(issue.Assignee.Email, string.Format(MailConstant.CANCEL_ISSUE_HEADER, issue.IssueName), mailBody));
         }
 
         public async Task UpdateIssueRejectResponse(ResponseRequest request)
         {
             if (await context.Issues.Where(x => x.IssueId == request.Id)
                 .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectResponse, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            Issue issue = await context.Issues.Include(x => x.Assignee).FirstAsync(x => x.IssueId == request.Id);
+            string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/issues?issueId=" + request.Id, "reject_issue_mail", request.ResponseContent);
+            _ = Task.Run(() => mailService.SendEmailAsync(issue.Assignee.Email, string.Format(MailConstant.REJECT_ISSUE_HEADER, issue.IssueName), mailBody));
         }
 
         public async Task UpdateIssueStatus(Guid issueId, string status)

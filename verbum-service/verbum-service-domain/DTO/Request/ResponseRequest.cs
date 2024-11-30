@@ -10,6 +10,6 @@ namespace verbum_service_domain.DTO.Request
     {
         public Guid Id { get; set; }
 
-        public string? ResponseContent { get; set; }
+        public string ResponseContent { get; set; }
     }
 }

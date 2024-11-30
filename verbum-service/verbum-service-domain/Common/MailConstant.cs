@@ -2,7 +2,7 @@
 {
     public static class MailConstant
     {
-        public const string CONFIRM_EMAIL_HEADER = "Hello {0}!, please confirm your email!!";
+        public const string CONFIRM_EMAIL_HEADER = "Hello!, please confirm your email!!";
         public const int MailExpirationTime = 1; //hour
         public const string REJECT_ORDER_HEADER = "Your order {0} has been rejected";
         public const string ACCEPT_ORDER_HEADER = "Your order {0} has been accepted";

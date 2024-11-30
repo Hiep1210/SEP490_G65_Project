@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using Org.BouncyCastle.Asn1.Ocsp;
 using PayPal.Api;
 using System;
 using verbum_service_application.Service;
@@ -27,6 +28,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IConfiguration Configuration;
         private Payment payment;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly MailService mailService;
 
         public async Task CreateOrder(verbum_service_domain.Models.Order info)
         {
@@ -268,17 +270,20 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task ChangeOrderStatus(Guid orderId, string orderStatus)
         {
             if (OrderStatus.NEW.ToString().Equals(orderStatus)
-                //|| OrderStatus.IN_PROGRESS.ToString().Equals(orderStatus)
                 || (UserRole.CLIENT.Equals(currentUser.Role) && !OrderStatus.CANCELLED.ToString().Equals(orderStatus))
                 || (UserRole.STAFF.Equals(currentUser.Role) && OrderStatus.CANCELLED.ToString().Equals(orderStatus)))
             {
-                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "verbum_service_domain.Models.Order Status"));
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "Order Status"));
             }
             if (OrderStatus.ACCEPTED.ToString().Equals(orderStatus))
             {
                 await context.Orders
                 .Where(x => x.OrderId == orderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.RejectReason, (string?)null));
+                //send mail
+                verbum_service_domain.Models.Order order = await context.Orders.Include(x => x.Client).FirstAsync(x => x.OrderId == orderId);
+                string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/orders/details/" + orderId, "accept_order_mail");
+                _ = Task.Run(() => mailService.SendEmailAsync(order.Client.Email, string.Format(MailConstant.ACCEPT_ORDER_HEADER, order.OrderName), mailBody));
             }
             int records = await context.Orders
                 .Where(x => x.OrderId == orderId)
@@ -337,6 +342,10 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             if (await context.Orders.Where(x => x.OrderId == request.Id)
                                .ExecuteUpdateAsync(o => o.SetProperty(x => x.RejectReason, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            //send mail
+            verbum_service_domain.Models.Order order = await context.Orders.Include(x => x.Client).FirstOrDefaultAsync(x => x.OrderId == request.Id);
+            string body = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/orders/details/" + order.OrderId, "reject_order_mail", order.RejectReason);
+            _ = Task.Run(() => mailService.SendEmailAsync(order.Client.Email, string.Format(MailConstant.REJECT_ORDER_HEADER, order.OrderName), body));
         }
 
         public async Task CreateRevelancy(Guid orderId)

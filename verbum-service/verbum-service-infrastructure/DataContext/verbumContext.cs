@@ -197,6 +197,9 @@ public partial class verbumContext : DbContext
                 .HasColumnType("timestamp(0) without time zone")
                 .HasColumnName("due_date");
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.RejectReason)
+                .HasColumnType("character varying")
+                .HasColumnName("reject_reason");
             entity.Property(e => e.Status)
                 .HasComment("NEW, IN_PROGRESS, SUBMITTED, ACCEPTED")
                 .HasColumnName("status");
@@ -358,7 +361,7 @@ public partial class verbumContext : DbContext
         {
             entity.HasKey(e => e.ReceiptId).HasName("receipt_pk");
 
-            entity.ToTable("receipt", tb => tb.HasComment("false is deposit, true is payment"));
+            entity.ToTable("receipt", tb => tb.HasComment("true is deposit, false is payment"));
 
             entity.Property(e => e.ReceiptId)
                 .ValueGeneratedNever()

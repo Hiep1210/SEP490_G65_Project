@@ -17,6 +17,16 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             return await SendMail(new MailContent()
             {
+                To = new List<string> { receiver },
+                Subject = subject,
+                Body = body
+            });
+        }
+
+        public async Task<string> SendEmailAsync(List<string> receiver, string subject, string body)
+        {
+            return await SendMail(new MailContent()
+            {
                 To = receiver,
                 Subject = subject,
                 Body = body
@@ -28,9 +38,9 @@ namespace verbum_service_infrastructure.Impl.Service
             var email = new MimeMessage();
             email.Sender = new MailboxAddress(mailSettings.DisplayName, mailSettings.Mail);
             email.From.Add(new MailboxAddress(mailSettings.DisplayName, mailSettings.Mail));
-            email.To.Add(MailboxAddress.Parse(mailContent.To));
+            email.To.AddRange(mailContent.To.Select(address => MailboxAddress.Parse(address.Trim())));
             email.Subject = mailContent.Subject;
-            
+
             var builder = new BodyBuilder();
             builder.HtmlBody = mailContent.Body;
             email.Body = builder.ToMessageBody();

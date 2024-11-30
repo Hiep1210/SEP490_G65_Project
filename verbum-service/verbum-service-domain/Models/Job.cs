@@ -42,6 +42,8 @@ public partial class Job
 
     public string? DeliverableUrl { get; set; }
 
+    public string? RejectReason { get; set; }
+
     public virtual Issue? Issue { get; set; }
 
     public virtual Work? Work { get; set; }

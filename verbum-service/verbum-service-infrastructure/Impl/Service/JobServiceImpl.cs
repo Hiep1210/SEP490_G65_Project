@@ -2,7 +2,7 @@
 using Lombok.NET;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Org.BouncyCastle.Asn1.Ocsp;
+using PayPal.Api;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.Common.ErrorModel;
@@ -21,6 +21,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly verbumContext context;
         private readonly IMapper mapper;
         private readonly UpdateJobValidation validation;
+        private readonly verbum_service_application.Service.MailService mailService;
         public async Task CreateJobs(CreateJobsRequest request)
         {
             using (IDbContextTransaction transaction = context.Database.BeginTransaction())
@@ -37,7 +38,7 @@ namespace verbum_service_infrastructure.Impl.Service
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_" + docUrl.Split("/")[^1].Split(".")[0].Split("uploads")[1],
+                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_VERBUM_" + docUrl.Split("/")[^1].Split(".")[0].Split("uploads")[1],
                                     Status = JobStatus.NEW.ToString(),
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
@@ -106,19 +107,25 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             int jobRecords = await context.Jobs
                 .Where(x => x.Id == jobId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.APPROVED.ToString()));
-
-            Guid orderId = await context.Jobs.Where(x => x.Id == jobId)
-                        .Include(x => x.Work)
-                        .ThenInclude(x => x.Order).Select(x => x.Work.Order.OrderId).FirstOrDefaultAsync();
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.APPROVED.ToString()).SetProperty(x => x.RejectReason, (string?) null));
 
             if (jobRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+            Job job = await context.Jobs
+                        .Include(x => x.Work)
+                        .ThenInclude(x => x.Order).ThenInclude(x => x.Client).Include(x => x.Assignees).FirstOrDefaultAsync(x => x.Id == jobId);
+
 
             var jobs = await context.Jobs
                 .Include(x => x.Work)
                 .Include(x => x.Issue)
-                .Where(x => x.Work.OrderId == orderId)
+                .Where(x => x.Work.OrderId == job.Work.OrderId)
                 .ToListAsync();
+
+            //send email
+            string body = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/jobs/details/" + jobId, "accept_job_mail");
+            List<string> toEmail = job.Assignees.Select(x => x.Email).ToList();
+            _ = Task.Run(() => mailService.SendEmailAsync(toEmail, MailConstant.ACCEPT_JOB_HEADER, body));
 
             bool allCompleted = jobs.All(job =>
             job.Status == JobStatus.APPROVED.ToString() &&
@@ -127,12 +134,26 @@ namespace verbum_service_infrastructure.Impl.Service
             if (allCompleted)
             {
                 int orderRecords = await context.Orders
-                    .Where(o => o.OrderId == orderId)
+                    .Where(o => o.OrderId == job.Work.OrderId)
                     .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
 
                 if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+                verbum_service_domain.Models.Order order = job.Work.Order;
+                string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/orders/details/" + order.OrderId, "complete_order_mail");
+                _ = Task.Run(() => mailService.SendEmailAsync(order.Client.Email, string.Format(MailConstant.COMPLETE_ORDER_HEADER, order.OrderName), body));
             }
         }
 
+        public async Task RejectJob(ResponseRequest request)
+        {
+            int records = await context.Jobs
+                .Where(x => x.Id == request.Id)
+                .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.IN_PROGRESS.ToString()).SetProperty(x => x.RejectReason, request.ResponseContent));
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            //send mail
+            List<string> assigneeEmails = context.Jobs.Include(x => x.Assignees).Where(job => job.Id == request.Id).SelectMany(job => job.Assignees).Select(assignee => assignee.Email).ToList();
+            string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/jobs/details/" + request.Id, "reject_job_mail", request.ResponseContent);
+            _ = Task.Run(() => mailService.SendEmailAsync(assigneeEmails, MailConstant.REJECT_JOB_HEADER, mailBody));
+        }
     }
 }

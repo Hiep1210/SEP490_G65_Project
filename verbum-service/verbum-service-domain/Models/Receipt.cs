@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace verbum_service_domain.Models;
 
 /// <summary>
-/// false is deposit, true is payment
+/// true is deposit, false is payment
 /// </summary>
 public partial class Receipt
 {

@@ -9,6 +9,7 @@ using verbum_service_domain.DTO.Response;
 using verbum_service_infrastructure.Impl.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using verbum_service_application.Service;
 
 namespace verbum_service_test.Impl.Service
 {
@@ -66,8 +67,9 @@ namespace verbum_service_test.Impl.Service
 
             var mockIConfiguration = new Mock<IConfiguration>();
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
 
-            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object);
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
                       .Returns(new List<OrderDetailsResponse>
