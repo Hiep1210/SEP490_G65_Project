@@ -8,25 +8,44 @@ export const useJobs = () => {
   const isLoading = ref(false)
   
   const getJobs = async () => {
+    isLoading.value = true
     try {
         const { data } = await useAPI('/job/get-all')
         jobs.value = data.value as Job[]
     } catch (error) {
+      toast({
+        title: 'Failed to fetch jobs',
+        description: 'An error occurred while fetching jobs',
+        variant: 'destructive'
+      })
       console.error('Failed to fetch jobs:', error)
+    }
+    finally {
+      isLoading.value = false
     }
   }
   const editJob = async (job: Partial<Job>) => {
+    isLoading.value = true
     try {
       await useAPI('/job/edit', {
         method: 'PUT',
         body: job,
       })
     } catch (error) {
+      toast({
+        title: 'Failed to edit job',
+        description: 'An error occurred while editing the job',
+        variant: 'destructive'
+      })
       console.error('Failed to edit job:', error)
+    }
+    finally {
+      isLoading.value = false
     }
   }
 
   const getJobsOfWork = async (workId: string) => {
+    isLoading.value = true
     try {
       const { data } = await useAPI(`/job/get-all?filter=WorkId eq ${workId}`)
       jobs.value = data.value as Job[]
@@ -52,13 +71,13 @@ export const useJobs = () => {
         })
         return
       }
-
       job.value = data.value as Job
-      toast({
-        title: 'Job detail fetched successfully',
-        description: 'The job detail has been fetched successfully',
-      })
     } catch (error) {
+      toast({
+        title: 'Failed to fetch job detail',
+        description: 'An error occurred while fetching job detail',
+        variant: 'destructive'
+      })
       console.error('Failed to fetch job detail:', error)
     }
     finally {
@@ -89,6 +108,11 @@ export const useJobs = () => {
         window.location.reload()
       }
     } catch (error) {
+      toast({
+        title: 'Failed to approve job',
+        description: 'An error occurred while approving the job',
+        variant: 'destructive'
+      })
       console.error('Failed to approve job:', error)
     }
   }
@@ -116,6 +140,11 @@ export const useJobs = () => {
         window.location.reload()
       }
     } catch (error) {
+      toast({
+        title: 'Failed to reject job',
+        description: 'An error occurred while rejecting the job',
+        variant: 'destructive'
+      })
       console.error('Failed to reject job:', error)
     }
   }

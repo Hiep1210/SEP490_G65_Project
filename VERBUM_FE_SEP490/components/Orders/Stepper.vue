@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Check, Languages, PackageCheck, PackagePlus, Truck } from 'lucide-vue-next'
+import { Check, CirclePlus, Languages, PackageCheck, PackagePlus, Plus, Truck } from 'lucide-vue-next'
 
 const props = defineProps<{ orderStatus: string | undefined }>()
 
@@ -9,30 +9,30 @@ const steps = [{
   title: 'New',
   value: 'NEW',
   description: 'Wait for the center to accept your order',
-  icon: PackagePlus,
+  icon: Plus,
 }, {
   step: 2,
   title: 'Accepted',
   value: 'ACCEPTED',
-  description: 'Wait for the center to check your package',
+  description: 'Wait for the center to check your files',
   icon: PackageCheck,
 }, {
   step: 3,
   title: 'In Progress',
   value: 'IN_PROGRESS',
-  description: 'The center is working on your package',
+  description: 'The center is working on your files',
   icon: Languages,
 }, {
   step: 4,
   title: 'Completed',
   value: 'COMPLETED',
-  description: 'Your package is ready for delivery',
+  description: 'Your files is ready for your review',
   icon: Check,
 }, {
   step: 5,
   title: 'Delivered',
   value: 'DELIVERED',
-  description: 'Your package has been delivered',
+  description: 'Your files has been delivered',
   icon: Truck,
 }]
 
@@ -64,7 +64,7 @@ console.log(activeStep.value)
         :class="isStepAchieved(step.step) ? ['ring-2 ring-ring ring-offset-2 ring-offset-background'] : ''"
         :variant="isStepAchieved(step.step) ? 'default' : 'outline'"
       >
-        <component :is="step.icon" class="w-4 h-4 size-5" />
+        <component :is="step.icon" class="size-5" />
       </Button>
       <div class="mt-1 flex flex-col items-center text-center">
         <div

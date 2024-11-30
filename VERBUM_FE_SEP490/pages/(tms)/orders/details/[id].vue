@@ -11,7 +11,7 @@ const { getRatingByOrderId, filteredRating } = useRating()
 const { toast } = useToast()
 
 const {supportedLanguages, getSupportedLanguages} = useLanguages()
-const { order, getOrder, changeOrderStatus, setOrderPrice } = useOrders()
+const { order, isLoading ,getOrder, changeOrderStatus, setOrderPrice } = useOrders()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -205,11 +205,9 @@ provide('role', role)
 </script>
 
 <template>
-  <div>
-    <div v-if="!order">
-      <NuxtLoadingIndicator />
-    </div>
-    <div v-else class="md:grid-cols-2 gap-5 pb-5">
+  <LoadingSpinner v-if="isLoading" />
+  <div v-else>
+    <div v-if="order" class="md:grid-cols-2 gap-5 pb-5">
       <OrdersStepper :order-status="order.orderStatus"/>
       <!-- Order Information and File URLs Section -->
       <div class="mt-3 flex gap-3">

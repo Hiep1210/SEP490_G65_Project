@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { getColumns } from '~/components/Jobs/column';
 useSeoMeta({
-  title: 'Jobs'
+    title: 'Jobs'
 })
 
-const { jobs, getJobs } = useJobs()
+const { jobs, isLoading, getJobs } = useJobs()
 const { assignList, getAssignList } = useUsers()
 const role = useAuthStore().user?.role
 
@@ -22,9 +22,8 @@ provide('assignList', assignList)
 </script>
 
 <template>
-    <div>
-        <JobsTable :columns="columns" :data="jobs" />
-    </div>
+    <LoadingSpinner v-if="isLoading" />
+    <JobsTable v-else :columns="columns" :data="jobs" />
 </template>
 
 <style scoped></style>
