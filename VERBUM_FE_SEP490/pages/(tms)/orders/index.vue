@@ -8,7 +8,7 @@ definePageMeta({
   layout: 'default'
 })
 
-const { orders, getOrders } = useOrders()
+const { orders, isLoading, getOrders } = useOrders()
 
 onMounted(async () => {
   if (!orders.value.length) {
@@ -20,7 +20,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ClientOnly>
-    <LazyOrdersTable :columns="columns" :data="orders" />
-  </ClientOnly>
+  <LoadingSpinner v-if="isLoading"/>
+  <LazyOrdersTable v-else :columns="columns" :data="orders" />
 </template>
