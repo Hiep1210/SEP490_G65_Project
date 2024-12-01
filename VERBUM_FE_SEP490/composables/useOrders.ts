@@ -140,40 +140,6 @@ export const useOrders = () => {
       if(status === 'IN_PROGRESS'){
         await getOrder(orderId);
       }
-      console.log(order)
-      if (status === 'IN_PROGRESS' && order.value) {
-        const payload = {
-          orderId: order.value.orderId,
-          orderName: order.value.orderName,
-          dueDate: order.value.dueDate
-            ? new Date(order.value.dueDate).toISOString().replace('Z', '')
-            : null,
-          hasTranslateService: order.value.hasTranslateService,
-          hasEditService: order.value.hasEditService,
-          hasEvaluateService: order.value.hasEvaluateService
-        }
-        const { data: guidResponse } = await useAPI<string[]>('work/generate', {
-          method: 'POST',
-          credentials: 'include',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' }
-        })
-
-        if (guidResponse?.value?.length) {
-          const payload2 = {
-            workIds: guidResponse.value,
-            documentURLs: order.value.translationFileUrls,
-            targetLanguageIds: order.value.targetLanguageId
-          }
-          await useAPI('job/add', {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify(payload2),
-            headers: { 'Content-Type': 'application/json' }
-          })
-        }
-      }
-
       toast({
         title: 'Your order is paid successfully!!',
         description: `We are going to do your order. Thank you for choosing our service.`

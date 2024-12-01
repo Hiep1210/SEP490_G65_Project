@@ -39,7 +39,7 @@ const assignLinguists = async (payload: { assigneesId: string[]; dueDate: string
   }
   try {
     const res = await repo(useNuxtApp().$api).assignLinguists(assignPayload)
-    if (!res) {
+    if (res) {
       toast({
         title: 'Linguists assigned successfully',
         description: 'Linguists have been assigned to the job',
