@@ -55,6 +55,31 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/verbum-be:latest
           file: ./verbum-service/Dockerfile  # Specify the Dockerfile location
 
+  deploydocker-demo: #deploy on demo branch 
+  
+    runs-on: ubuntu-latest
+    needs: build  # Ensures 'build' job completes before 'deploy'
+    if: github.ref == 'refs/heads/develop-demo' # Deploy runs only on 'develop-demo' branch
+    
+    steps:
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_DEMO_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_DEMO_TOKEN }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_DEMO_USERNAME }}/verbum-be:latest
+          file: ./verbum-service/Dockerfile  # Specify the Dockerfile location
+
   deployrender:
 
     runs-on: ubuntu-latest
