@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NuGet.Frameworks;
+using verbum_service_application.Service;
 using verbum_service_domain.Common;
 using verbum_service_domain.DTO.Request;
 using verbum_service_domain.DTO.Response;
@@ -97,6 +98,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -107,7 +109,7 @@ namespace verbum_service_test.Impl.Service
                 Role = "LINGUIST"
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<IssueResponse>>(It.IsAny<IEnumerable<Issue>>()))
                       .Returns(new List<IssueResponse>
@@ -129,6 +131,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -139,7 +142,7 @@ namespace verbum_service_test.Impl.Service
                 Role = "CLIENT"
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<IssueResponse>>(It.IsAny<IEnumerable<Issue>>()))
                       .Returns(new List<IssueResponse>
@@ -161,6 +164,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -171,7 +175,7 @@ namespace verbum_service_test.Impl.Service
                 Role = "EVALUATE_MANAGER"
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
             //Act
             var result = issueService.ViewAllIssue();
 
@@ -185,6 +189,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -195,7 +200,7 @@ namespace verbum_service_test.Impl.Service
                 Role = ""
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
             //Act
             var result = issueService.ViewAllIssue();
             //Assert
@@ -208,6 +213,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -218,7 +224,7 @@ namespace verbum_service_test.Impl.Service
                 Role = "CLIENT"
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
 
             mockMapper.Setup(m => m.Map<IEnumerable<UploadIssueAttachmentFiles>>(It.IsAny<IEnumerable<IssueAttachment>>()))
                       .Returns(new List<UploadIssueAttachmentFiles>
@@ -241,6 +247,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -251,7 +258,7 @@ namespace verbum_service_test.Impl.Service
                 Role = "CLIENT"
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, null, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, null, currentUser, mailService.Object);
             //Act
             var result = issueService.GetAllIssueAttachments();
 
@@ -265,6 +272,7 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
+            var mailService = new Mock<MailService>();
 
             var currentUser = new CurrentUser
             {
@@ -284,7 +292,7 @@ namespace verbum_service_test.Impl.Service
                 IssueAttachments = null
             };
 
-            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser);
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, mailService.Object);
             //Act
             var result = issueService.UpdateIssue(request);
 
