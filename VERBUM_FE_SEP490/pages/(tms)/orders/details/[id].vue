@@ -238,7 +238,8 @@ provide('role', role)
               <span v-if="order.discountId"
                 >Discount: {{ order.discountId }}</span
               >
-              <span>Created: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
+              <span>Created At: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
+              <span v-if="order.completedDate">Completed At: {{ formatToVietnamTimezone(order.completedDate || '') }}</span>
               <span v-if="order.orderNote"
                 >Note: {{ order.orderNote }}</span
               >
@@ -249,20 +250,20 @@ provide('role', role)
               <span>Service:</span>
               <template v-if="!isEditing">
                 <span
-                  v-for="service in ['TRN', 'EDIT', 'EVL']"
+                  v-for="service in ['Translation', 'Editing', 'Evaluation']"
                   v-show="
-                    (order?.hasTranslateService && service === 'TRN') ||
-                    (order?.hasEditService && service === 'EDIT') ||
-                    (order?.hasEvaluateService && service === 'EVL')
+                    (order?.hasTranslateService && service === 'Translation') ||
+                    (order?.hasEditService && service === 'Editing') ||
+                    (order?.hasEvaluateService && service === 'Evaluation')
                   "
                   :key="service"
-                  class="font-bold"
+                  class="font-bold text-primary"
                   >{{ service }}</span
                 >
               </template>
               <template v-else-if="editedOrder">
                 <span
-                  v-for="service in ['Translate', 'Edit', 'Evaluate']"
+                  v-for="service in ['TRANSLATION', 'EDITING', 'EVALUATION']"
                   :key="service"
                   class="font-bold"
                 >
@@ -290,16 +291,17 @@ provide('role', role)
             <!-- Language Selection -->
             <div class="flex items-center space-x-1">
               <template v-if="!isEditing">
-                <Badge variant="default">{{ order?.sourceLanguageId }}</Badge>
+                <Badge variant="default">{{ languageList.find((language) => language.languageId === order?.sourceLanguageId)?.languageName }}</Badge>
                 <LucideArrowBigRight />
                 <div class="flex gap-1">
-                  <Badge
-                    v-for="lang in order?.targetLanguageId"
-                    :key="lang"
-                    variant="secondary"
-                    >{{ lang }}</Badge
-                  >
-                </div>
+                    <Badge
+                      v-for="lang in order?.targetLanguageId || []"
+                      :key="lang"
+                      variant="secondary"
+                    >
+                      {{ languageList.find((language) => lang === language.languageId)?.languageName || lang }}
+                    </Badge>
+                  </div>
               </template>
               <template v-else>
                 <OrdersDetailsLanguageSelector
