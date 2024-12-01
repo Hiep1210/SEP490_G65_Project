@@ -35,6 +35,7 @@ namespace verbum_service_infrastructure.Impl.Workflow
         }
         protected async override Task CommonStep(OrderCreate request)
         {
+            if (ObjectUtils.IsEmpty(request.DiscountId)) request.DiscountId = null;
             order = mapper.Map<Order>(request);
             order.OrderId = Guid.NewGuid();
             order.CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);

@@ -63,7 +63,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object);
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
 
             mockMapper.Setup(m => m.Map<IEnumerable<JobListResponse>>(It.IsAny<IEnumerable<Job>>()))
                       .Returns(new List<JobListResponse>
@@ -88,7 +88,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object);
+            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null);
 
             //Act
             var result = jobService.GetAllJob();
@@ -105,7 +105,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object);
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
 
             mockMapper.Setup(m => m.Map<JobListResponse>(It.IsAny<IEnumerable<Job>>()))
                       .Returns(new JobListResponse
@@ -128,7 +128,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object);
+            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null);
 
             //Act
             var result = jobService.GetJobById(Guid.Parse("7357a81d-ca86-40e3-a8c6-4ef9f4134f4f"));
