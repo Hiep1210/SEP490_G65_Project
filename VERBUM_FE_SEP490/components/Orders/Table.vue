@@ -51,14 +51,14 @@ const toCreate = () => {
     <div class="flex justify-between space-x-4 pb-4">
       <div class="flex space-x-2">
         <Input 
-          class="max-w-sm" placeholder="Filter orders..."
+          class="max-w-sm border border-primary" placeholder="Filter orders..."
           :model-value="table.getColumn('orderName')?.getFilterValue() as string"
           @update:model-value=" table.getColumn('orderName')?.setFilterValue($event)" />
         <Select 
           :model-value="table.getColumn('orderStatus')?.getFilterValue() as string"
           @update:model-value="table.getColumn('orderStatus')?.setFilterValue($event)">
           <SelectTrigger class="w-[20rem]">
-            <SelectValue placeholder="Select a status" />
+            <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -75,7 +75,7 @@ const toCreate = () => {
           </SelectContent>
         </Select>
       </div>
-      <Button variant="outline" @click="toCreate">Create an Order</Button>
+      <Button @click="toCreate">Create an Order</Button>
     </div>
 
     <div class="border rounded-lg overflow-hidden">

@@ -17,7 +17,7 @@ import type { Issue } from '~/types/issues'
 
 const props = defineProps<{
   issues: Issue[]
-  role: string
+  role: string | undefined
 }>()
 
 const activeIssueStatuses = ['OPEN', 'IN_PROGRESS']
