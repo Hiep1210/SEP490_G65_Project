@@ -132,5 +132,7 @@ namespace verbum_service.Controllers
         {
             return Ok(currentUser);
         }
+
+        
     }
 }
