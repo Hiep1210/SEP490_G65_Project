@@ -11,7 +11,7 @@ const {user} = useAuthStore()
       <div>
         <div v-if="!user" class="hidden lg:flex items-center gap-4">
           <a href="/login">Log in</a>
-          <LandingLink href="#" size="md">Sign up</LandingLink>
+          <LandingLink href="/signup" size="md">Sign up</LandingLink>
         </div>
       </div>
     </header>
