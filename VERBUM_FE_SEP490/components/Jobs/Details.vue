@@ -114,7 +114,7 @@ const { approve, reject } = useJobs()
       </template>
     </section>
     <section v-if="props.job" class="mb-6">
-      <JobsTabs :job="props.job" />
+      <JobsTabs :job="props.job" :target-lang-id="job?.targetLanguageId" />
     </section>
   </div>
 </template>
