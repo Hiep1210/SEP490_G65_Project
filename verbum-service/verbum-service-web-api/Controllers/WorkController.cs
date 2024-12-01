@@ -31,15 +31,5 @@ namespace verbum_service.Controllers
             return ResponseFilter.OkOrNoContent(await workService.GetAllWork(), this);
         }
 
-        [HttpPut("update")]
-        //[Roles(UserRole.TRANSLATE_MANAGER, UserRole.EVALUATE_MANAGER, UserRole.EDIT_MANAGER, UserRole.MANAGER)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(ErrorObject), 400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateWork([FromBody] WorkUpdate work)
-        {
-            await updateWorkWorkflow.process(work);
-            return NoContent();
-        }
     }
 }
