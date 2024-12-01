@@ -1,6 +1,6 @@
 <template>
   <LandingNavbar />
-  <slot></slot>
+  <slot />
 </template>
 
 <style>
