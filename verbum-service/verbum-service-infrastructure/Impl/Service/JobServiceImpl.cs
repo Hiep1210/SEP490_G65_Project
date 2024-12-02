@@ -38,7 +38,7 @@ namespace verbum_service_infrastructure.Impl.Service
                                 Job job = new Job
                                 {
                                     Id = Guid.NewGuid(),
-                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_VERBUM_" + docUrl.Split("/")[^1].Split(".")[0].Split("uploads")[1],
+                                    Name = targetLangId + "_" + work.ServiceCodeNavigation.ServiceName + "_VERBUM_" + docUrl,
                                     Status = JobStatus.NEW.ToString(),
                                     CreatedAt = DateTime.Now,
                                     UpdatedAt = DateTime.Now,
