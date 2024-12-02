@@ -37,7 +37,7 @@
           </div>
         </div>
       </TabsContent>
-      <TabsContent value="relatedJob">
+      <TabsContent value="deliverable">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
@@ -47,10 +47,10 @@
           >
             There are no deliverables
           </div>
-          <div v-else class="p-2"><a class="hyper-link" :href="job.deliverableUrl">{{ getFirebaseFileName(job.deliverableUrl) }}</a></div>
+          <div v-else class="p-2"><a class="hyper-link" :href="job.deliverableUrl"> {{ getFirebaseFileName(job.deliverableUrl) }}</a></div>
         </div>
       </TabsContent>
-      <TabsContent value="prevDeli">
+      <TabsContent value="relatedJob">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="

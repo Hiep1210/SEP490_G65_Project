@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Linguist } from '@/types/user'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
 import * as z from 'zod'
 import { cn } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-vue-next'
@@ -14,13 +15,13 @@ const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
 
 const schema = toTypedSchema(z.object({
   assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(), 'Due date is required').max(new Date(props.workDueDate), {
+  dueDate: z.coerce.date().min(new Date(1900, 1, 1), 'Due date is required').max(new Date(props.workDueDate), {
     message: 'Due date must be before the works due date'
   }
   )
 }))
 
-const { handleSubmit, setFieldValue } = useForm({
+const form = useForm({
   validationSchema: schema,
   initialValues: {
     assignee_id: [],
@@ -31,12 +32,12 @@ const { handleSubmit, setFieldValue } = useForm({
 const selectedLinguists = ref<string[]>([])
 const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
   selectedLinguists.value = newSelectedLinguists
-  setFieldValue('assignee_id', newSelectedLinguists)
+  form.setFieldValue('assignee_id', newSelectedLinguists)
 }
 
 const emit = defineEmits(['assign'])
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = form.handleSubmit((values) => {
   const payload = {
     assigneesId: values.assignee_id,
     dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
@@ -56,19 +57,16 @@ const onSubmit = handleSubmit((values) => {
             Choose linguists and due date
           </DialogDescription>
         </DialogHeader>
-        <Form v-slot="{ meta, values, validate }" as="form" keep-values :validation-schema="schema">
-          <form class="space-y-2" @submit="(e) => {
+          <form 
+            class="space-y-2" @submit="(e) => {
             e.preventDefault()
-            validate()
-            console.log(meta.valid)
-            if (meta.valid) {
-              onSubmit(values)
-            }
+            onSubmit()
           }">
             <FormField v-slot="{ componentField, errorMessage }" name="assignee_id">
               <FormItem class="flex flex-col">
                 <FormLabel>Linguist</FormLabel>
-                <JobsLinguistSelector v-bind="componentField" v-model:selected-linguists="selectedLinguists"
+                <JobsLinguistSelector 
+                  v-bind="componentField" v-model:selected-linguists="selectedLinguists"
                   :error="!!errorMessage" :linguists="assignList"
                   @update:selected-linguists="updateSelectedLinguists" />
                 <FormMessage />
@@ -79,7 +77,8 @@ const onSubmit = handleSubmit((values) => {
                 <FormLabel>Due date</FormLabel>
                 <Popover>
                   <PopoverTrigger as-child>
-                    <Button variant="outline" :class="cn(
+                    <Button 
+                      variant="outline" :class="cn(
                       'w-[280px] justify-start text-left font-normal',
                       !value && 'text-muted-foreground',
                     )">
@@ -88,7 +87,8 @@ const onSubmit = handleSubmit((values) => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
-                    <Calendar v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)"
+                    <Calendar 
+                      v-bind="componentField" initial-focus :min-value="new CalendarDate(1900, 1, 1)"
                       :max-value="new Date(workDueDate)" />
                   </PopoverContent>
                 </Popover>
@@ -96,12 +96,10 @@ const onSubmit = handleSubmit((values) => {
               </FormItem>
             </FormField>
             <DialogFooter>
-              <Button type="submit" variant="outline" :disabled="!meta.valid">Confirm</Button>
+              <Button type="submit" variant="outline">Confirm</Button>
             </DialogFooter>
           </form>
-        </Form>
       </DialogContent>
     </Dialog>
-
   </div>
 </template>
