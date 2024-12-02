@@ -43,25 +43,31 @@ async function onSubmit(values: CreateIssuePayload) {
     orderId: props.orderId,
     issueAttachments: values.issueAttachments
       ? values.issueAttachments
-        .split(',')
-        .map((url: string) => ({ attachmentUrl: url.trim(), tag: 'ATTACHMENT' }))
+          .split(',')
+          .map((url: string) => ({
+            attachmentUrl: url.trim(),
+            tag: 'ATTACHMENT'
+          }))
       : []
   }
 
   const response = await createIssue(payload)
   if (response) {
-    window.location.reload();
+    window.location.reload()
   }
 }
-
-console.log('create issues index', props.jobDeliverables)
 </script>
 
 <template>
-  <Form id="dialogForm" v-slot="{ submitForm }" :validation-schema="formSchema" @submit="onSubmit">
+  <Form
+    id="dialogForm"
+    v-slot="{ submitForm }"
+    :validation-schema="formSchema"
+    @submit="onSubmit"
+  >
     <Dialog>
       <DialogTrigger as-child>
-        <Button variant="outline"> Create Issue</Button>
+        <Button>Create Issue</Button>
       </DialogTrigger>
       <DialogContent class="max-w-[1000px] max-h-[750px] overflow-y-scroll">
         <DialogHeader>

@@ -2,7 +2,7 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_IN_PROGRESS  } from '~/constants/orderSatus'
+import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
@@ -10,8 +10,9 @@ const { getRatingByOrderId, filteredRating } = useRating()
 
 const { toast } = useToast()
 
-const {supportedLanguages, getSupportedLanguages} = useLanguages()
-const { order, isLoading ,getOrder, changeOrderStatus, setOrderPrice } = useOrders()
+const { supportedLanguages, getSupportedLanguages } = useLanguages()
+const { order, isLoading, getOrder, changeOrderStatus, setOrderPrice } =
+  useOrders()
 const route = useRoute()
 const orderId = route.params.id
 const { user } = useAuthStore()
@@ -31,13 +32,12 @@ onMounted(() => {
   if (order.value) {
     useSeoMeta({ title: order.value.orderName })
   }
-  getRating();
+  getRating()
 })
 
-
 const getRating = () => {
-  getRatingByOrderId(orderId as string);
-  console.log({filteredRating})
+  getRatingByOrderId(orderId as string)
+  console.log({ filteredRating })
 }
 
 // Enter edit mode
@@ -97,8 +97,8 @@ const saveEdit = async () => {
         })
         window.location.reload()
       }
-      } else {
-        throw new Error('No edited order found')
+    } else {
+      throw new Error('No edited order found')
     }
 
     if (order.value) {
@@ -151,14 +151,13 @@ const handleSetPrices = () => {
 
 const handlePaymentClose = () => {
   openPaymentDialog.value = false
-  if(order.value?.orderStatus === 'DELIVERED'){
+  if (order.value?.orderStatus === 'DELIVERED') {
     openRatingDialog.value = true
   }
 }
 
 const handleRatingOpen = () => {
   openRatingDialog.value = true
-
 }
 
 const handleRatingClose = () => {
@@ -193,178 +192,257 @@ const confirmSetPrices = async () => {
   }
 }
 
-
-
 const orderTitle = computed(() => order.value?.orderName || 'Order Details')
 
 useSeoMeta({
   title: orderTitle
 })
 provide('role', role)
-
 </script>
 
 <template>
   <LoadingSpinner v-if="isLoading" />
   <div v-else>
     <div v-if="order" class="md:grid-cols-2 gap-5 pb-5">
-      <OrdersStepper :order-status="order.orderStatus"/>
+      <OrdersStepper :order-status="order.orderStatus" />
       <!-- Order Information and File URLs Section -->
       <div class="mt-3 flex gap-3">
         <div class="flex-1 space-y-4">
-        <div class="p-4 space-y-2 orderDetails border rounded-md">
-          <div class="flex justify-between">
-            <p class="text-[2rem] font-bold text-primary underline">
-              {{ order?.orderName }}
-            </p>
-            <div class="flex gap-3 items-center">
-              <h1 v-if="order.orderPrice" class="font-semibold text-xl">Order Price: <span class="font-bold hyper-link">{{ order?.orderPrice }} USD</span></h1>
-              <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-                <Separator orientation="vertical" />
-                <Button @click="handlePay()">Deposit</Button>
-              </div>
-              <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-                <Separator orientation="vertical" />
-                <Button @click="handlePay()">Paying Remaining</Button>
-              </div>
-              <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
-                <Separator orientation="vertical" />
-                <Button @click="handleSetPrices">Set prices</Button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Order Details -->
-          <div class="flex flex-col gap-2 w-1/2">
-            <h1 v-if="order.orderNote" class="font-semibold">Client Note: <span class="font-normal">{{ order?.orderNote }}</span></h1>
-            <h1 class="font-semibold">Status: <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{ order?.orderStatus }}</Badge></h1>
-
-            <h1 v-if="order.createdDate" class="font-semibold">Created At: <span class="font-normal">{{ formatToVietnamTimezone(order?.createdDate || '') }}</span></h1>
-            <!-- Due Date -->
-            <div class="flex items-center space-x-2">
-              <h1 v-if="order.createdDate" class="font-semibold">Due Date: <span class="font-normal">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span></h1>
-              <Input
-                v-else-if="editedOrder"
-                v-model="editedOrder.dueDate"
-                type="date"
-                class="border rounded p-1 w-fit"
-              />
-            </div>
-            <h1 v-if="order.completedDate" class="font-semibold">Completed At: <span class="font-normal">{{ formatToVietnamTimezone(order.completedDate || '') }}</span></h1>
-
-            <h1 v-if="order.discountId" class="font-semibold">Discount Code: <span class="font-normal">{{ order.discountId }}</span></h1>
-
-            <!-- Services Section -->
-            <div class="flex items-center space-x-3">
-              <h1 class="font-semibold">Service:</h1>
-              <template v-if="!isEditing">
-                <span
-                  v-for="service in ['Translation', 'Editing', 'Evaluation']"
-                  v-show="
-                    (order?.hasTranslateService && service === 'Translation') ||
-                    (order?.hasEditService && service === 'Editing') ||
-                    (order?.hasEvaluateService && service === 'Evaluation')
+          <div class="p-4 space-y-2 orderDetails border rounded-md">
+            <div class="flex justify-between">
+              <p class="text-[2rem] font-bold text-primary underline">
+                {{ order?.orderName }}
+              </p>
+              <div class="flex gap-3 items-center">
+                <h1 v-if="order.orderPrice" class="font-semibold text-xl">
+                  Order Price:
+                  <span class="font-bold hyper-link"
+                    >{{ order?.orderPrice }} USD</span
+                  >
+                </h1>
+                <div
+                  v-if="
+                    order.orderStatus === 'ACCEPTED' &&
+                    role === 'CLIENT' &&
+                    order.orderPrice
                   "
-                  :key="service"
-                  class="font-bold text-primary"
-                  >{{ service }}</span
                 >
-              </template>
-              <template v-else-if="editedOrder">
-                <span
-                  v-for="service in ['TRANSLATION', 'EDITING', 'EVALUATION']"
-                  :key="service"
-                  class="font-bold text-primary"
+                  <Separator orientation="vertical" />
+                  <Button @click="handlePay()">Deposit</Button>
+                </div>
+                <div
+                  v-if="
+                    order.orderStatus === 'COMPLETED' &&
+                    role === 'CLIENT' &&
+                    order.orderPrice
+                  "
                 >
-                  <Checkbox
-                    :id="`has${service}Service`"
-                    v-model:checked="editedOrder[`has${service}Service`]"
-                  />
-                  {{ service.toUpperCase() }}
-                </span>
-              </template>
+                  <Separator orientation="vertical" />
+                  <Button @click="handlePay()">Paying Remaining</Button>
+                </div>
+                <div
+                  v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'"
+                >
+                  <Separator orientation="vertical" />
+                  <Button @click="handleSetPrices">Set prices</Button>
+                </div>
+              </div>
             </div>
 
-            <!-- Language Selection -->
-            <div class="flex items-center space-x-1">
-              <template v-if="!isEditing">
-                <Badge variant="default">{{ languageList.find((language) => language.languageId === order?.sourceLanguageId)?.languageName }}</Badge>
-                <LucideArrowBigRight />
-                <div class="flex gap-1">
+            <!-- Order Details -->
+            <div class="flex flex-col gap-2 w-1/2">
+              <h1 v-if="order.orderNote" class="font-semibold">
+                Client Note:
+                <span class="font-normal">{{ order?.orderNote }}</span>
+              </h1>
+              <h1 class="font-semibold">
+                Status:
+                <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{
+                  order?.orderStatus
+                }}</Badge>
+              </h1>
+
+              <h1 v-if="order.createdDate" class="font-semibold">
+                Created At:
+                <span class="font-normal">{{
+                  formatToVietnamTimezone(order?.createdDate || '')
+                }}</span>
+              </h1>
+              <!-- Due Date -->
+              <div class="flex items-center space-x-2">
+                <h1 v-if="order.createdDate" class="font-semibold">
+                  Due Date:
+                  <span class="font-normal">{{
+                    formatToVietnamTimezone(order?.dueDate || '')
+                  }}</span>
+                </h1>
+                <Input
+                  v-else-if="editedOrder"
+                  v-model="editedOrder.dueDate"
+                  type="date"
+                  class="border rounded p-1 w-fit"
+                />
+              </div>
+              <h1 v-if="order.completedDate" class="font-semibold">
+                Completed At:
+                <span class="font-normal">{{
+                  formatToVietnamTimezone(order.completedDate || '')
+                }}</span>
+              </h1>
+
+              <h1 v-if="order.discountId" class="font-semibold">
+                Discount Code:
+                <span class="font-normal">{{ order.discountId }}</span>
+              </h1>
+
+              <!-- Services Section -->
+              <div class="flex items-center space-x-3">
+                <h1 class="font-semibold">Service:</h1>
+                <template v-if="!isEditing">
+                  <span
+                    v-for="service in ['Translation', 'Editing', 'Evaluation']"
+                    v-show="
+                      (order?.hasTranslateService &&
+                        service === 'Translation') ||
+                      (order?.hasEditService && service === 'Editing') ||
+                      (order?.hasEvaluateService && service === 'Evaluation')
+                    "
+                    :key="service"
+                    class="font-bold text-primary"
+                    >{{ service }}</span
+                  >
+                </template>
+                <template v-else-if="editedOrder">
+                  <span
+                    v-for="service in ['TRANSLATION', 'EDITING', 'EVALUATION']"
+                    :key="service"
+                    class="font-bold text-primary"
+                  >
+                    <Checkbox
+                      :id="`has${service}Service`"
+                      v-model:checked="editedOrder[`has${service}Service`]"
+                    />
+                    {{ service.toUpperCase() }}
+                  </span>
+                </template>
+              </div>
+
+              <!-- Language Selection -->
+              <div class="flex items-center space-x-1">
+                <template v-if="!isEditing">
+                  <Badge variant="default">{{
+                    languageList.find(
+                      (language) =>
+                        language.languageId === order?.sourceLanguageId
+                    )?.languageName
+                  }}</Badge>
+                  <LucideArrowBigRight />
+                  <div class="flex gap-1">
                     <Badge
                       v-for="lang in order?.targetLanguageId || []"
                       :key="lang"
                       variant="secondary"
                     >
-                      {{ languageList.find((language) => lang === language.languageId)?.languageName || lang }}
+                      {{
+                        languageList.find(
+                          (language) => lang === language.languageId
+                        )?.languageName || lang
+                      }}
                     </Badge>
                   </div>
-              </template>
-              <template v-else>
-                <OrdersDetailsLanguageSelector
-                  :language-list="languageList"
-                  :selected-languages="editedOrder?.sourceLanguageId || ''"
-                  :original-languages="order?.sourceLanguageId || ''"
-                  :is-source-language="true"
-                  @update:selected-languages="changeSourceLanguage"
-                />
-                <LucideArrowBigRight />
-                <OrdersDetailsLanguageSelector
-                  :language-list="languageList"
-                  :selected-languages="editedOrder?.targetLanguageId || []"
-                  :original-languages="order?.targetLanguageId || []"
-                  :is-source-language="false"
-                  @update:selected-languages="changeTargetLanguage"
-                />
-              </template>
+                </template>
+                <template v-else>
+                  <OrdersDetailsLanguageSelector
+                    :language-list="languageList"
+                    :selected-languages="editedOrder?.sourceLanguageId || ''"
+                    :original-languages="order?.sourceLanguageId || ''"
+                    :is-source-language="true"
+                    @update:selected-languages="changeSourceLanguage"
+                  />
+                  <LucideArrowBigRight />
+                  <OrdersDetailsLanguageSelector
+                    :language-list="languageList"
+                    :selected-languages="editedOrder?.targetLanguageId || []"
+                    :original-languages="order?.targetLanguageId || []"
+                    :is-source-language="false"
+                    @update:selected-languages="changeTargetLanguage"
+                  />
+                </template>
+              </div>
             </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex space-x-2">
+            <template v-if="isEditing && role === 'CLIENT'">
+              <Button @click="saveEdit">Save</Button>
+              <Button variant="outline" @click="cancelEdit">Cancel</Button>
+            </template>
+            <Button
+              v-else-if="
+                role === 'CLIENT' &&
+                (order.orderStatus === 'NEW' ||
+                  order.orderStatus === 'REJECTED')
+              "
+              @click="enableEdit"
+              >Edit Order</Button
+            >
+            <OrdersDetailsCancelDialog
+              v-if="
+                role === 'CLIENT' &&
+                order.orderStatus !== 'COMPLETED' &&
+                order.orderStatus !== 'CANCELLED' &&
+                order.orderStatus !== 'DELIVERED'
+              "
+              :order-id="order.orderId"
+            >
+              <Button variant="destructive">Cancel Order</Button>
+            </OrdersDetailsCancelDialog>
+            <template v-if="role === 'STAFF'">
+              <Button
+                v-if="order.orderStatus === 'NEW'"
+                @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
+                >Accept Order</Button
+              >
+              <OrdersDetailsDialog
+                v-if="order.orderStatus === 'NEW'"
+                :order-id="order.orderId"
+              />
+            </template>
+            <Button
+              v-if="
+                role === 'CLIENT' &&
+                order.orderStatus === 'DELIVERED' &&
+                !filteredRating
+              "
+              @click="handleRatingOpen"
+              >Rating your order</Button
+            >
+          </div>
+
+          <OrdersDetailsTabs :order="order" />
+
+          <!-- Rating -->
+          <div v-if="order.orderStatus === 'DELIVERED'">
+            <RatingBox :order-id="orderId as string" />
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex space-x-2">
-          <template v-if="isEditing && role === 'CLIENT'">
-            <Button @click="saveEdit">Save</Button>
-            <Button variant="outline" @click="cancelEdit">Cancel</Button>
-          </template>
-          <Button v-else-if="role === 'CLIENT' && (order.orderStatus === 'NEW' || order.orderStatus === 'REJECTED')" @click="enableEdit"
-            >Edit Order</Button
-          >
-          <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED' && order.orderStatus !=='DELIVERED')" :order-id="order.orderId">
-              <Button
-                variant="destructive"
-                >Cancel Order</Button
-              >
-          </OrdersDetailsCancelDialog>
-          <template v-if="role === 'STAFF'">
-            <Button v-if="order.orderStatus === 'NEW'" @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
-              >Accept Order</Button
-            >
-            <OrdersDetailsDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId" />
-          </template>
-          <Button v-if="role === 'CLIENT' && (order.orderStatus === 'DELIVERED') && !filteredRating" @click="handleRatingOpen"
-            >Rating your order</Button
-          >
+        <!-- Smaller Issues List Section -->
+        <div
+          v-if="
+            order.orderStatus === ORDER_COMPLETED ||
+            order.orderStatus === ORDER_IN_PROGRESS
+          "
+          class="flex-1 space-y-4 border rounded-md"
+        >
+          <OrdersIssues
+            :job-deliverables="order.jobDeliverables"
+            :order-id="orderId as string"
+            :role="role"
+            :user="user"
+          />
         </div>
-
-        <OrdersDetailsTabs :order="order" />
-
-        <!-- Rating -->
-         <div v-if="order.orderStatus === 'DELIVERED'" >
-          <RatingBox :order-id="orderId as string"/>
-         </div>
-
-      </div>
-
-      <!-- Smaller Issues List Section -->
-      <div v-if="order.orderStatus === ORDER_COMPLETED || order.orderStatus === ORDER_IN_PROGRESS" class="flex-1 space-y-4 border rounded-md">
-        <OrdersIssues
-          :job-deliverables="order.jobDeliverables"
-          :order-id="orderId as string"
-          :role="role"
-          :user="user"
-        />
-      </div>
       </div>
 
       <!-- Set Prices Dialog -->
@@ -393,16 +471,16 @@ provide('role', role)
 
       <PaymentDialog
         :order="order"
-        :status="order.orderStatus === 'ACCEPTED'? 'IN_PROGRESS' : 'DELIVERED'"
+        :status="order.orderStatus === 'ACCEPTED' ? 'IN_PROGRESS' : 'DELIVERED'"
         :open="openPaymentDialog"
         @close="handlePaymentClose"
       />
 
       <RatingDialog
-          :open="openRatingDialog"
-          :order-id="order.orderId"
-          @close="handleRatingClose"
-          @submit="handleRatingSubmit"
+        :open="openRatingDialog"
+        :order-id="order.orderId"
+        @close="handleRatingClose"
+        @submit="handleRatingSubmit"
       />
     </div>
   </div>

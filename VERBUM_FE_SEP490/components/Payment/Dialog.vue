@@ -9,13 +9,14 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import type { Order } from '~/types/order'
-// import { usePayment } from '~/composables/usePayment'
+
+const config = useRuntimeConfig()
+
 const props = defineProps<{
   order: Order
   open: boolean
   status: string
 }>()
-// const {payWithPayPal} = usePayment();
 const emit = defineEmits(['close', 'confirm']) // Emit update event
 const isOpen = ref(props.open)
 const price = props.order.orderPrice || '0'
@@ -28,7 +29,7 @@ const isDeposit = ref()
 if (props.status === 'IN_PROGRESS') {
   pricePay.value = priceDeposit
   isDeposit.value = true
-} else if(props.status === 'DELIVERED') {
+} else if (props.status === 'DELIVERED') {
   pricePay.value = payRemaining
   isDeposit.value = false
 }
@@ -45,7 +46,7 @@ watch(
 const usePaypal = async () => {
   await successPayment(props.status, props.order.orderId)
   window.open(
-    `http://localhost:8000/api/order/payment?orderId=${props.order.orderId}&isDeposit=${isDeposit.value}`
+    `${config.public.baseUrl}/api/order/payment?orderId=${props.order.orderId}&isDeposit=${isDeposit.value}`
   )
 }
 

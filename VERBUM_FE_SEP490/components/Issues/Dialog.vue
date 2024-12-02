@@ -471,7 +471,14 @@ const solutionlist = issue.value.issueAttachments.filter(
               </TableRow>
               <TableRow>
                 <TableCell class="font-semibold">Order:</TableCell>
-                <TableCell>{{ issue.orderName }}</TableCell>
+                <TableCell>
+                  <NuxtLink
+                    :to="`/orders/details/${issue.orderId}`"
+                    class="hyper-link"
+                  >
+                    {{ issue.orderName }}
+                  </NuxtLink>
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="font-semibold">File:</TableCell>
