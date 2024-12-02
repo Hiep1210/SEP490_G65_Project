@@ -8,6 +8,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const employeeRoutes = ['/works', '/jobs', '/issues']
   const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
   const clientRoutes = ['/orders', '/issues', '/receipts']
+  const directorRoutes = ['/orders']
+  const staffRoutes = ['/order']
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
@@ -39,6 +41,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/works')
         else if (user?.role.includes('ADMINISTRATOR') && !adminRoutes.some(route => to.path.includes(route)))
           return navigateTo('/users')
+        else if (user?.role.includes('DIRECTOR') && (!directorRoutes.some(route => to.path.includes(route)) || to.path.includes('/create')))
+          return navigateTo('/orders')
+        else if (user?.role.includes('STAFF') && !staffRoutes.some(route => to.path.includes(route)))
+          return navigateTo('/order')
         else if (to.path.includes(redirectPath))
           return navigateTo('/')
         else return
