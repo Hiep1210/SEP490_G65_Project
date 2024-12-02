@@ -1,13 +1,8 @@
 <template>
-  <div>
-    <DropdownMenu>
-      <DropdownMenuTrigger as-child><Button variant="outline">Options</Button></DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem @click="onClick('Download')">Download</DropdownMenuItem>
-        <DropdownMenuItem v-if="beDisplayed" @click="onClick('Delete')">Delete</DropdownMenuItem>
-        <DropdownMenuItem v-if="isDeleted && role === 'CLIENT'" @click="onClick('Recover')">Recover</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+  <div class="flex gap-3">
+    <Button @click="onClick('Download')">Download</Button>
+    <Button variant="destructive" v-if="beDisplayed" @click="onClick('Delete')">Delete</Button>
+    <Button v-if="isDeleted && role === 'CLIENT'" @click="onClick('Recover')" class="bg-green-500 text-white">Recover</Button>
   </div>
 </template>
 
