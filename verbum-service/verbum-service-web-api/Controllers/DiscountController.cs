@@ -1,5 +1,6 @@
 ﻿using Lombok.NET;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using verbum_service.Filter;
 using verbum_service_application.Service;
 using verbum_service_domain.Common;
@@ -13,7 +14,7 @@ namespace verbum_service.Controllers
 {
     [Route("api/discount")]
     [ApiController]
-    [Roles(UserRole.DIRECTOR)]
+    //[Roles(UserRole.DIRECTOR)]
     [RequiredArgsConstructor]
     public partial class DiscountController : ControllerBase
     {
@@ -27,6 +28,16 @@ namespace verbum_service.Controllers
         public async Task<IActionResult> GetAllDiscount()
         {
             return ResponseFilter.OkOrNoContent(await discountService.GetAllDiscount(), this);
+        }
+
+        [HttpGet("get-by-id")]
+        [ProducesResponseType(typeof(DiscountResponse), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorObject), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetDiscountById([FromQuery][Required] Guid id)
+        {
+            return ResponseFilter.OkOrNoContent(await discountService.GetDiscountById(id), this);
         }
 
         [HttpPost]

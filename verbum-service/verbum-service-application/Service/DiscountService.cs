@@ -12,6 +12,7 @@ namespace verbum_service_application.Service
     public interface DiscountService
     {
         Task<List<DiscountResponse>> GetAllDiscount();
+        Task<DiscountResponse> GetDiscountById(Guid guid);
         Task AddDiscount(DiscountDTO request);
         Task UpdateDiscount(DiscountDTO request);
         Task DeleteDiscount(Guid discountId);
