@@ -39,7 +39,7 @@ const assignLinguists = async (payload: { assigneesId: string[]; dueDate: string
   }
   try {
     const res = await repo(useNuxtApp().$api).assignLinguists(assignPayload)
-    if (res) {
+    if (res.status === "200" || res.status === "204") {
       toast({
         title: 'Linguists assigned successfully',
         description: 'Linguists have been assigned to the job',
@@ -64,7 +64,7 @@ const { approve, reject } = useJobs()
     <header class="mb-6 flex justify-between">
       <div class="space-y-2">
         <h1 class="text-3xl font-semibold text-primary">
-          {{props.job?.name }}
+          {{getJobName(props.job?.name ?? '')}}
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
@@ -95,17 +95,17 @@ const { approve, reject } = useJobs()
           :work-due-date="props.job?.workDueDate || ''"
           @assign="assignLinguists" />
         <Button 
+          v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           variant="outline" 
           :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
           @click="approve(props.job)">
           Approve
         </Button>
-        <Button 
-        variant="outline" 
-        :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
-          @click="reject(props.job)">
-          Reject
-        </Button>
+        <JobsRejectDialog
+          v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
+          @reject="reject(job?.id, $event)" >
+          <Button variant="outline" :disable="props.job?.status !== 'SUBMITTED'">Reject</Button> 
+        </JobsRejectDialog>
       </template>
       <template v-else>
         <JobsUploadFileDialog :job="props.job">
