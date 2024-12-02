@@ -29,20 +29,23 @@ const fetchIssues = async () => {
 
 const handleUpdate = async (updateIssues) => {
   await updateIssue(updateIssues)
-  window.location.reload();
+  window.location.reload()
 }
 
 onMounted(() => {
   fetchIssues()
 })
-
 </script>
 
 <template>
   <div class="h-full">
     <div class="flex justify-between items-center p-3 border-b">
-      <span class="text-lg font-semibold">Issues</span>
-      <IssuesCreate v-if="props.role === 'CLIENT'" :order-id="props.orderId" :job-deliverables="jobDeliverables" />
+      <span class="text-lg font-semibold text-primary">Issues</span>
+      <IssuesCreate
+        v-if="props.role === 'CLIENT'"
+        :order-id="props.orderId"
+        :job-deliverables="jobDeliverables"
+      />
     </div>
     <div v-if="issues" class="h-[15rem] overflow-auto p-2">
       <IssuesTable :issues="issues" :role="props.role" @update="handleUpdate" />

@@ -1,7 +1,9 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script setup lang="ts">
 import * as z from 'zod'
-import { useToast } from '../ui/toast'
+
+const config = useRuntimeConfig()
+
 const schema = z.object({
   email: z
     .string()
@@ -27,7 +29,7 @@ const onSubmit = async (values: { email: string; password: string }) => {
   }
 }
 const googleAuth = () => {
-  window.open('http://localhost:8000/api/auth/google-login')
+  window.open(`${config.public.baseUrl}/api/auth/google-login`)
 }
 </script>
 
