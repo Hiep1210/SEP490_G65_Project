@@ -22,11 +22,10 @@ export const useAuth = () => {
         credentials: 'include'
       })
 
-      if (!response.ok) {
-        if (response.status === 400) {
+      if (!response.ok && response.status === 400) {
           toast({
-            title: 'Invalid credentials',
-            description: 'Please check your email and password'
+            title: 'Login error',
+            description: 'Invalid email or password'
           })
         } else {
           toast({
@@ -34,7 +33,6 @@ export const useAuth = () => {
             description: 'An error occurred while logging in'
           })
         }
-      }
 
       accessToken.value = useCookie('access_token').value
 
@@ -57,10 +55,6 @@ export const useAuth = () => {
       }, 2000)
     } catch (error) {
       console.error('Login error:', error)
-      toast({
-        title: 'Error',
-        description: 'Something went wrong'
-      })
     }
   }
 
