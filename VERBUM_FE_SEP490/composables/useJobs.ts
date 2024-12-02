@@ -62,7 +62,6 @@ export const useJobs = () => {
           jobId: jobId
         }
       })
-      
       if (status.value === "error") {
         toast({
           title: 'Failed to fetch job detail',
@@ -90,7 +89,6 @@ export const useJobs = () => {
         method: 'PUT',
         query: {
           jobId: job?.id,
-          orderId: job?.orderId
         }
       })
       if (status.value === "error") {
@@ -116,13 +114,16 @@ export const useJobs = () => {
       console.error('Failed to approve job:', error)
     }
   }
-  const reject = async (job: Partial<Job> | undefined) => {
+  const reject = async (jobId: string | undefined, rejectReason: string) => {
     try {
-      const {status, error} = await useAPI('/job/edit', {
+      const {status, error} = await useAPI('/job/reject', {
         method: 'PUT',
         body: {
-          ...job,
-          status: "IN_PROGRESS"
+          id: jobId,
+          responseContent: rejectReason,
+        },
+        headers: {
+          'Content-Type': 'application/json'
         }
       })
       if (status.value === "error") {

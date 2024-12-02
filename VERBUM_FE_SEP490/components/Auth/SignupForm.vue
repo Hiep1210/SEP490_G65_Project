@@ -3,6 +3,8 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { AutoForm } from '@/components/ui/auto-form'
 
+const config = useRuntimeConfig()
+
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,12}$/
 
@@ -39,7 +41,7 @@ const onSubmit = async (values: Record<string, string>) => {
   }
 }
 const googleAuth = () => {
-  window.open('http://localhost:8000/api/auth/google-login')
+  window.open(`${config.public.baseUrl}/api/auth/google-login`)
 }
 </script>
 

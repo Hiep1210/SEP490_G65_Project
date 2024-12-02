@@ -19,12 +19,12 @@
           <Table v-else>
             <TableHeader>
               <TableRow>
-                <TableHead>URL</TableHead>
+                <TableHead class="text-primary">Files</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-for="file in order.translationFileUrls" :key="file">
-                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
+                <TableCell class="font-semibold">{{ getFirebaseFileName(file) }}</TableCell>
                 <TableCell>
                   <OrdersDetailsOptions :id="order.orderId" :url="file" :is-deleted="false" :is-delivered="false" :is-new-or-rejected="isNewOrRejected" />
                 </TableCell>
@@ -45,12 +45,12 @@
           <Table v-else>
             <TableHeader>
               <TableRow>
-                <TableHead>URL</TableHead>
+                <TableHead class="text-primary">Files</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-for="file in order.referenceFileUrls" :key="file">
-                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
+                <TableCell class="font-semibold">{{ getFirebaseFileName(file) }}</TableCell>
                 <TableCell>
                   <OrdersDetailsOptions :id="order.orderId" :url="file" :is-deleted="false" :is-delivered="false" :is-new-or-rejected="isNewOrRejected" />
                 </TableCell>
@@ -71,12 +71,12 @@
           <Table v-else>
             <TableHeader>
               <TableRow>
-                <TableHead>URL</TableHead>
+                <TableHead class="text-primary">Files</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-for="deliverable in getElementsWithHighestServiceOrder(order.jobDeliverables)" :key="deliverable.deliverableFileUrl">
-                <TableCell>{{ getFirebaseFileName(deliverable.deliverableFileUrl || '') }}</TableCell>
+                <TableCell class="font-semibold">{{ getFirebaseFileName(deliverable.deliverableFileUrl || '') }}</TableCell>
                 <TableCell>
                   <OrdersDetailsOptions :id="order.orderId" :url="deliverable.deliverableFileUrl || ''" :is-delivered="true" :is-new-or-rejected="isNewOrRejected"/>
                 </TableCell>
@@ -97,12 +97,12 @@
           <div v-else>
             <TableHeader>
               <TableRow>
-                <TableHead>URL</TableHead>
+                <TableHead class="text-primary">Files</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-for="file in order.deleteddFileUrls" :key="file">
-                <TableCell>{{ getFirebaseFileName(file) }}</TableCell>
+                <TableCell class="font-semibold">{{ getFirebaseFileName(file) }}</TableCell>
                 <TableCell>
                   <OrdersDetailsOptions :id="order.orderId" :url="file" :is-deleted="true" :is-new-or-rejected="isNewOrRejected"/>
                 </TableCell>

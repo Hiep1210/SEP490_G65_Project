@@ -8,6 +8,8 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
+
 useSeoMeta({
   title: 'Confirm Email'
 })
@@ -25,7 +27,7 @@ const error = ref('')
 async function confirmEmail(token) {
   try {
     const response = await fetch(
-      `http://localhost:8000/api/auth/confirm-email/?access_token=${token}`,
+      `${config.public.baseUrl}/api/auth/confirm-email/?access_token=${token}`,
       {
         method: 'get'
       }
