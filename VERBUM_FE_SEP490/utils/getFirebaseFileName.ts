@@ -1,4 +1,3 @@
-import { get } from 'firebase/database';
 import { getStorage, ref } from 'firebase/storage';
 
 export const getFirebaseFileName = (downloadURL: string) => {
