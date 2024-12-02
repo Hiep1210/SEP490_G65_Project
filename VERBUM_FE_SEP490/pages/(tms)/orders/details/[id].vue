@@ -214,34 +214,30 @@ provide('role', role)
         <div class="flex-1 space-y-4">
         <div class="p-4 space-y-2 orderDetails border rounded-md">
           <div class="flex">
-            <p class="text-[2rem] font-semibold flex-auto">
+            <p class="text-[2rem] font-bold text-primary underline">
               {{ order?.orderName }}
             </p>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay()">Deposit </Button>
+              <Button @click="handlePay()">Deposit</Button>
             </div>
             <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay()">Paying Remaining </Button>
+              <Button @click="handlePay()">Paying Remaining</Button>
             </div>
             <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
-              <Button @click="handleSetPrices">Set prices </Button>
+              <Button @click="handleSetPrices">Set prices</Button>
             </div>
           </div>
 
           <!-- Order Details -->
           <div class="flex flex-col">
-            <div class="grid grid-cols-2 gap-x-2">
-              <span class="text-gray-500"
-                >Status: {{ order?.orderStatus }}</span
-              >
+            <div class="w-1/2">
+              <h1 v-if="order.orderNote" class="font-semibold">Client Note: <span class="font-normal">{{ order?.orderNote }}</span></h1>
+              <h1 class="font-semibold">Status: <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{ order?.orderStatus }}</Badge></h1>
               <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
-              <span v-if="order.discountId"
-                >Discount: {{ order.discountId }}</span
-              >
               <span>Created At: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
               <span v-if="order.completedDate">Completed At: {{ formatToVietnamTimezone(order.completedDate || '') }}</span>
-              <span v-if="order.orderNote"
-                >Note: {{ order.orderNote }}</span
+              <span v-if="order.discountId"
+                >Discount: {{ order.discountId }}</span
               >
             </div>
 

@@ -1,4 +1,4 @@
-export const getIssueBadgeClass = (status: string) => {
+export const getIssueBadgeClass = (status: string | undefined) => {
   switch (status) {
     case 'OPEN':
       return 'bg-red-100 text-red-500 border-2 border-red-500';
@@ -16,7 +16,7 @@ export const getIssueBadgeClass = (status: string) => {
 };
 
 
-export const getJobBadgeClass = (status: string) => {
+export const getJobBadgeClass = (status: string | undefined) => {
   switch (status) {
     case 'OPEN':
       return 'bg-red-100 text-red-500 border-2 border-red-500';
@@ -31,7 +31,7 @@ export const getJobBadgeClass = (status: string) => {
   }
 }
 
-export const getReceiptBadgeClass = (status: string) => {
+export const getReceiptBadgeClass = (status: string | undefined) => {
   switch (status) {
     case 'Deposit':
       return 'bg-blue-100 text-blue-500 border-2 border-blue-500';
@@ -56,7 +56,7 @@ export const getWorkBadgeClass = (status: string | undefined) => {
   }
 }
 
-export const getOrderBadgeClass = (status: string) => {
+export const getOrderBadgeClass = (status: string | undefined) => {
   switch (status) {
     case 'NEW':
       return 'bg-gray-100 text-gray-500 border-2 border-gray-500';
