@@ -213,37 +213,50 @@ provide('role', role)
       <div class="mt-3 flex gap-3">
         <div class="flex-1 space-y-4">
         <div class="p-4 space-y-2 orderDetails border rounded-md">
-          <div class="flex">
+          <div class="flex justify-between">
             <p class="text-[2rem] font-bold text-primary underline">
               {{ order?.orderName }}
             </p>
-            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay()">Deposit</Button>
-            </div>
-            <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
-              <Button @click="handlePay()">Paying Remaining</Button>
-            </div>
-            <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
-              <Button @click="handleSetPrices">Set prices</Button>
+            <div class="flex gap-3 items-center">
+              <h1 v-if="order.orderPrice" class="font-semibold text-xl">Order Price: <span class="font-bold hyper-link">{{ order?.orderPrice }} USD</span></h1>
+              <div v-if="order.orderStatus === 'ACCEPTED' && role === 'CLIENT' && order.orderPrice">
+                <Separator orientation="vertical" />
+                <Button @click="handlePay()">Deposit</Button>
+              </div>
+              <div v-if="order.orderStatus === 'COMPLETED' && role === 'CLIENT' && order.orderPrice">
+                <Separator orientation="vertical" />
+                <Button @click="handlePay()">Paying Remaining</Button>
+              </div>
+              <div v-if="order.orderStatus === 'ACCEPTED' && role === 'DIRECTOR'">
+                <Separator orientation="vertical" />
+                <Button @click="handleSetPrices">Set prices</Button>
+              </div>
             </div>
           </div>
 
           <!-- Order Details -->
-          <div class="flex flex-col">
-            <div class="w-1/2">
-              <h1 v-if="order.orderNote" class="font-semibold">Client Note: <span class="font-normal">{{ order?.orderNote }}</span></h1>
-              <h1 class="font-semibold">Status: <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{ order?.orderStatus }}</Badge></h1>
-              <span v-if="order.orderPrice">Price: {{ order.orderPrice }} USD</span>
-              <span>Created At: {{ formatToVietnamTimezone(order?.createdDate || '') }}</span>
-              <span v-if="order.completedDate">Completed At: {{ formatToVietnamTimezone(order.completedDate || '') }}</span>
-              <span v-if="order.discountId"
-                >Discount: {{ order.discountId }}</span
-              >
+          <div class="flex flex-col gap-2 w-1/2">
+            <h1 v-if="order.orderNote" class="font-semibold">Client Note: <span class="font-normal">{{ order?.orderNote }}</span></h1>
+            <h1 class="font-semibold">Status: <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{ order?.orderStatus }}</Badge></h1>
+
+            <h1 v-if="order.createdDate" class="font-semibold">Created At: <span class="font-normal">{{ formatToVietnamTimezone(order?.createdDate || '') }}</span></h1>
+            <!-- Due Date -->
+            <div class="flex items-center space-x-2">
+              <h1 v-if="order.createdDate" class="font-semibold">Due Date: <span class="font-normal">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span></h1>
+              <Input
+                v-else-if="editedOrder"
+                v-model="editedOrder.dueDate"
+                type="date"
+                class="border rounded p-1 w-fit"
+              />
             </div>
+            <h1 v-if="order.completedDate" class="font-semibold">Completed At: <span class="font-normal">{{ formatToVietnamTimezone(order.completedDate || '') }}</span></h1>
+
+            <h1 v-if="order.discountId" class="font-semibold">Discount Code: <span class="font-normal">{{ order.discountId }}</span></h1>
 
             <!-- Services Section -->
             <div class="flex items-center space-x-3">
-              <span>Service:</span>
+              <h1 class="font-semibold">Service:</h1>
               <template v-if="!isEditing">
                 <span
                   v-for="service in ['Translation', 'Editing', 'Evaluation']"
@@ -261,27 +274,15 @@ provide('role', role)
                 <span
                   v-for="service in ['TRANSLATION', 'EDITING', 'EVALUATION']"
                   :key="service"
-                  class="font-bold"
+                  class="font-bold text-primary"
                 >
-                  {{ service.substring(0, 2).toUpperCase() }}
                   <Checkbox
                     :id="`has${service}Service`"
                     v-model:checked="editedOrder[`has${service}Service`]"
                   />
+                  {{ service.toUpperCase() }}
                 </span>
               </template>
-            </div>
-
-            <!-- Due Date -->
-            <div class="flex items-center space-x-2">
-              <span>Due date:</span>
-              <span v-if="!isEditing">{{ formatToVietnamTimezone(order?.dueDate || '') }}</span>
-              <Input
-                v-else-if="editedOrder"
-                v-model="editedOrder.dueDate"
-                type="date"
-                class="border rounded p-1 w-fit"
-              />
             </div>
 
             <!-- Language Selection -->
@@ -331,7 +332,7 @@ provide('role', role)
           >
           <OrdersDetailsCancelDialog v-if="role === 'CLIENT' && (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED' && order.orderStatus !=='DELIVERED')" :order-id="order.orderId">
               <Button
-                variant="outline"
+                variant="destructive"
                 >Cancel Order</Button
               >
           </OrdersDetailsCancelDialog>

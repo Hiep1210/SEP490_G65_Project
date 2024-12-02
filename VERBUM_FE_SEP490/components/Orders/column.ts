@@ -24,6 +24,41 @@ export const columns: ColumnDef<Order>[] = [
     }
   },
   {
+    accessorKey: 'dueDate',
+    header: 'Due Date',
+    cell: ({ row }) => {
+      const date = row.getValue('dueDate') as string
+      const formattedDate = formatToVietnamTimezone(date)
+      return h('div', {}, formattedDate)
+    }
+  },
+  {
+    accessorKey: 'sourceLanguageId',
+    header: 'Source Language',
+    cell: ({ row }) => {
+      const sourceLanguageId = row.getValue('sourceLanguageId') as string
+      return h(
+        Badge,
+        { class: 'bg-primary text-white', variant: 'default' },
+        { default: () => sourceLanguageId }
+      )
+    }
+  },
+  {
+    accessorKey: 'targetLanguageId',
+    header: 'Target Language',
+    cell: ({ row }) => {
+      const targetLanguageIds = row.getValue('targetLanguageId') as string[]
+      return targetLanguageIds.map((id) =>
+        h(
+          Badge,
+          { class: 'bg-gray-500 text-white mx-1', variant: 'default' },
+          { default: () => id }
+        )
+      )
+    }
+  },
+  {
     accessorKey: 'orderStatus',
     header: 'Status',
     cell: ({ row }) => {
