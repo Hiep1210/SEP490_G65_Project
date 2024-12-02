@@ -43,7 +43,7 @@ const closeIssuesDialog = () => {
 
 const props = defineProps<{
   issues: Issue[];
-  role: string;
+  role: string | undefined;
 }>();
 
 const issues = ref(props.issues);

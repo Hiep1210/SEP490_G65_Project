@@ -2,7 +2,7 @@
 </script>
 <template>
   <div>
-    <NuxtLoadingIndicator color="green" :height="5" :throttle="0" />
+    <NuxtLoadingIndicator color="#088EAF" :height="5" :throttle="0" />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

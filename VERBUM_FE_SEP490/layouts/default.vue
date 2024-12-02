@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { user } = useAuthStore()
+</script>
 
 <template>
   <div
@@ -23,6 +25,7 @@
         <div class="flex-1">
           <LayoutBreadcrumbs />
         </div>
+        <div>Hello, <span class="font-semibold">{{ user?.name }}</span><span v-if="user?.role !== 'CLIENT'" class="text-primary font-bold"> - {{ user?.role }}</span></div>
         <LayoutDarkmodeToggle />
         <LayoutUserDropdown />
       </header>

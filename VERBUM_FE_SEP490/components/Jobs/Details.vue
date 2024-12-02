@@ -39,7 +39,7 @@ const assignLinguists = async (payload: { assigneesId: string[]; dueDate: string
   }
   try {
     const res = await repo(useNuxtApp().$api).assignLinguists(assignPayload)
-    if (!res) {
+    if (res.status === "200" || res.status === "204") {
       toast({
         title: 'Linguists assigned successfully',
         description: 'Linguists have been assigned to the job',
@@ -64,7 +64,7 @@ const { approve, reject } = useJobs()
     <header class="mb-6 flex justify-between">
       <div class="space-y-2">
         <h1 class="text-3xl font-semibold text-primary">
-          {{props.job?.name }}
+          {{getJobName(props.job?.name ?? '')}}
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
@@ -73,17 +73,17 @@ const { approve, reject } = useJobs()
       </JobsEditDialog>
     </header>
 
-    <section class="mb-6">
-      <div class="mt-4 space-y-2">
-        <div>
-          <p v-if="props.job && props.job?.assigneeNames?.length > 0" class="">
-            Assigned to: {{ props.job?.assigneeNames.map((assignee) => assignee.name).join(', ') }}
-          </p>
-          <p>Target Language: {{ props.job?.targetLanguageId }}</p>
-          <p v-if="props.job?.workDueDate">Work's Due Date: {{ formatToVietnamTimezone(props.job?.workDueDate) }}</p>
-          <p v-if="props.job?.dueDate" class="">Due Date: {{ formatToVietnamTimezone(props.job?.dueDate) }}</p>
-          <p v-if="props.job?.createdAt" class="">Created At: {{ formatToVietnamTimezone(props.job?.createdAt) }}</p>
-          <p v-if="props.job?.updatedAt" class="">Updated At: {{ formatToVietnamTimezone(props.job?.updatedAt) }}</p>
+    <section class="mb-6 border rounded p-4">
+      <div class="flex flex-col gap-2">
+        <div class="space-y-2">
+          <h1 v-if="props.job && props.job?.assigneeNames?.length > 0" class="font-semibold">
+            Assigned to: <span class="font-normal">{{ props.job?.assigneeNames.map((assignee) => assignee.name).join(', ') }}</span>
+          </h1>
+          <h1 class="font-semibold">Target Language: <span class="font-normal">{{ props.job?.targetLanguageId }}</span></h1>
+          <h1 v-if="props.job?.workDueDate" class="font-semibold">Work's Due Date: <span class="font-normal">{{ formatToVietnamTimezone(props.job?.workDueDate) }}</span></h1>
+          <h1 v-if="props.job?.dueDate" class="font-semibold">Due Date: <span class="font-normal">{{ formatToVietnamTimezone(props.job?.dueDate) }}</span></h1>
+          <h1 v-if="props.job?.createdAt" class="font-semibold">Created At: <span class="font-normal">{{ formatToVietnamTimezone(props.job?.createdAt) }}</span></h1>
+          <h1 v-if="props.job?.updatedAt" class="font-semibold">Updated At: <span class="font-normal">{{ formatToVietnamTimezone(props.job?.updatedAt) }}</span></h1>
         </div>
       </div>
     </section>
@@ -95,17 +95,17 @@ const { approve, reject } = useJobs()
           :work-due-date="props.job?.workDueDate || ''"
           @assign="assignLinguists" />
         <Button 
+          v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           variant="outline" 
           :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
           @click="approve(props.job)">
           Approve
         </Button>
-        <Button 
-        variant="outline" 
-        :disabled="props.job?.status !== 'SUBMITTED' || !props.job"
-          @click="reject(props.job)">
-          Reject
-        </Button>
+        <JobsRejectDialog
+          v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
+          @reject="reject(job?.id, $event)" >
+          <Button variant="outline" :disable="props.job?.status !== 'SUBMITTED'">Reject</Button> 
+        </JobsRejectDialog>
       </template>
       <template v-else>
         <JobsUploadFileDialog :job="props.job">
@@ -114,7 +114,7 @@ const { approve, reject } = useJobs()
       </template>
     </section>
     <section v-if="props.job" class="mb-6">
-      <JobsTabs :job="props.job" />
+      <JobsTabs :job="props.job" :target-lang-id="job?.targetLanguageId" />
     </section>
   </div>
 </template>

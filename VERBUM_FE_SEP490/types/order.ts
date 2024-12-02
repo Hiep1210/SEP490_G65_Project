@@ -5,6 +5,7 @@ export interface Order {
   orderName?: string
   createdDate?: string
   dueDate?: string
+  completedDate?: string
   sourceLanguageId?: string
   targetLanguageId?: string[]
   orderStatus?: string

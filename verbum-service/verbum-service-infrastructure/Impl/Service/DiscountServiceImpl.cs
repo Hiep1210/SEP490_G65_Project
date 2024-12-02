@@ -52,6 +52,16 @@ namespace verbum_service_infrastructure.Impl.Service
             return mapper.Map<List<DiscountResponse>>(await context.Discounts.ToListAsync());
         }
 
+        public async Task<DiscountResponse> GetDiscountById(Guid guid)
+        {
+            Discount discount = await context.Discounts.FirstOrDefaultAsync(d => d.DiscountId == guid);
+            if (ObjectUtils.IsEmpty(discount))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Discount"));
+            }
+            return mapper.Map<DiscountResponse>(discount);
+        }
+
         public async Task UpdateDiscount(DiscountDTO request)
         {
             List<string> errors = await validation.Validate(request);

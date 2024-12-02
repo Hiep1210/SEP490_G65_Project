@@ -37,7 +37,7 @@
           </div>
         </div>
       </TabsContent>
-      <TabsContent value="relatedJob">
+      <TabsContent value="deliverable">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
@@ -47,10 +47,10 @@
           >
             There are no deliverables
           </div>
-          <div v-else class="p-2"><a class="hyper-link" :href="job.deliverableUrl">{{ getFirebaseFileName(job.deliverableUrl) }}</a></div>
+          <div v-else class="p-2"><a class="hyper-link" :href="job.deliverableUrl"> {{ getFirebaseFileName(job.deliverableUrl) }}</a></div>
         </div>
       </TabsContent>
-      <TabsContent value="prevDeli">
+      <TabsContent value="relatedJob">
         <div class="border rounded-md h-max-[18rem] overflow-auto">
           <div
             v-if="
@@ -64,6 +64,7 @@
             <div v-for="(label, file) in job.previousJobDeliverables" :key="file">
               <div class="space-x-6">
                 <Badge>{{ label }}</Badge>
+                <Badge>{{ targetLangId }}</Badge>
                 <a :href="file" class="hyper-link">{{ getFirebaseFileName(file) }}</a>
               </div>
             </div>
@@ -85,6 +86,10 @@ const props = defineProps({
       deliverableUrl: '',
       previousJobDeliverables: {},
     })
+  },
+  targetLangId: {
+    type: String as PropType<string>,
+    default: ''
   }
 })
 const grids = computed(() => {
