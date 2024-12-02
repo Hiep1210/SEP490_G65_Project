@@ -64,6 +64,7 @@
             <div v-for="(label, file) in job.previousJobDeliverables" :key="file">
               <div class="space-x-6">
                 <Badge>{{ label }}</Badge>
+                <Badge>{{ targetLangId }}</Badge>
                 <a :href="file" class="hyper-link">{{ getFirebaseFileName(file) }}</a>
               </div>
             </div>
@@ -85,6 +86,10 @@ const props = defineProps({
       deliverableUrl: '',
       previousJobDeliverables: {},
     })
+  },
+  targetLangId: {
+    type: String as PropType<string>,
+    default: ''
   }
 })
 const grids = computed(() => {
