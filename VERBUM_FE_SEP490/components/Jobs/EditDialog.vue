@@ -11,14 +11,10 @@
             Choose linguists and due date
           </DialogDescription>
         </DialogHeader>
-        <Form v-slot="{ meta, values, validate }" as="form" keep-values :validation-schema="schema">
-          <form class="space-y-2" @submit="(e) => {
+          <form class="space-y-2"  @submit="(e) => {
             e.preventDefault()
-            validate()
-            console.log(meta.valid)
-            if (meta.valid) {
-              onSubmit(values)
-            }
+            form.validate()
+            onSubmit()
           }">
             <FormField v-slot="{ componentField, errorMessage }" name="assignee_id">
               <FormItem class="flex flex-col">
@@ -50,10 +46,9 @@
               </FormItem>
             </FormField>
             <DialogFooter>
-              <Button type="submit" variant="outline" :disabled="!meta.valid">Confirm</Button>
+              <Button type="submit" variant="outline">Confirm</Button>
             </DialogFooter>
           </form>
-        </Form>
       </DialogContent>
     </Dialog>
 
@@ -62,6 +57,7 @@
 
 <script lang="ts" setup>
 import * as z from 'zod'
+import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import type { Linguist } from '@/types/user'
 import { cn } from '@/lib/utils'
@@ -77,7 +73,7 @@ const schema = toTypedSchema(z.object({
   dueDate: z.coerce.date().min(new Date(), 'Due date is required')
 }))
 
-const { handleSubmit, setFieldValue } = useForm({
+const form = useForm({
   validationSchema: schema,
   initialValues: {
     assignee_id: [],
@@ -88,12 +84,12 @@ const { handleSubmit, setFieldValue } = useForm({
 
 const updateSelectedLinguists = (newSelectedLinguists: string[]) => {
   selectedLinguists.value = newSelectedLinguists
-  setFieldValue('assignee_id', newSelectedLinguists)
+  form.setFieldValue('assignee_id', newSelectedLinguists)
 }
 
 const emit = defineEmits(['edit'])
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = form.handleSubmit((values) => {
   const payload = {
     assigneesId: values.assignee_id,
     dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
