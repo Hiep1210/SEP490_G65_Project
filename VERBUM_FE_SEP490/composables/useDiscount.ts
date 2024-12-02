@@ -98,12 +98,43 @@ export const useDiscounts = () => {
     }
   }
 
+  const getDiscountById = async (id: string) => {
+    isLoading.value = true
+    try {
+      const { data: discountsData } = await useAPI<Discount>(`/discount/get-by-id?id=${id}`, {
+        method: 'GET'
+      })
+      if (!discountsData?.value) {
+        toast({
+          title: 'No discounts found!',
+          description: 'There are no discounts available!!'
+        })
+        discounts.value = []
+      } else {
+        toast({
+          title: 'Apply discount code success!',
+          description: 'Enjoy your discount!!'
+        })
+        return discountsData.value
+      }
+    } catch (error) {
+      toast({
+        title: 'Error fetching discounts!!',
+        description: 'An error occurred while fetching discounts!!'
+      })
+      console.log('Error fetching discounts: ', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     discounts,
     isLoading,
     getDiscounts,
     updateDiscount,
     createDiscount,
-    deleteDiscount
+    deleteDiscount,
+    getDiscountById
   }
 }
