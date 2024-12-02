@@ -34,31 +34,36 @@ namespace verbum_service_infrastructure.Impl.Workflow
         }
         protected override async Task CommonStep(ConfirmPaymentDTO request)
         {
-            orderId = await context.Receipts.Where(x => x.ReceiptId.ToString() == request.guid).Select(x => x.OrderId).FirstOrDefaultAsync();
+            Receipt receipt = await context.Receipts.FirstAsync(r => r.ReceiptId.ToString() == request.guid);
+            orderId = receipt.OrderId;
             Order order = await context.Orders.Include(x => x.TargetLanguages).Include(x => x.OrderReferences).Include(x => x.Works).FirstOrDefaultAsync(x => x.OrderId == orderId);
-            if (!OrderStatus.ACCEPTED.ToString().Equals(order.OrderStatus))
+            if (!OrderStatus.ACCEPTED.ToString().Equals(order.OrderStatus) && !OrderStatus.COMPLETED.ToString().Equals(order.OrderStatus))
             {
                 throw new BusinessException("Order has been paid");
             }
-            //generate work
-            GenerateWork generateWork = new GenerateWork()
+
+            if (receipt.DepositeOrPayment)
             {
-                OrderId = order.OrderId,
-                DueDate = order.DueDate,
-                OrderName = order.OrderName,
-                HasEditService = order.HasEditService,
-                HasEvaluateService = order.HasEvaluateService,
-                HasTranslateService = order.HasTranslateService
-            };
-            await workService.GenerateWork(generateWork);
-            //generate job
-            CreateJobsRequest createJobsRequest = new CreateJobsRequest()
-            {
-                WorkIds = order.Works.Select(x => x.WorkId).ToList(),
-                DocumentUrls = order.OrderReferences.Where(x => x.Tag.Equals(OrderFileTag.TRANSLATION.ToString())).Select(x => x.ReferenceFileUrl).ToList(),
-                TargetLanguageIds = order.TargetLanguages.Select(x => x.LanguageId).ToList()
-            };
-            await jobService.CreateJobs(createJobsRequest);
+                //generate work
+                GenerateWork generateWork = new GenerateWork()
+                {
+                    OrderId = order.OrderId,
+                    DueDate = order.DueDate,
+                    OrderName = order.OrderName,
+                    HasEditService = order.HasEditService,
+                    HasEvaluateService = order.HasEvaluateService,
+                    HasTranslateService = order.HasTranslateService
+                };
+                await workService.GenerateWork(generateWork);
+                //generate job
+                CreateJobsRequest createJobsRequest = new CreateJobsRequest()
+                {
+                    WorkIds = order.Works.Select(x => x.WorkId).ToList(),
+                    DocumentUrls = order.OrderReferences.Where(x => x.Tag.Equals(OrderFileTag.TRANSLATION.ToString())).Select(x => x.ReferenceFileUrl).ToList(),
+                    TargetLanguageIds = order.TargetLanguages.Select(x => x.LanguageId).ToList()
+                };
+                await jobService.CreateJobs(createJobsRequest);
+            }
         }
 
         protected override async Task PostStep(ConfirmPaymentDTO request)
