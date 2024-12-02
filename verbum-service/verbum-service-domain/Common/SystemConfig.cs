@@ -15,6 +15,7 @@ namespace verbum_service_domain.Common
         public const int REFRESH_TOKEN_LIFE = 14; //days
         public const string DOMAIN = "http://localhost:8000/api/auth";
         public const string BE_DOMAIN = "http://localhost:8000/api";
-        public const string FE_DOMAIN = "http://localhost:3000";
+        // public const string FE_DOMAIN = "http://localhost:3000";
+        public const string FE_DOMAIN = "https://hvpw7q-3000.csb.app/"; //for code sandbx
     }
 }
