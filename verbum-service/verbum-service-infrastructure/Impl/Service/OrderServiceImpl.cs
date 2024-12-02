@@ -75,7 +75,7 @@ namespace verbum_service_infrastructure.Impl.Service
             switch (currentUser.Role)
             {
                 case UserRole.CLIENT:
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
+                    orders = await context.Orders.Include(x => x.Discount).Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
                         .Where(x => x.ClientId == clientId)
                         .ToListAsync();
                     break;
@@ -86,7 +86,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 case UserRole.EDIT_MANAGER:
                 case UserRole.TRANSLATE_MANAGER:
                 case UserRole.EVALUATE_MANAGER:
-                    orders = await context.Orders.Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
+                    orders = await context.Orders.Include(x => x.Discount).Include(o => o.TargetLanguages).Include(o => o.OrderReferences).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation)
                         .ToListAsync();
                     break;
                 default:
@@ -99,7 +99,7 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task<OrderDetailsResponse> GetOrderDetails(Guid id)
         {
             verbum_service_domain.Models.Order orders = new verbum_service_domain.Models.Order();
-            orders = await context.Orders.Include(x => x.TargetLanguages).Include(x => x.OrderReferences).Include(x => x.Receipts).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
+            orders = await context.Orders.Include(x => x.Discount).Include(x => x.TargetLanguages).Include(x => x.OrderReferences).Include(x => x.Receipts).Include(x => x.Works).ThenInclude(x => x.Jobs).Include(x => x.Works).ThenInclude(x => x.ServiceCodeNavigation).FirstOrDefaultAsync(x => x.OrderId == id);
             if (ObjectUtils.IsEmpty(orders))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
@@ -246,7 +246,7 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             verbum_service_domain.Models.Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
 
-            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100);
+            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price - (price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100));
 
             order.OrderPrice = price;
             int records = await context.SaveChangesAsync();

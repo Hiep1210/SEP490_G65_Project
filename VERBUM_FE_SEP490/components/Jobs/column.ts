@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/vue-table";
 import Checkbox from "../ui/checkbox/Checkbox.vue";
 import type { Job } from "@/types/job";
+import Badge from "../ui/badge/Badge.vue";
 import { computed } from "vue";
 
 export function getColumns(userRole: string | undefined): ColumnDef<Job>[] {
@@ -10,13 +11,24 @@ export function getColumns(userRole: string | undefined): ColumnDef<Job>[] {
         {
             accessorKey: 'name',
             header: 'Name',
-            cell: ({ row }) => h('div', row.getValue('name')),
+            cell: ({ row }) => {
+                const name = row.getValue('name') as string
+                const jobName = getJobName(name);
+                return h('div', jobName)
+            },
         },
         {
             accessorKey: 'targetLanguageId',
             header: 'Target Language',
-            cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('targetLanguageId')),
-        },
+            cell: ({ row }) => {
+              const targetLanguageId = row.getValue('targetLanguageId') as string
+              return h(
+                        Badge,
+                        { class: 'bg-primary text-white', variant: 'default' },
+                        { default: () => getLanguageName(targetLanguageId) }
+                    )
+            }
+          },
         {
             id: 'assigneeNames',
             header: 'Assignees',
@@ -29,8 +41,15 @@ export function getColumns(userRole: string | undefined): ColumnDef<Job>[] {
         {
             accessorKey: 'status',
             header: 'Status',
-            cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('status')),
-        },
+            cell: ({ row }) => {
+              const status = row.getValue('status') as string
+              return h(
+                Badge,
+                { class: getJobBadgeClass(status), variant: 'default' },
+                { default: () => status }
+              )
+            }
+          }
     ];
 
     return userRole === 'Linguist'

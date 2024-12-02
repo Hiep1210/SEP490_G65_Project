@@ -16,7 +16,7 @@ useHead({
     @click="emit('click:card')"
   >
     <div class="font-semibold truncate" :title="props.data.name">
-      {{ props.data.name }}
+      {{ getJobName(props.data.name) }}
     </div>
     <div>
       Target Language: {{ props.data.targetLanguageId }}

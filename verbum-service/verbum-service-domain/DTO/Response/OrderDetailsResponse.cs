@@ -28,5 +28,7 @@ namespace verbum_service_domain.DTO.Response
         /// </summary>
         public string? OrderNote { get; set; }
         public DateTime? CompletedDate { get; set; }
+        public string? DiscountName { get; set; }
+        public int? DiscountAmount { get; set; }
     }
 }

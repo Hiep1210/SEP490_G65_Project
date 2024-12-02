@@ -39,19 +39,18 @@ const assignLinguists = async (payload: { assigneesId: string[]; dueDate: string
   }
   try {
     const res = await repo(useNuxtApp().$api).assignLinguists(assignPayload)
-    if (res.status === "200" || res.status === "204") {
-      toast({
-        title: 'Linguists assigned successfully',
-        description: 'Linguists have been assigned to the job',
-      })
-      window.location.reload()
-    } else {
+    if (!res) {
       toast({
         title: 'Failed to assign linguists',
         description: 'Please try again later',
         variant: 'destructive',
       })
-    }
+    } 
+    toast({
+      title: 'Linguists assigned',
+      description: 'The job has been assigned to the linguists',
+    })
+    window.location.reload()
   } catch (error) {
     console.error('Failed to assign linguists:', error)
   }
@@ -68,7 +67,7 @@ const { approve, reject } = useJobs()
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
-      <JobsEditDialog v-if="canEdit">
+      <JobsEditDialog v-if="canEdit" @edit="assignLinguists">
         <Button variant="outline">Edit</Button>
       </JobsEditDialog>
     </header>
