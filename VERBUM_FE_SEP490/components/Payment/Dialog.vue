@@ -33,7 +33,6 @@ if (props.status === 'IN_PROGRESS') {
   pricePay.value = payRemaining
   isDeposit.value = false
 }
-const { successPayment } = useOrders()
 // console.log({payFinish})
 
 watch(
@@ -44,16 +43,10 @@ watch(
 )
 
 const usePaypal = async () => {
-  await successPayment(props.status, props.order.orderId)
   window.open(
     `${config.public.baseUrl}/api/order/payment?orderId=${props.order.orderId}&isDeposit=${isDeposit.value}`
   )
 }
-
-// const handlePayWithPaypal = async() => {
-//   await payWithPayPal(props.order.orderId, isDeposit )
-
-// }
 
 const closeDialog = () => {
   emit('close') // Emit close event

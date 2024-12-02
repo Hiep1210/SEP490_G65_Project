@@ -11,10 +11,6 @@ export const usePayment = () => {
               headers: { 'Content-Type': 'application/json' },
               params: {orderId: orderId, isDeposit: isDeposit}
             })
-            toast({
-              title: 'Your order is paid successfully!!',
-              description: `We are going to do your order. Thank you for choosing our service.`
-            })
           } catch (error) {
             toast({
               title: 'Error paying',
