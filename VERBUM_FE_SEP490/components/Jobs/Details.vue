@@ -64,7 +64,7 @@ const { approve, reject } = useJobs()
     <header class="mb-6 flex justify-between">
       <div class="space-y-2">
         <h1 class="text-3xl font-semibold text-primary">
-          {{props.job?.name }}
+          {{getJobName(props.job?.name ?? '')}}
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
