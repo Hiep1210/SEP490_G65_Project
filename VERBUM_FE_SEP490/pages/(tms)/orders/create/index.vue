@@ -38,8 +38,8 @@ const formSchema = [
   }),
   z.object({
     reference: z.string().optional(),
-    referenceFileURLs: z.string().optional()
-    // discountId: z.string()
+    referenceFileURLs: z.string().optional(),
+    discountId: z.string().nullable().optional()
   })
 ]
 
@@ -53,6 +53,7 @@ interface FormValues {
   hasEvaluateService?: boolean
   reference?: string
   referenceFileURLs: string
+  discountId?: string
 }
 
 const stepIndex = ref(1)
@@ -93,11 +94,10 @@ async function onSubmit(values: FormValues) {
     referenceFileURLs: values.referenceFileURLs
       .split(',')
       .map((url: string) => url.trim()),
-    discountId: null
+    discountId: values.discountId
   }
 
   try {
-    // Send the payload to the backend using a POST request
     const { status } = await useAPI('/order/add', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -105,11 +105,11 @@ async function onSubmit(values: FormValues) {
         'Content-Type': 'application/json'
       }
     })
-    toast({
-      title: 'Order Created !!',
-      description: `Order has been created successfully!!`
-    })
     if (status.value === "success") {
+      toast({
+        title: 'Order Created !!',
+        description: `Order has been created successfully!!`
+      })
       const response = await repo(useNuxtApp().$api).getOrders()
       if (!response){
         toast({

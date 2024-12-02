@@ -1,43 +1,69 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type { ColumnDef } from "@tanstack/vue-table";
-import Checkbox from "../ui/checkbox/Checkbox.vue";
-import type { Work } from "~/composables/useWorks";
+import type { ColumnDef } from '@tanstack/vue-table'
+import Checkbox from '../ui/checkbox/Checkbox.vue'
+import type { Work } from '~/composables/useWorks'
+import Badge from '../ui/badge/Badge.vue'
 
-
-
-
-export const columns:ColumnDef<Work>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => h(Checkbox, {
-        }),
-        cell: ({ row }) => h(Checkbox, {
-        }),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'workName',
-        header: 'Work Name',
-        cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('workName')),
-    },
-    {
-        accessorKey: 'sourceLanguageId',
-        header: 'Source Language',
-        cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('sourceLanguageId')),
-    },
-    {
-        accessorKey: 'targetLanguageId',
-        header: 'Target Language',
-        cell: ({ row }) => {
-            const targetLanguages: string[] = row.getValue('targetLanguageId');
-            return h('div', { class: 'capitalize' }, targetLanguages.length > 0 ? targetLanguages.join(', ') : '');
-        },
-    },
-    {
-        accessorKey: 'orderStatus',
-        header: 'Status',
-        cell: ({ row }) => h('div', { class: 'capitalize'}, row.getValue('orderStatus')),
-    },
+export const columns: ColumnDef<Work>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => h(Checkbox, {}),
+    cell: ({ row }) => h(Checkbox, {}),
+    enableSorting: false,
+    enableHiding: false
+  },
+  {
+    accessorKey: 'workName',
+    header: 'Work Name',
+    cell: ({ row }) =>
+      h('div', { class: 'capitalize' }, row.getValue('workName'))
+  },
+  {
+    accessorKey: 'dueDate',
+    header: 'Due Date',
+    cell: ({ row }) => {
+      const date = row.getValue('dueDate') as string
+      const formattedDate = formatToVietnamTimezone(date)
+      return h('div', {}, formattedDate)
+    }
+  },
+  {
+    accessorKey: 'sourceLanguageId',
+    header: 'Source Language',
+    cell: ({ row }) => {
+      const sourceLanguageId = row.getValue('sourceLanguageId') as string
+      return h(
+        Badge,
+        { class: 'bg-primary text-white', variant: 'default' },
+        { default: () => getLanguageName(sourceLanguageId) }
+      )
+    }
+  },
+  {
+    accessorKey: 'targetLanguageId',
+    header: 'Target Language',
+    cell: ({ row }) => {
+      const targetLanguageIds = row.getValue('targetLanguageId') as string[]
+      return targetLanguageIds.map((id) =>
+        h(
+          Badge,
+          { class: 'bg-gray-500 text-white mx-1', variant: 'default' },
+          { default: () => getLanguageName(id) }
+        )
+      )
+    }
+  },
+  {
+    accessorKey: 'orderStatus',
+    header: 'Status',
+    cell: ({ row }) => {
+      const orderStatus = row.getValue('orderStatus') as string
+      return h(
+        Badge,
+        { class: getOrderBadgeClass(orderStatus), variant: 'default' },
+        { default: () => orderStatus }
+      )
+    }
+  }
 ]

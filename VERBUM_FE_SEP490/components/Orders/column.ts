@@ -40,7 +40,7 @@ export const columns: ColumnDef<Order>[] = [
       return h(
         Badge,
         { class: 'bg-primary text-white', variant: 'default' },
-        { default: () => sourceLanguageId }
+        { default: () => getLanguageName(sourceLanguageId) }
       )
     }
   },
@@ -53,7 +53,7 @@ export const columns: ColumnDef<Order>[] = [
         h(
           Badge,
           { class: 'bg-gray-500 text-white mx-1', variant: 'default' },
-          { default: () => id }
+          { default: () => getLanguageName(id) }
         )
       )
     }
