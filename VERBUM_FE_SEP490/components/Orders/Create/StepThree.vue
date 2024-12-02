@@ -8,7 +8,21 @@ const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
 const uploadProgress = ref<number[]>([]) // Track progress of each file
 
+const {getDiscountById} = useDiscounts()
+
 const downloadUrlsString = computed(() => downloadUrls.value.join(','))
+
+const discountCode = ref('')
+const appliedDiscount = ref<string | null>('')
+
+async function applyDiscount() {
+  const response = await getDiscountById(discountCode.value)
+  if (response) {
+    appliedDiscount.value = response.discountId
+  } else {
+    appliedDiscount.value = null
+  }
+}
 
 async function uploadFiles() {
   downloadUrls.value = []
@@ -50,6 +64,7 @@ watch(files, () => {
     uploadFiles()
   }
 })
+
 </script>
 
 <template>
@@ -109,6 +124,27 @@ watch(files, () => {
           </div>
         </CardContent>
       </Card>
+      <FormMessage />
+    </FormItem>
+  </FormField>
+
+  <FormField v-slot="{ componentField }" name="discountId" :model-value="appliedDiscount">
+    <FormItem>
+      <FormLabel>Discount code</FormLabel>
+      <FormControl>
+        <div class="flex gap-3">
+          <Input
+          v-model="discountCode"
+          placeholder="Enter you discount code here"
+          />
+          <Input
+          type="hidden"
+          v-bind="componentField"
+          :value="appliedDiscount ? appliedDiscount.valueOf() : null"
+          />
+          <Button type="button" @click.prevent="applyDiscount">Apply</Button>
+        </div>
+      </FormControl>
       <FormMessage />
     </FormItem>
   </FormField>
