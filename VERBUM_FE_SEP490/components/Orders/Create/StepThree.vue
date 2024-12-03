@@ -13,7 +13,7 @@ const {getDiscountById} = useDiscounts()
 const downloadUrlsString = computed(() => downloadUrls.value.join(','))
 
 const discountCode = ref('')
-const appliedDiscount = ref<string | null>('')
+const appliedDiscount = ref<string | null>(null)
 
 async function applyDiscount() {
   const response = await getDiscountById(discountCode.value)
