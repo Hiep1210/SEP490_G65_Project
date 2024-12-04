@@ -46,6 +46,22 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllSupportedLanguage_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var languageService = new LanguageServiceImpl(null, mockMapper.Object);
+
+            //Act
+            var result = languageService.GetAllSupportedLanguages();
+
+            //Assert
+            Assert.ThrowsException<AggregateException>(() => result.Result);
+        }
+
+        [TestMethod]
         public async Task GetAllLanguages()
         {
             //Arrange
@@ -67,6 +83,22 @@ namespace verbum_service_test.Impl.Service
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Result.Count());
+        }
+
+        [TestMethod]
+        public async Task GetAllLanguages_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var languageService = new LanguageServiceImpl(null, mockMapper.Object);
+
+            //Act
+            var result = languageService.GetAllLanguages();
+
+            //Assert
+            Assert.ThrowsException<AggregateException>(() => result.Result);
         }
     }
 }

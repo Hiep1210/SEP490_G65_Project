@@ -432,5 +432,33 @@ namespace verbum_service_test
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Result.Count());
         }
+
+        [TestMethod]
+        public async Task GetAllOrderReferenceFile_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+            var mockCurrentUser = new Mock<CurrentUser>();
+
+            var orderReference = new OrderReference
+            {
+                OrderId = Guid.Parse("5300c159-8a4c-4721-9379-4d10171f25bd"),
+                Tag = "TRANSLATION",
+                IsDeleted = false
+            };
+
+            var mockIConfiguration = new Mock<IConfiguration>();
+            var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
+
+            var orderService = new OrderServiceImpl(null, mockMapper.Object, mockCurrentUser.Object, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+
+            //Act
+            var result = orderService.GetAllOrderRefrenceFiles();
+
+            //Assert
+            Assert.ThrowsException<AggregateException>(() => result.Result);
+        }
     }
 }

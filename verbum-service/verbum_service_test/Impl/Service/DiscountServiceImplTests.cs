@@ -65,6 +65,23 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllDiscount_Excepiton()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+            var saveDiscountValidation = new Mock<SaveDiscountValidation>(dbContext);
+
+            var discountService = new DiscountServiceImpl(mockMapper.Object, null, saveDiscountValidation.Object);
+
+            //Act
+            var result = discountService.GetAllDiscount();
+
+            //Assert
+            Assert.ThrowsException<AggregateException>(() => result.Result);
+        }
+
+        [TestMethod]
         public async Task AddDiscount()
         {
             //Arrange

@@ -10,6 +10,8 @@ using verbum_service_infrastructure.Impl.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using verbum_service_application.Service;
+using verbum_service_domain.Common.ErrorModel;
+using verbum_service_domain.DTO.Request;
 
 namespace verbum_service_test.Impl.Service
 {
@@ -72,6 +74,12 @@ namespace verbum_service_test.Impl.Service
             var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
 
             var workService = new WorkServiceImpl(dbContext, mockMapper.Object, currentUser);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
+                      .Returns(new List<WorkResponse>
+                      {
+                          new WorkResponse{ WorkId = Guid.NewGuid() }
+                      });
 
             //Act
             var result = workService.GetAllWork();
@@ -180,7 +188,7 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
-        public async Task GetAllWork_Exception()
+        public async Task GetAllWork_RoleException()
         {
             //Arrange
             var dbContext = await GetDatabaseContext();
@@ -211,13 +219,53 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllWork_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var workService = new WorkServiceImpl(null, mockMapper.Object, currentUser);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
+                      .Returns(new List<WorkResponse>
+                      {
+                          new WorkResponse{ WorkId = Guid.NewGuid() }
+                      });
+
+            //Act
+            var result = workService.GetAllWork();
+
+            //Assert
+            Assert.ThrowsException<AggregateException>(() => result.Result);
+        }
+
+        [TestMethod]
         public async Task AddWorkCategory()
         {
             //Arrange
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
 
-            var workService = new WorkServiceImpl(dbContext, mockMapper.Object, null);
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var workService = new WorkServiceImpl(dbContext, mockMapper.Object, currentUser);
 
             mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
                       .Returns(new List<WorkResponse>
@@ -233,6 +281,41 @@ namespace verbum_service_test.Impl.Service
             //Assert
             Work workCategory = await dbContext.Works.FirstOrDefaultAsync(w => w.WorkId == Guid.Parse("ff21791c-03bc-4b38-8705-9755fafa0c9f"));
             Assert.IsNotNull(workCategory);
+        }
+
+        [TestMethod]
+        public async Task AddWorkCategory_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var workService = new WorkServiceImpl(null, mockMapper.Object, currentUser);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
+                      .Returns(new List<WorkResponse>
+                      {
+                          new WorkResponse{ WorkId = Guid.NewGuid() }
+                      });
+
+            List<int> categoryIds = new List<int> { 1 };
+
+            //Act
+            //Assert
+            var exception = await Assert.ThrowsExceptionAsync<NullReferenceException>(async () =>
+            {
+                await workService.AddWorkCategory(Guid.Parse("ff21791c-03bc-4b38-8705-9755fafa0c9f"), categoryIds);
+            });
+
         }
 
         [TestMethod]
@@ -257,6 +340,31 @@ namespace verbum_service_test.Impl.Service
             //Assert
             var count = dbContext.Works.ToList().Count;
             Assert.IsTrue(count > 3);
+        }
+
+        [TestMethod]
+        public async Task AddRange_Exception()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var workService = new WorkServiceImpl(null, mockMapper.Object, null);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
+                      .Returns(new List<WorkResponse>
+                      {
+                          new WorkResponse{ WorkId = Guid.NewGuid() }
+                      });
+
+            List<string> serviceList = new List<string> { "EV" };
+
+            //Act
+            //Assert
+            var exception = await Assert.ThrowsExceptionAsync<NullReferenceException>(async () =>
+            {
+                await workService.AddRange(Guid.Parse("ff21791c-03bc-4b38-8705-9755fafa0c9f"), DateTime.Now, serviceList);
+            });
         }
 
         [TestMethod]
@@ -311,7 +419,7 @@ namespace verbum_service_test.Impl.Service
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
 
-            var workService = new WorkServiceImpl(dbContext, mockMapper.Object, null);
+            var workService = new WorkServiceImpl(null, mockMapper.Object, null);
 
             mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
                       .Returns(new List<WorkResponse>
@@ -344,7 +452,10 @@ namespace verbum_service_test.Impl.Service
 
             //Act
             //Assert
-            workService.GenerateWork(generateWork);
+            var exception = await Assert.ThrowsExceptionAsync<BusinessException>(async () =>
+            {
+                await workService.GenerateWork(generateWork);
+            });
         }
     }
 }
