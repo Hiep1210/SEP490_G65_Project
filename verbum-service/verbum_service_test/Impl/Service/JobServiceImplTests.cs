@@ -81,6 +81,29 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllJob_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+            var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
+
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<JobListResponse>>(It.IsAny<IEnumerable<Job>>()))
+                      .Returns(new List<JobListResponse>
+                      {
+                      });
+
+            //Act
+            var result = jobService.GetAllJob();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllJob_Exception()
         {
             //Arrange

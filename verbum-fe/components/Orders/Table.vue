@@ -24,7 +24,7 @@ const props = defineProps<{
 }>()
 
 const columnFilters = ref<ColumnFiltersState>([])
-
+const role = useAuthStore().user?.role as string | undefined
 const table = useVueTable({
   get data() { return props.data },
   get columns() { return props.columns },
@@ -38,12 +38,22 @@ const table = useVueTable({
     }
   }
 })
+const pageIndex = ref(table.getState().pagination.pageIndex)
+const pageCount = table.getPageCount()
+
+const toPreviousPage = () => {
+  table.previousPage()
+  pageIndex.value = table.getState().pagination.pageIndex
+}
+
+const toNextPage = () => {
+  table.nextPage()
+  pageIndex.value = table.getState().pagination.pageIndex
+}
 
 const toCreate = () => {
   navigateTo("/orders/create")
 }
-
-
 </script>
 
 <template>
@@ -75,7 +85,7 @@ const toCreate = () => {
           </SelectContent>
         </Select>
       </div>
-      <Button @click="toCreate">Create an Order</Button>
+      <Button v-if="role === 'CLIENT'" @click="toCreate">Create an Order</Button>
     </div>
 
     <div class="border rounded-lg overflow-hidden">
@@ -111,10 +121,11 @@ const toCreate = () => {
       </Table>
     </div>
     <div class="flex items-center justify-end py-4 space-x-2">
-      <Button variant="outline" size="sm" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()">
+      <Button variant="outline" size="sm" :disabled="!table.getCanPreviousPage()" @click="toPreviousPage()">
         Previous
       </Button>
-      <Button variant="outline" size="sm" :disabled="!table.getCanNextPage()" @click="table.nextPage()">
+      <p> {{  pageIndex + 1 }} of {{ pageCount }}</p>
+      <Button variant="outline" size="sm" :disabled="!table.getCanNextPage()" @click="toNextPage()">
         Next
       </Button>
     </div>
