@@ -97,6 +97,15 @@ namespace verbum_service_test.Impl.Service
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
 
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "CLIENT"
+            };
+
             mockMapper.Setup(m => m.Map<IEnumerable<ReceiptInfoResponse>>(It.IsAny<IEnumerable<Receipt>>()))
                       .Returns(new List<ReceiptInfoResponse>
                       {
@@ -104,7 +113,7 @@ namespace verbum_service_test.Impl.Service
                           new ReceiptInfoResponse { ReceiptId = Guid.NewGuid(), OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30") },
                       });
 
-            var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object);
+            var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object, currentUser);
 
             //Act
             var result = receiptServiceImpl.GetAllReceipt();
@@ -121,12 +130,21 @@ namespace verbum_service_test.Impl.Service
             var dbContext = await GetDatabaseContext();
             var mockMapper = new Mock<IMapper>();
 
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "CLIENT"
+            };
+
             mockMapper.Setup(m => m.Map<IEnumerable<ReceiptInfoResponse>>(It.IsAny<IEnumerable<Receipt>>()))
                       .Returns(new List<ReceiptInfoResponse>
                       {
                       });
 
-            var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object);
+            var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object, currentUser);
 
             //Act
             var result = receiptServiceImpl.GetAllReceipt();
@@ -142,7 +160,16 @@ namespace verbum_service_test.Impl.Service
             //Arrange
             var mockMapper = new Mock<IMapper>();
 
-            var receiptServiceImpl = new ReceiptServiceImpl(null, mockMapper.Object);
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "CLIENT"
+            };
+
+            var receiptServiceImpl = new ReceiptServiceImpl(null, mockMapper.Object, currentUser);
 
             //Act
             var result = receiptServiceImpl.GetAllReceipt();
