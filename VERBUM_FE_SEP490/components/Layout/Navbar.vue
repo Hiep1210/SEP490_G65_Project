@@ -4,7 +4,6 @@ import {
   FileWarning,
   Book,
   User,
-  ChartBar,
   DollarSign,
   ReceiptText
 } from 'lucide-vue-next'
@@ -43,7 +42,6 @@ const roleMenuItems = {
     { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
   ],
   DIRECTOR: [
-    { navName: 'Prices', navLink: '/prices', navIcon: DollarSign },
     { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
   ]
 } as const
