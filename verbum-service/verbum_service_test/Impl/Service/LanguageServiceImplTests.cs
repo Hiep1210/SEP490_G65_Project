@@ -46,6 +46,28 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllSupportedLanguage_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var languageService = new LanguageServiceImpl(dbContext, mockMapper.Object);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<LanguageResponse>>(It.IsAny<IEnumerable<Language>>()))
+                      .Returns(new List<LanguageResponse>
+                      {
+                      });
+
+            //Act
+            var result = languageService.GetAllSupportedLanguages();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllSupportedLanguage_Exception()
         {
             //Arrange
@@ -83,6 +105,28 @@ namespace verbum_service_test.Impl.Service
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Result.Count());
+        }
+
+        [TestMethod]
+        public async Task GetAllLanguages_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var languageService = new LanguageServiceImpl(dbContext, mockMapper.Object);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<LanguageResponse>>(It.IsAny<IEnumerable<Language>>()))
+                      .Returns(new List<LanguageResponse>
+                      {
+                      });
+
+            //Act
+            var result = languageService.GetAllLanguages();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
         }
 
         [TestMethod]

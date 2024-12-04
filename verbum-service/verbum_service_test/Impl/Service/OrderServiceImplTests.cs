@@ -184,6 +184,40 @@ namespace verbum_service_test
         }
 
         [TestMethod]
+        public async Task GetAllOrder_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "CLIENT"
+            };
+            var mockIConfiguration = new Mock<IConfiguration>();
+            var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+            var mailService = new Mock<MailService>();
+
+            var orderService = new OrderServiceImpl(dbContext, mockMapper.Object, currentUser, mockIConfiguration.Object, mockIhttpcontextAccessor.Object, mailService.Object);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<OrderDetailsResponse>>(It.IsAny<IEnumerable<Order>>()))
+                      .Returns(new List<OrderDetailsResponse>
+                      {
+                      });
+
+            //Act
+            var result = orderService.GetAllOrder();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllOrder_EvaluateManager()
         {
             //Arrange

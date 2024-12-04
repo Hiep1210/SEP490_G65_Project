@@ -58,6 +58,29 @@ namespace verbum_service_test
         }
 
         [TestMethod]
+        public async Task GetAllCategoryTest_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            mockMapper.Setup(m => m.Map<IEnumerable<CategoryInfoResponse>>(It.IsAny<IEnumerable<Category>>()))
+                      .Returns(new List<CategoryInfoResponse>
+                      {
+                          
+                      });
+
+            var categoryServiceImpl = new CategoryServiceImpl(dbContext, mockMapper.Object);
+
+            //Act
+            var result = categoryServiceImpl.GetAllCategory();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllCategoryTest_Exception()
         {
             //Arrange
@@ -95,6 +118,28 @@ namespace verbum_service_test
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Result.Count());
+        }
+
+        [TestMethod]
+        public async Task GetCategoriesByNameTest_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            mockMapper.Setup(m => m.Map<IEnumerable<CategoryInfoResponse>>(It.IsAny<IEnumerable<Category>>()))
+                      .Returns(new List<CategoryInfoResponse>
+                      {
+                      });
+
+            var categoryServiceImpl = new CategoryServiceImpl(dbContext, mockMapper.Object);
+
+            //Act
+            var result = categoryServiceImpl.GetCategoriesByName("OFO");
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
         }
 
         [TestMethod]

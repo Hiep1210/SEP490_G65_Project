@@ -90,6 +90,40 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllWork_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "TRANSLATE_MANAGER"
+            };
+
+            var mockIConfiguration = new Mock<IConfiguration>();
+            var mockIhttpcontextAccessor = new Mock<IHttpContextAccessor>();
+
+            var workService = new WorkServiceImpl(dbContext, mockMapper.Object, currentUser);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<WorkResponse>>(It.IsAny<IEnumerable<Work>>()))
+                      .Returns(new List<WorkResponse>
+                      {
+                      });
+
+            //Act
+            var result = workService.GetAllWork();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllWork_EditManager()
         {
             //Arrange

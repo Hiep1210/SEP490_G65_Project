@@ -115,6 +115,28 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllReceiptTest_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            mockMapper.Setup(m => m.Map<IEnumerable<ReceiptInfoResponse>>(It.IsAny<IEnumerable<Receipt>>()))
+                      .Returns(new List<ReceiptInfoResponse>
+                      {
+                      });
+
+            var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object);
+
+            //Act
+            var result = receiptServiceImpl.GetAllReceipt();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllReceiptTest_Exception()
         {
             //Arrange

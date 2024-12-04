@@ -124,6 +124,37 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllIssue_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("c78d7b35-7fe0-45f3-b171-df0eb48179c5"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var issueService = new IssueServiceImpl(mockMapper.Object, dbContext, currentUser, null);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<IssueResponse>>(It.IsAny<IEnumerable<Issue>>()))
+                      .Returns(new List<IssueResponse>
+                      {
+                      });
+
+            //Act
+            var result = issueService.ViewAllIssue();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllIssue_Client()
         {
             //Arrange

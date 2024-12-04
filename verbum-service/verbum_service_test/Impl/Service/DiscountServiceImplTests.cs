@@ -65,6 +65,29 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllDiscount_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+            var saveDiscountValidation = new Mock<SaveDiscountValidation>(dbContext);
+
+            var discountService = new DiscountServiceImpl(mockMapper.Object, dbContext, saveDiscountValidation.Object);
+
+            mockMapper.Setup(m => m.Map<IEnumerable<DiscountResponse>>(It.IsAny<IEnumerable<Discount>>()))
+                      .Returns(new List<DiscountResponse>
+                      {
+                      });
+
+            //Act
+            var result = discountService.GetAllDiscount();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllDiscount_Excepiton()
         {
             //Arrange

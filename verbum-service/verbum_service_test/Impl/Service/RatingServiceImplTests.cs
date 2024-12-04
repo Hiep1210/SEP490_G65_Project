@@ -117,6 +117,29 @@ namespace verbum_service_test.Impl.Service
         }
 
         [TestMethod]
+        public async Task GetAllRatingTest_Empty()
+        {
+            //Arrange
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+            var mockCurrentUser = new Mock<CurrentUser>();
+
+            mockMapper.Setup(m => m.Map<IEnumerable<RatingResponse>>(It.IsAny<IEnumerable<Rating>>()))
+                      .Returns(new List<RatingResponse>
+                      {
+                      });
+
+            var ratingServiceImpl = new RatingServiceImpl(dbContext, mockMapper.Object, mockCurrentUser.Object);
+
+            //Act
+            var result = ratingServiceImpl.GetAllRating();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Result.Count());
+        }
+
+        [TestMethod]
         public async Task GetAllRatingTest_Exception()
         {
             //Arrange
