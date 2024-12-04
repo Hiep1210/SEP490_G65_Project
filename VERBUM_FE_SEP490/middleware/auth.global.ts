@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
   const clientRoutes = ['/orders', '/issues', '/receipts']
   const directorRoutes = ['/orders']
-  const staffRoutes = ['/order']
+  const staffRoutes = ['/orders']
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
 
