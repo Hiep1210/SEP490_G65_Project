@@ -245,12 +245,21 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task UpdateOrderPrice(Guid orderId, decimal price)
         {
             verbum_service_domain.Models.Order order = context.Orders.Include(o => o.Discount).FirstOrDefault(x => x.OrderId == orderId);
-
-            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price - (price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100));
-
-            order.OrderPrice = price;
-            int records = await context.SaveChangesAsync();
-            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            if (price <= 0)
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID,"Price"));
+            }
+            if (ObjectUtils.IsEmpty(order))
+            {
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
+            }
+            if(price > 0 && ObjectUtils.IsNotEmpty(order))
+            {
+                if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price - (price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100));
+                order.OrderPrice = price;
+                int records = await context.SaveChangesAsync();
+                if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+            }
         }
 
         public async Task UpdateOrderTargetLanguage(OrderUpdate request)
