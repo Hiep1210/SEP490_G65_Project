@@ -32,10 +32,6 @@ namespace verbum_service_infrastructure.Impl.Validation
                     errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "one of issue attachment's tag"));
                 }
             }
-            if (await context.Issues.AnyAsync(x => x.IssueName.Equals(request.IssueName)))
-            {
-                errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "issue name"));
-            }
             if (!context.Orders.Where(x => x.OrderId.Equals(request.OrderId)).Select(x => x.OrderStatus).FirstOrDefault().Equals(OrderStatus.COMPLETED.ToString()))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.ISSUE_CREATE_WHEN_ORDER_NOT_COMPLETED));
