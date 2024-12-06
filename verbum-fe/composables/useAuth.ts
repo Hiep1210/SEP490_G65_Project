@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useToast } from '~/components/ui/toast'
-import { ref } from 'vue'
+import { ToastAction, useToast } from '~/components/ui/toast'
+import { ref, h } from 'vue'
 import { decodeToken } from '~/lib/auth/auth'
 import type { User } from '~/types/user'
+import { Button } from '~/components/ui/button'
 const { toast } = useToast()
 
 export const useAuth = () => {
@@ -23,16 +24,16 @@ export const useAuth = () => {
       })
 
       if (!response.ok && response.status === 400) {
-          toast({
-            title: 'Login error',
-            description: 'Invalid email or password'
-          })
-        } else {
-          toast({
-            title: 'Login error',
-            description: 'An error occurred while logging in'
-          })
-        }
+        toast({
+          title: 'Login error',
+          description: 'Invalid email or password'
+        })
+      } else {
+        toast({
+          title: 'Login error',
+          description: 'An error occurred while logging in'
+        })
+      }
 
       accessToken.value = useCookie('access_token').value
 
@@ -59,27 +60,44 @@ export const useAuth = () => {
   }
 
   const signup = async (credentials: any) => {
-    const response = await fetch(`${config.public.baseUrl}/api/auth/signup`, {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: { 'Content-Type': 'application/json' }
-    })
-
-    if (!response.ok) {
-      toast({
-        title: 'Failed to sign up',
-        description: 'An error occurred while signing up'
+    try {
+      const response = await fetch(`${config.public.baseUrl}/api/auth/signup`, {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: { 'Content-Type': 'application/json' }
       })
-      throw new Error('Failed to sign up')
-    }
-    toast({
-      title: 'Account created',
-      description: 'Your account has been created successfully'
-    })
 
-    setTimeout(() => {
-      router.push('/login')
-    }, 2000)
+      if (!response.ok) {
+        toast({
+          title: 'Failed to sign up',
+          description: 'An error occurred while signing up'
+        })
+        throw new Error('Failed to sign up')
+      }
+      if (response.status === 204) {
+        console.log('Account created:', credentials.email)
+        toast({
+          title: 'Account created',
+          description:
+            'Please check your email to verify your account, if you do not see the email, click the button to resend it',
+          action: h(
+            Button,
+            {
+              onClick: async () =>
+                await fetch(
+                  `${config.public.baseUrl}/api/auth/resend-email?email=${credentials.email}`,
+                  {
+                    method: 'POST'
+                  }
+                )
+            },
+            'Resend email'
+          )
+        })
+      }
+    } catch (error) {
+      console.error('Signup error:', error)
+    }
   }
 
   const logout = async () => {

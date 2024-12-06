@@ -300,12 +300,12 @@ provide('role', role)
                 <h1 class="font-semibold">Service:</h1>
                 <template v-if="!isEditing">
                   <span
-                    v-for="service in ['Translation', 'Editing', 'Evaluation']"
+                    v-for="service in ['Translate', 'Edit', 'Evaluate']"
                     v-show="
                       (order?.hasTranslateService &&
-                        service === 'Translation') ||
-                      (order?.hasEditService && service === 'Editing') ||
-                      (order?.hasEvaluateService && service === 'Evaluation')
+                        service === 'Translate') ||
+                      (order?.hasEditService && service === 'Edit') ||
+                      (order?.hasEvaluateService && service === 'Evaluate')
                     "
                     :key="service"
                     class="font-bold text-primary"
@@ -314,7 +314,7 @@ provide('role', role)
                 </template>
                 <template v-else-if="editedOrder">
                   <span
-                    v-for="service in ['TRANSLATION', 'EDITING', 'EVALUATION']"
+                    v-for="service in ['Translate', 'Edit', 'Evaluate']"
                     :key="service"
                     class="font-bold text-primary"
                   >
@@ -322,7 +322,7 @@ provide('role', role)
                       :id="`has${service}Service`"
                       v-model:checked="editedOrder[`has${service}Service`]"
                     />
-                    {{ service.toUpperCase() }}
+                    {{ service }}
                   </span>
                 </template>
               </div>
