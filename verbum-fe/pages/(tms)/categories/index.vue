@@ -57,7 +57,6 @@ watch(categories, (newCategories) => {
 
 <template>
   <div>
-    <h1>Categories</h1>
     <div class="container mx-auto space-y-4">
       <!-- Input form -->
       <div class="space-y-2 space-x-2">

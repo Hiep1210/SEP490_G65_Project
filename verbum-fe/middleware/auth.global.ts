@@ -40,7 +40,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
           return navigateTo('/works')
         else if (user?.role.includes('ADMINISTRATOR') && !adminRoutes.some(route => to.path.includes(route)))
-          return navigateTo('/users')
+          return navigateTo('/languages')
         else if (user?.role.includes('DIRECTOR') && (!directorRoutes.some(route => to.path.includes(route)) || to.path.includes('/create')))
           return navigateTo('/orders')
         else if (user?.role.includes('STAFF') && !staffRoutes.some(route => to.path.includes(route)))
