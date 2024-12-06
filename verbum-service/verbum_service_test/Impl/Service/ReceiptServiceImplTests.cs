@@ -109,8 +109,8 @@ namespace verbum_service_test.Impl.Service
             mockMapper.Setup(m => m.Map<IEnumerable<ReceiptInfoResponse>>(It.IsAny<IEnumerable<Receipt>>()))
                       .Returns(new List<ReceiptInfoResponse>
                       {
-                          new ReceiptInfoResponse { ReceiptId = Guid.NewGuid(), OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30") },
-                          new ReceiptInfoResponse { ReceiptId = Guid.NewGuid(), OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30") },
+                          new ReceiptInfoResponse { OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30") },
+                          new ReceiptInfoResponse { OrderId = Guid.Parse("551cc0f7-4600-4b69-a07f-44b7817b3e30") },
                       });
 
             var receiptServiceImpl = new ReceiptServiceImpl(dbContext, mockMapper.Object, currentUser);
