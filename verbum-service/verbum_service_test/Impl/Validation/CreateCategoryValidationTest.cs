@@ -28,7 +28,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_Empty()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
@@ -65,7 +64,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_Dupplicate()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
@@ -98,7 +96,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_Format()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
@@ -133,7 +130,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_LongFormat()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 

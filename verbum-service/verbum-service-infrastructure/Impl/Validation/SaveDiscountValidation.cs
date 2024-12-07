@@ -20,18 +20,12 @@ namespace verbum_service_infrastructure.Impl.Validation
         public async Task<List<string>> Validate(DiscountDTO request)
         {
             List<string> errors = new List<string>();
-            errors.AddRange(ValidateRequired(request));
-            errors.AddRange(ValidateDiscountPercent(request));
-            if (ObjectUtils.IsNotEmpty(errors))
-            {
-                return errors;
-            }
-            errors.AddRange(await ValidateDuplicate(request));
+            ValidateRequired(request, errors);
+            ValidateDiscountPercent(request, errors);
             return errors;
         }
-        public List<string> ValidateRequired(DiscountDTO request)
+        public void ValidateRequired(DiscountDTO request, List<string> errors)
         {
-            List<string> errors = new List<string>();
             if(ObjectUtils.IsEmpty(request.DiscountPercent))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "discount percent"));
@@ -40,42 +34,13 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "discount name"));
             }
-            return errors;
         }
-        public List<string> ValidateDiscountPercent(DiscountDTO request)
+        public void ValidateDiscountPercent(DiscountDTO request, List<string> errors)
         {
-            List<string> errors = new List<string>();
-            if (request.DiscountPercent <= 0 && request.DiscountPercent >= 100)
+            if (request.DiscountPercent <= 0 || request.DiscountPercent >= 100)
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "discount percentage"));
             }
-            return errors;
-        }
-        public async Task<List<string>> ValidateDuplicate(DiscountDTO request)
-        {
-            List<string> errors = new List<string>();
-            if (request.IsUpdate)
-            {
-                if (await context.Discounts.AnyAsync(x => x.DiscountName == request.DiscountName && x.DiscountId != request.DiscountId))
-                {
-                    errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "discount name"));
-                }
-                if (await context.Discounts.AnyAsync(context => context.DiscountPercent == request.DiscountPercent && context.DiscountId != request.DiscountId))
-                {
-                    errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "discount percent"));
-                }
-            } else
-            {
-                if (await context.Discounts.AnyAsync(x => x.DiscountName == request.DiscountName ))
-                {
-                    errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "discount name"));
-                }
-                if (await context.Discounts.AnyAsync(context => context.DiscountPercent == request.DiscountPercent ))
-                {
-                    errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "discount percent"));
-                }
-            }
-            return errors;
         }
     }
 }
