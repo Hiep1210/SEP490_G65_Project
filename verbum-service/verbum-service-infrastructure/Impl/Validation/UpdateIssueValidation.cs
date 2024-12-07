@@ -24,7 +24,6 @@ namespace verbum_service_infrastructure.Impl.Validation
             if (ObjectUtils.IsEmpty(request.IssueName) || ObjectUtils.IsEmpty(request.IssueDescription))
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "missing fields"));
-                return errors;
             }
             foreach (var attachment in request.IssueAttachments)
             {

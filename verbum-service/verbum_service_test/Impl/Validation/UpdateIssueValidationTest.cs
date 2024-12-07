@@ -109,6 +109,7 @@ namespace verbum_service_test.Impl.Validation
 
             //Assert
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Contains("one of issue attachment's tag is invalid"));
         }
     }
 }
