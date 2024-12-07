@@ -69,16 +69,16 @@ namespace verbum_service_test.Impl.Validation
 
             CategoryInfo categoryInfo = new CategoryInfo
             {
-                Name = "General"
+                Name = "Dupplicate"
             };
 
             Category general = new Category()
             {
-                CategoryId = 6,
-                CategoryName = "General"
+                CategoryId = 35,
+                CategoryName = "Dupplicate"
             };
 
-            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 6);
+            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 35);
             if (generalCategory == null)
             {
                 dbContext.Categories.Add(general);
@@ -90,6 +90,7 @@ namespace verbum_service_test.Impl.Validation
 
             //Assert
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Contains("Category is already in database"));
         }
 
         [TestMethod]

@@ -23,6 +23,41 @@ namespace verbum_service_test.Impl.Validation
         }
 
         [TestMethod]
+        public async Task UpdateCategoryValidation_IdEmpty()
+        {
+            var dbContext = await GetDatabaseContext();
+            var mockMapper = new Mock<IMapper>();
+
+            var validation = new UpdateCategoryValidation(dbContext);
+
+            CategoryUpdate categoryUpdate = new CategoryUpdate
+            {
+                Id = 0,
+                Name = "Something"
+            };
+
+            Category general = new Category()
+            {
+                CategoryId = 6,
+                CategoryName = "General"
+            };
+
+            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 6);
+            if (generalCategory == null)
+            {
+                dbContext.Categories.Add(general);
+                await dbContext.SaveChangesAsync();
+            }
+
+            //Act
+            List<string> result = await validation.Validate(categoryUpdate);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Contains("CategoryId is required"));
+        }
+
+        [TestMethod]
         public async Task UpdateCategoryValidation_NameEmpty()
         {
             var dbContext = await GetDatabaseContext();
@@ -69,16 +104,16 @@ namespace verbum_service_test.Impl.Validation
             CategoryUpdate categoryUpdate = new CategoryUpdate
             {
                 Id = 100,
-                Name = "General"
+                Name = "Dupplicate"
             };
 
             Category general = new Category()
             {
-                CategoryId = 6,
-                CategoryName = "General"
+                CategoryId = 35,
+                CategoryName = "Dupplicate"
             };
 
-            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 6);
+            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 35);
             if (generalCategory == null)
             {
                 dbContext.Categories.Add(general);
@@ -90,6 +125,7 @@ namespace verbum_service_test.Impl.Validation
 
             //Assert
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Contains("Category is already in database"));
         }
 
         [TestMethod]
