@@ -27,7 +27,6 @@ const roleMenuItems = {
   ADMIN: [
     { navName: 'Categories', navLink: '/categories', navIcon: FileWarning },
     { navName: 'Languages', navLink: '/languages', navIcon: Book },
-    { navName: 'Discounts', navLink: '/discounts', navIcon: DollarSign }
   ],
   MANAGER: [
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },

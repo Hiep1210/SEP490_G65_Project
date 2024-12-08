@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const user = decodeToken(access_token.value)
   const unprotectedRoutes = ['/', '/login', '/signup']
   const employeeRoutes = ['/works', '/jobs', '/issues']
-  const adminRoutes = ['/users', '/languages', '/categories ']
+  const adminRoutes = ['/users', '/languages', '/categories']
   const clientRoutes = ['/orders', '/issues', '/receipts']
   const directorRoutes = ['/orders', '/discounts']
   const staffRoutes = ['/orders']
@@ -49,7 +49,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/')
         else return
       } else {
-        // Invalid token, clear user and redirect to login
         useAuthStore().clearUser()
         return navigateTo('/login')
       }
