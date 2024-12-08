@@ -295,7 +295,7 @@ provide('role', role)
                           )"
                         >
                           <CalendarIcon class="mr-2 h-4 w-4" />
-                          {{ df.format(new Date(editedOrder.dueDate || today(toLocalTimeZone()))) || "Pick a date" }}
+                          {{ df.format(new Date(editedOrder.dueDate)) || "Pick a date" }}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent class="w-auto p-0">
