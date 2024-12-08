@@ -19,6 +19,7 @@ namespace verbum_service_infrastructure.Impl.Validation
         {
             List<string> alerts = new List<string>();
             ValidateEmpty(request, alerts);
+            ValidateFormat(request, alerts);
             await ValidateDupplicate(request, alerts);
             return alerts;
         }
@@ -41,13 +42,13 @@ namespace verbum_service_infrastructure.Impl.Validation
 
         private void ValidateFormat(CategoryInfo request, List<string> alerts)
         {
-            if (request.Name.All(char.IsLetterOrDigit))
+            if (!request.Name.All(char.IsLetterOrDigit))
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Category name must only contain letter or digits"));
             }
             if(request.Name.Length < 1 || request.Name.Length > 30)
             {
-                alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Category name must be between 1 to 30 characters."));
+                alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Category name must be between 1 to 30 characters"));
             }
         }
     }
