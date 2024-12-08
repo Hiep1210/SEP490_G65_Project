@@ -6,9 +6,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const user = decodeToken(access_token.value)
   const unprotectedRoutes = ['/', '/login', '/signup']
   const employeeRoutes = ['/works', '/jobs', '/issues']
-  const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
+  const adminRoutes = ['/users', '/languages', '/categories ']
   const clientRoutes = ['/orders', '/issues', '/receipts']
-  const directorRoutes = ['/orders']
+  const directorRoutes = ['/orders', '/discounts']
   const staffRoutes = ['/orders']
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
@@ -39,7 +39,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/works')
         else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
           return navigateTo('/works')
-        else if (user?.role.includes('ADMINISTRATOR') && !adminRoutes.some(route => to.path.includes(route)))
+        else if (user?.role.includes('ADMIN') && !adminRoutes.some(route => to.path.includes(route)))
           return navigateTo('/languages')
         else if (user?.role.includes('DIRECTOR') && (!directorRoutes.some(route => to.path.includes(route)) || to.path.includes('/create')))
           return navigateTo('/orders')
