@@ -4,8 +4,11 @@ import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
 import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
-import { format } from 'date-fns'
+import { format, toDate } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
+import { Calendar as CalendarIcon } from 'lucide-vue-next'
+import {getLocalTimeZone, parseDate, today, DateFormatter, toLocalTimeZone} from '@internationalized/date'
+import { cn } from '@/lib/utils'
 const { getRatingByOrderId, filteredRating } = useRating()
 
 const { toast } = useToast()
@@ -75,7 +78,7 @@ const saveEdit = async () => {
       const payload = {
         ...editedOrder.value,
         dueDate: editedOrder.value.dueDate
-          ? format(new Date(editedOrder.value.dueDate), 'yyyy-MM-dd')
+          ? format(new Date(editedOrder.value.dueDate), "yyyy-MM-dd'T'HH:mm:ss")
           : null,
         targetLanguageIdList: editedOrder.value?.targetLanguageId,
         translateService: editedOrder.value?.hasTranslateService,
@@ -194,6 +197,10 @@ const confirmSetPrices = async () => {
 
 const orderTitle = computed(() => order.value?.orderName || 'Order Details')
 
+const df = new DateFormatter('vi-VN', {
+  dateStyle: 'short'
+})
+
 useSeoMeta({
   title: orderTitle
 })
@@ -270,18 +277,33 @@ provide('role', role)
               </h1>
               <!-- Due Date -->
               <div class="flex items-center space-x-2">
-                <h1 v-if="order.createdDate" class="font-semibold">
+                <h1 v-if="order.createdDate && !isEditing" class="font-semibold">
                   Due Date:
                   <span class="font-normal">{{
                     formatToVietnamTimezone(order?.dueDate || '')
                   }}</span>
                 </h1>
-                <Input
-                  v-else-if="editedOrder"
-                  v-model="editedOrder.dueDate"
-                  type="date"
-                  class="border rounded p-1 w-fit"
-                />
+                <template v-if="isEditing && editedOrder">
+                  <h1 class="font-semibold">
+                    Due Date:
+                    <Popover>
+                      <PopoverTrigger>
+                        <Button
+                          variant="outline"
+                          :class="cn(
+                            'w-[10rem] justify-start text-left font-normal',
+                          )"
+                        >
+                          <CalendarIcon class="mr-2 h-4 w-4" />
+                          {{ df.format(new Date(editedOrder.dueDate || today(toLocalTimeZone()))) || "Pick a date" }}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent class="w-auto p-0">
+                        <Calendar v-model="editedOrder.dueDate" initial-focus :max-value="today(getLocalTimeZone())"/>
+                      </PopoverContent>
+                    </Popover>
+                  </h1>
+                </template>
               </div>
               <h1 v-if="order.completedDate" class="font-semibold">
                 Completed At:
