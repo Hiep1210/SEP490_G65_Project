@@ -49,14 +49,6 @@ namespace verbum_service_infrastructure.Impl.Validation
                     alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "OrderNote can not be over 255 characters"));
                 }
             }
-
-            if (ObjectUtils.IsNotEmpty(request.DiscountId))
-            {
-                if (!Guid.TryParse(request.DiscountId.ToString(), out Guid discountGuid))
-                {
-                    alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Invalid Discount Code"));
-                }
-            }
         }
 
         private async Task ValidateExist(OrderCreate request, List<string> alerts)
@@ -71,21 +63,14 @@ namespace verbum_service_infrastructure.Impl.Validation
             }
             if (ObjectUtils.IsNotEmpty(request.DiscountId))
             {
-                if (!Guid.TryParse(request.DiscountId.ToString(), out Guid discountGuid))
-                {
-                    alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Discount Code"));
-                }
-                else
-                {
-                    if (await context.Orders.AnyAsync(o => o.DiscountId == discountGuid))
+                    if (await context.Orders.AnyAsync(o => o.DiscountId == request.DiscountId))
                     {
                         alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Discount code was used"));
                     }
-                    if (!await context.Discounts.AnyAsync(d => d.DiscountId == discountGuid))
+                    if (!await context.Discounts.AnyAsync(d => d.DiscountId == request.DiscountId))
                     {
                         alerts.Add(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Discount Code"));
                     }
-                }
             }
         }
 

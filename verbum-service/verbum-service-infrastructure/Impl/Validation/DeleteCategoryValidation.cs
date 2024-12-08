@@ -20,6 +20,7 @@ namespace verbum_service_infrastructure.Impl.Validation
             List<string> alerts = new List<string>();
             ValidateEmpty(request, alerts);
             await ValidateExist(request, alerts);
+            await ValidateWorkExist(request, alerts);
             return alerts;
         }
 
