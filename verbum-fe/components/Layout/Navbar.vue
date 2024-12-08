@@ -41,6 +41,7 @@ const roleMenuItems = {
   ],
   DIRECTOR: [
     { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
+    { navName: 'Discounts', navLink: '/discounts', navIcon: DollarSign }
   ]
 } as const
 
