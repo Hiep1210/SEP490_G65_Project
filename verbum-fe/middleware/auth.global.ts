@@ -4,11 +4,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   const access_token = useCookie('access_token')
   const user = decodeToken(access_token.value)
-  const unprotectedRoutes = ['/', '/login', '/signup']
+  const unprotectedRoutes = ['/', '/login', '/signup', '/resend']
   const employeeRoutes = ['/works', '/jobs', '/issues']
-  const adminRoutes = ['/users', '/languages', '/discounts', '/categories ']
+  const adminRoutes = ['/users', '/languages', '/categories']
   const clientRoutes = ['/orders', '/issues', '/receipts']
-  const directorRoutes = ['/orders']
+  const directorRoutes = ['/orders', '/discounts']
   const staffRoutes = ['/orders']
   const redirectPath = '/redirect'
   const isConfirmEmailRoute = to.path.startsWith('/confirm-email')
@@ -39,8 +39,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/works')
         else if (user?.role === 'LINGUIST' && !employeeRoutes.some(route => to.path.includes(route)))
           return navigateTo('/works')
-        else if (user?.role.includes('ADMINISTRATOR') && !adminRoutes.some(route => to.path.includes(route)))
-          return navigateTo('/users')
+        else if (user?.role.includes('ADMIN') && !adminRoutes.some(route => to.path.includes(route)))
+          return navigateTo('/languages')
         else if (user?.role.includes('DIRECTOR') && (!directorRoutes.some(route => to.path.includes(route)) || to.path.includes('/create')))
           return navigateTo('/orders')
         else if (user?.role.includes('STAFF') && !staffRoutes.some(route => to.path.includes(route)))
@@ -49,7 +49,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
           return navigateTo('/')
         else return
       } else {
-        // Invalid token, clear user and redirect to login
         useAuthStore().clearUser()
         return navigateTo('/login')
       }
@@ -62,7 +61,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (
     !isAuthenticated.value &&
-    !unprotectedRoutes.includes(to.path) &&
+    !unprotectedRoutes.some(route => to.path.includes(route)) &&
     !isConfirmEmailRoute
   ) {
     return navigateTo('/login')

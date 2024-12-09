@@ -26,7 +26,7 @@ namespace verbum_service_infrastructure.Impl.Validation
 
         private void ValidateEmpty(CategoryUpdate request, List<string> alerts)
         {
-            if (ObjectUtils.IsEmpty(request.Id))
+            if (ObjectUtils.IsEmpty(request.Id) || request.Id == 0)
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "CategoryId"));
             }

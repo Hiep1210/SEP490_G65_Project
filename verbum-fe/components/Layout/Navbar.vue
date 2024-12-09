@@ -26,9 +26,7 @@ const roleMenuItems = {
   ],
   ADMIN: [
     { navName: 'Categories', navLink: '/categories', navIcon: FileWarning },
-    { navName: 'Users', navLink: '/users', navIcon: User },
     { navName: 'Languages', navLink: '/languages', navIcon: Book },
-    { navName: 'Discounts', navLink: '/discounts', navIcon: DollarSign }
   ],
   MANAGER: [
     { navName: 'Works', navLink: '/works', navIcon: FolderOpen },
@@ -42,7 +40,8 @@ const roleMenuItems = {
     { navName: 'Issues', navLink: '/issues', navIcon: FileWarning }
   ],
   DIRECTOR: [
-    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen }
+    { navName: 'Orders', navLink: '/orders', navIcon: FolderOpen },
+    { navName: 'Discounts', navLink: '/discounts', navIcon: DollarSign }
   ]
 } as const
 

@@ -101,5 +101,6 @@ const googleAuth = () => {
         <a href="/login" class="underline text-primary">Login</a>
       </div>
     </div>
+    <Toaster/>
   </div>
 </template>
