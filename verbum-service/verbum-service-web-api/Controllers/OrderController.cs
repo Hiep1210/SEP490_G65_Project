@@ -136,16 +136,6 @@ namespace verbum_service.Controllers
             await orderService.DeleteOrderReferenceFile(orderId, fileURl);
             return NoContent();
         }
-        [HttpPut("file-recover")]
-        [Roles(UserRole.ADMIN)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> RecoverDeletedFiles(Guid orderId, string fileURl)
-        {
-            await orderService.RecoverDeletedFiles(orderId, fileURl);
-            return NoContent();
-        }
 
         [HttpPut("send-reject-response")]
         //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
