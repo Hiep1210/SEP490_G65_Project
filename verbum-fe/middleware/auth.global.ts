@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   const access_token = useCookie('access_token')
   const user = decodeToken(access_token.value)
-  const unprotectedRoutes = ['/', '/login', '/signup']
+  const unprotectedRoutes = ['/', '/login', '/signup', '/resend']
   const employeeRoutes = ['/works', '/jobs', '/issues']
   const adminRoutes = ['/users', '/languages', '/categories']
   const clientRoutes = ['/orders', '/issues', '/receipts']
@@ -61,7 +61,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (
     !isAuthenticated.value &&
-    !unprotectedRoutes.includes(to.path) &&
+    !unprotectedRoutes.some(route => to.path.includes(route)) &&
     !isConfirmEmailRoute
   ) {
     return navigateTo('/login')

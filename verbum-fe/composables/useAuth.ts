@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ToastAction, useToast } from '~/components/ui/toast'
+import { useToast } from '~/components/ui/toast'
 import { ref, h } from 'vue'
 import { decodeToken } from '~/lib/auth/auth'
 import type { User } from '~/types/user'
@@ -75,25 +75,12 @@ export const useAuth = () => {
         throw new Error('Failed to sign up')
       }
       if (response.status === 204) {
-        console.log('Account created:', credentials.email)
         toast({
           title: 'Account created',
           description:
-            'Please check your email to verify your account, if you do not see the email, click the button to resend it',
-          action: h(
-            Button,
-            {
-              onClick: async () =>
-                await fetch(
-                  `${config.public.baseUrl}/api/auth/resend-email?email=${credentials.email}`,
-                  {
-                    method: 'POST'
-                  }
-                )
-            },
-            'Resend email'
-          )
+            'Account created successfully.'
         })
+        navigateTo(`/resend/${credentials.email}`)
       }
     } catch (error) {
       console.error('Signup error:', error)
