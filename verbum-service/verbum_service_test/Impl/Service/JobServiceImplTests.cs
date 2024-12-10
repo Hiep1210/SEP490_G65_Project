@@ -63,7 +63,16 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null,currentUser);
 
             mockMapper.Setup(m => m.Map<IEnumerable<JobListResponse>>(It.IsAny<IEnumerable<Job>>()))
                       .Returns(new List<JobListResponse>
@@ -88,7 +97,16 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
+            var currentUser = new CurrentUser
+            {
+                Id = Guid.Parse("80d4d6dd-8f0a-479e-b4a6-1016f34ec78a"),
+                Email = "test@example.com",
+                Name = "Test User",
+                Status = "Active",
+                Role = "LINGUIST"
+            };
+
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null, currentUser);
 
             mockMapper.Setup(m => m.Map<IEnumerable<JobListResponse>>(It.IsAny<IEnumerable<Job>>()))
                       .Returns(new List<JobListResponse>
@@ -111,7 +129,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null);
+            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null, null);
 
             //Act
             var result = jobService.GetAllJob();
@@ -128,7 +146,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null);
+            var jobService = new JobServiceImpl(dbContext, mockMapper.Object, updateJobValidation.Object, null, null);
 
             mockMapper.Setup(m => m.Map<JobListResponse>(It.IsAny<IEnumerable<Job>>()))
                       .Returns(new JobListResponse
@@ -151,7 +169,7 @@ namespace verbum_service_test.Impl.Service
             var mockMapper = new Mock<IMapper>();
             var updateJobValidation = new Mock<UpdateJobValidation>(dbContext);
 
-            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null);
+            var jobService = new JobServiceImpl(null, mockMapper.Object, updateJobValidation.Object, null, null);
 
             //Act
             var result = jobService.GetJobById(Guid.Parse("7357a81d-ca86-40e3-a8c6-4ef9f4134f4f"));
