@@ -128,7 +128,7 @@ namespace verbum_service_infrastructure.Impl.Service
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
-        public async Task ReopenIssue (ReopenIssueRequest request)
+        public async Task ReopenIssue(ReopenIssueRequest request)
         {
             Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
             if (updateIssue.Status != IssueStatusEnum.CANCEL.ToString() && updateIssue.Status != IssueStatusEnum.RESOLVED.ToString()) throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));
@@ -140,7 +140,7 @@ namespace verbum_service_infrastructure.Impl.Service
             updateIssue.CancelResponse = null;
             context.Issues.Update(updateIssue);
 
-            Guid orderId = await context.Issues.Where(x => x.IssueId ==  request.IssueId)
+            Guid orderId = await context.Issues.Where(x => x.IssueId == request.IssueId)
                         .Include(x => x.Job)
                         .ThenInclude(x => x.Work)
                         .ThenInclude(x => x.Order).Select(x => x.Job.Work.Order.OrderId).FirstOrDefaultAsync();
@@ -158,8 +158,39 @@ namespace verbum_service_infrastructure.Impl.Service
             if (await context.Issues.Where(x => x.IssueId == request.Id)
                 .ExecuteUpdateAsync(o => o.SetProperty(x => x.CancelResponse, request.ResponseContent)) < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
             Issue issue = await context.Issues.Include(x => x.Assignee).FirstAsync(x => x.IssueId == request.Id);
-            string mailBody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/issues?issueId=" + request.Id, "cancel_issue_mail", request.ResponseContent);
-            _ = Task.Run(() => mailService.SendEmailAsync(issue.Assignee.Email, string.Format(MailConstant.CANCEL_ISSUE_HEADER, issue.IssueName), mailBody));
+
+            Guid orderId = await context.Issues.Where(x => x.IssueId == request.Id)
+                .Include(x => x.Job)
+                .ThenInclude(x => x.Work)
+                .ThenInclude(x => x.Order).Select(x => x.Job.Work.Order.OrderId).FirstOrDefaultAsync();
+
+            var jobs = await context.Jobs
+                        .Include(x => x.Work)
+                        .Include(x => x.Issue)
+                        .Where(x => x.Work.OrderId == orderId)
+                        .ToListAsync();
+
+            bool allCompleted = jobs.All(job =>
+                    job.Status == JobStatus.APPROVED.ToString() &&
+                    (job.Issue == null || job.Issue.Status == IssueStatusEnum.RESOLVED.ToString() || job.Issue.Status == IssueStatusEnum.CANCEL.ToString()));
+
+            if (allCompleted)
+            {
+                int orderRecords = await context.Orders
+                    .Where(o => o.OrderId == orderId)
+                    .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.COMPLETED.ToString()));
+
+                if (orderRecords < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+                verbum_service_domain.Models.Order order = await context.Orders.Include(x => x.Client).FirstAsync(x => x.OrderId == orderId);
+                string orderbody = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/orders/details/" + order.OrderId, "complete_order_mail");
+                _ = Task.Run(() => mailService.SendEmailAsync(order.Client.Email, string.Format(MailConstant.COMPLETE_ORDER_HEADER, order.OrderName), orderbody));
+            }
+
+
+            //send mail cancel issue
+            string body = await MailUtils.BuildVerificationEmail(SystemConfig.FE_DOMAIN + "/issues?issueId=" + request.Id, "cancel_issue_mail", request.ResponseContent);
+            _ = Task.Run(() => mailService.SendEmailAsync(issue.Assignee.Email, string.Format(MailConstant.CANCEL_ISSUE_HEADER, issue.IssueName), body));
         }
 
         public async Task UpdateIssueRejectResponse(ResponseRequest request)
@@ -174,7 +205,7 @@ namespace verbum_service_infrastructure.Impl.Service
         public async Task UpdateIssueStatus(Guid issueId, string status)
         {
             if (!Enum.IsDefined(typeof(IssueStatusEnum), status)
-                || IssueStatusEnum.OPEN.ToString().Equals(status) 
+                || IssueStatusEnum.OPEN.ToString().Equals(status)
                 || (UserRole.CLIENT.Equals(currentUser.Role) && !IssueStatusEnum.CANCEL.ToString().Equals(status)))
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.INVALID, "issue status"));

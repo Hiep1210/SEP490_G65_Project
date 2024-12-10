@@ -164,7 +164,7 @@ namespace verbum_service_infrastructure.Impl.Service
         {
             if(context.Jobs.Where(x => x.Id == request.Id).Select(x => x.Status).First().Equals(JobStatus.APPROVED))
             {
-                throw new BusinessException(ValidationAlertCode.CANNOT_UPDATE, "job status");
+                throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.CANNOT_UPDATE, "job status"));
             }
             int records = await context.Jobs
                 .Where(x => x.Id == request.Id)
