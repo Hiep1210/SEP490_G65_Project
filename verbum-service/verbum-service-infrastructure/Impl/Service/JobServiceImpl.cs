@@ -162,6 +162,10 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task RejectJob(ResponseRequest request)
         {
+            if(context.Jobs.Where(x => x.Id == request.Id).Select(x => x.Status).First().Equals(JobStatus.APPROVED))
+            {
+                throw new BusinessException(ValidationAlertCode.CANNOT_UPDATE, "job status");
+            }
             int records = await context.Jobs
                 .Where(x => x.Id == request.Id)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.Status, JobStatus.IN_PROGRESS.ToString()).SetProperty(x => x.RejectReason, request.ResponseContent));
