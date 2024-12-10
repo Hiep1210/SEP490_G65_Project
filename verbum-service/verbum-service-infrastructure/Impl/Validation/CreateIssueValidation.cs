@@ -36,6 +36,10 @@ namespace verbum_service_infrastructure.Impl.Validation
             {
                 errors.Add(AlertMessage.Alert(ValidationAlertCode.ISSUE_CREATE_WHEN_ORDER_NOT_COMPLETED));
             }
+            if (await context.Issues.AnyAsync(x => x.SrcDocumentUrl.Equals(request.DeliverableUrl)))
+            {
+                errors.Add(AlertMessage.Alert(ValidationAlertCode.DUPLICATE, "deliverable url"));
+            }
             return errors;
         }
     }
