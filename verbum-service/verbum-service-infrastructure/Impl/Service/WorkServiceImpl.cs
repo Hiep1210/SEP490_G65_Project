@@ -80,7 +80,8 @@ namespace verbum_service_infrastructure.Impl.Service
                 case UserRole.LINGUIST:
                     orders = await context.Works
                         .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences).Include(x => x.Jobs).ThenInclude(x => x.Assignees)
+                        .Where(w => w.Jobs.Any(j => j.Assignees.Any(a => a.Id == currentUser.Id)))
                         .ToListAsync();
                     break;
                 default:
