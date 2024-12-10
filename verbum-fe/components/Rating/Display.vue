@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 defineProps<{ question: string; rating: number }>();
-
 </script>
 <template>
   <div>

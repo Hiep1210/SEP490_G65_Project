@@ -453,9 +453,7 @@ provide('role', role)
         <!-- Smaller Issues List Section -->
         <div
           v-if="
-            order.orderStatus === ORDER_COMPLETED ||
-            order.orderStatus === ORDER_IN_PROGRESS
-          "
+            order.orderStatus === ORDER_COMPLETED"
           class="flex-1 space-y-4 border rounded-md"
         >
           <OrdersIssues

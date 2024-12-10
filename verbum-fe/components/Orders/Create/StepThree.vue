@@ -68,7 +68,7 @@ watch(files, () => {
 </script>
 
 <template>
-  <FormField v-slot="{ componentField }" name="reference">
+  <FormField v-slot="{ componentField }" name="orderNote">
     <FormItem>
       <FormLabel>Note</FormLabel>
       <FormControl>
