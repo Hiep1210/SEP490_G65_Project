@@ -22,6 +22,7 @@ namespace verbum_service_infrastructure.Impl.Service
         private readonly IMapper mapper;
         private readonly UpdateJobValidation validation;
         private readonly verbum_service_application.Service.MailService mailService;
+        private readonly CurrentUser currentUser;
         public async Task CreateJobs(CreateJobsRequest request)
         {
             using (IDbContextTransaction transaction = context.Database.BeginTransaction())
@@ -64,8 +65,23 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<JobListResponse>> GetAllJob()
         {
-            List<JobListResponse> allJobs = mapper.Map<List<JobListResponse>>(await context.Jobs.Include(x => x.Assignees).ToListAsync());
-            return allJobs;
+            List<Job> allJobs = await context.Jobs.Include(x => x.Assignees).Include(x => x.Work).ToListAsync();
+            switch(currentUser.Role)
+            {
+                case UserRole.LINGUIST:
+                    allJobs = allJobs.Where(x => x.Assignees.Select(x => x.Id).Contains(currentUser.Id)).ToList();
+                    break;
+                case UserRole.TRANSLATE_MANAGER:
+                    allJobs = allJobs.Where(x => x.Work.ServiceCode == "TL").ToList();
+                    break;
+                case UserRole.EDIT_MANAGER:
+                    allJobs = allJobs.Where(x => x.Work.ServiceCode == "ED").ToList();
+                    break;
+                case UserRole.EVALUATE_MANAGER:
+                    allJobs = allJobs.Where(x => x.Work.ServiceCode == "EV").ToList();
+                    break;
+            }
+            return mapper.Map<List<JobListResponse>>(allJobs);
         }
 
         public async Task<JobInfoResponse> GetJobById(Guid jobId)
