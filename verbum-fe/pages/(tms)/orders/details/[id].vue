@@ -2,12 +2,12 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
+import { ORDER_COMPLETED } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
-import { format, toDate } from 'date-fns'
+import { format } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
-import {getLocalTimeZone, parseDate, today, DateFormatter, toLocalTimeZone} from '@internationalized/date'
+import {getLocalTimeZone, today, DateFormatter} from '@internationalized/date'
 import { cn } from '@/lib/utils'
 const { getRatingByOrderId, filteredRating } = useRating()
 
@@ -314,7 +314,7 @@ provide('role', role)
 
               <h1 v-if="order.discountId" class="font-semibold">
                 Discount Code:
-                <span class="font-normal">{{ order.discountId }}</span>
+                <span class="hyper-link">{{ order.discountName }}</span>
               </h1>
 
               <!-- Services Section -->

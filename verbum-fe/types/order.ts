@@ -11,6 +11,7 @@ export interface Order {
   orderStatus?: string
   orderPrice?: string
   discountId?: string
+  discountName?: string
   hasTranslateService?: boolean
   hasEditService?: boolean
   hasEvaluateService?: boolean
