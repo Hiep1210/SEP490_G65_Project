@@ -168,7 +168,7 @@ namespace verbum_service_test.Impl.Service
             DiscountDTO request = new DiscountDTO
             {
                 DiscountId = Guid.Parse("e522870d-3976-4afe-b2fc-9918acedf316"),
-                DiscountPercent = 100,
+                DiscountPercent = 90,
                 DiscountName = "addDiscount",
                 IsUpdate = true
             };
@@ -177,15 +177,15 @@ namespace verbum_service_test.Impl.Service
                       .Returns(new Discount
                       {
                           DiscountId = Guid.Parse("e522870d-3976-4afe-b2fc-9918acedf316"),
-                          DiscountPercent = 100,
+                          DiscountPercent = 90,
                           DiscountName = "newaddDiscount",
                       });
 
             //Act
             //Assert
-            discountService.UpdateDiscount(request);
+            await discountService.UpdateDiscount(request);
             var addedDiscount = await dbContext.Discounts.FirstOrDefaultAsync(c => c.DiscountId == Guid.Parse("e522870d-3976-4afe-b2fc-9918acedf316"));
-            Assert.AreEqual(100,addedDiscount.DiscountPercent);
+            Assert.AreEqual(90,addedDiscount.DiscountPercent);
         }
 
         [TestMethod]

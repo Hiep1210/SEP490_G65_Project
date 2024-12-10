@@ -13,7 +13,6 @@ namespace verbum_service_application.Service
         Task UpdateOrderTargetLanguage(OrderUpdate request);
         Task<OrderDetailsResponse> GetOrderDetails(Guid id);
         Task ChangeOrderStatus(Guid orderId, string orderStatus);
-        Task RecoverDeletedFiles(Guid orderId, string url);
         Task DeleteOrderReferenceFile(Guid orderId, string url);
         Task UploadOrderReferenceFile(List<UploadOrderFileRequest> request);
         Task<List<UploadOrderFileRequest>> GetAllOrderRefrenceFiles();

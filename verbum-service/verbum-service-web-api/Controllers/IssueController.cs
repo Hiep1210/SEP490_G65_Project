@@ -69,17 +69,6 @@ namespace verbum_service.Controllers
             return NoContent();
         }
 
-        [HttpPut("file-recover")]
-        [Roles(UserRole.ADMIN)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> RecoverDeletedFiles(Guid issueId, string fileURl)
-        {
-            await issueService.RecoverDeletedFiles(issueId, fileURl);
-            return NoContent();
-        }
-
         [HttpPut("send-cancel-response")]
         //[Roles(UserRole.CLIENT, UserRole.MANAGER)]
         [ProducesResponseType(204)]

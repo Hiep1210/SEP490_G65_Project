@@ -80,28 +80,37 @@ const filteredLanguages = computed(() =>
       lang.languageId.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 )
+console.log('selectedLanguagesArray', selectedLanguagesArray.value)
 </script>
 
 <template>
   <div ref="dropdownRef" class="relative">
     <div
-      class="flex items-center justify-between border border-gray-300 rounded-md px-1 py-1 cursor-pointer"
+      class="flex items-center justify-between rounded-md px-1 py-1 cursor-pointer"
       aria-haspopup="listbox"
       :aria-expanded="isOpen ? 'true' : 'false'"
       aria-controls="language-list"
       @click="toggleDropdown"
     >
-      <span>
-        <template v-if="props.isSourceLanguage">
-          {{ props.selectedLanguages || 'Select Source Language' }}
+    <span>
+      <template v-if="props.isSourceLanguage">
+        <Badge>
+          {{ languageList.find((lang)=> lang.languageId === $props.selectedLanguages)?.languageName || 'Select Source Language' }}
+        </Badge>
+      </template>
+      <template v-else>
+        <template v-if="selectedLanguagesArray.length">
+          <Badge 
+            v-for="(languageName, languageId) in selectedLanguagesArray" 
+            :key="languageId"
+            class="bg-slate-500"
+          >
+            {{ languageList.find((lang) => lang.languageId===languageName)?.languageName }}
+          </Badge>
         </template>
-        <template v-else>
-          <span v-if="selectedLanguagesArray.length">
-            {{ selectedLanguagesArray.join(', ') }}
-          </span>
-          <span v-else>Select Target Language</span>
-        </template>
-      </span>
+        <Badge v-else>Select Target Language</Badge>
+      </template>
+    </span>
     </div>
     <div
       v-if="isOpen"

@@ -28,7 +28,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_Empty()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
@@ -65,22 +64,21 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_Dupplicate()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
             CategoryInfo categoryInfo = new CategoryInfo
             {
-                Name = "General"
+                Name = "Dupplicate"
             };
 
             Category general = new Category()
             {
-                CategoryId = 6,
-                CategoryName = "General"
+                CategoryId = 35,
+                CategoryName = "Dupplicate"
             };
 
-            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 6);
+            var generalCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == 35);
             if (generalCategory == null)
             {
                 dbContext.Categories.Add(general);
@@ -92,13 +90,13 @@ namespace verbum_service_test.Impl.Validation
 
             //Assert
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Contains("Category is already in database"));
         }
 
         [TestMethod]
         public async Task CreateCategoryValidation_Format()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 
@@ -133,7 +131,6 @@ namespace verbum_service_test.Impl.Validation
         public async Task CreateCategoryValidation_LongFormat()
         {
             var dbContext = await GetDatabaseContext();
-            var mockMapper = new Mock<IMapper>();
 
             var validation = new CreateCategoryValidation(dbContext);
 

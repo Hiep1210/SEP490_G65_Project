@@ -39,7 +39,7 @@ namespace verbum_service.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAll([FromQuery][Required] Guid jobId)
+        public async Task<IActionResult> GetJobDetail([FromQuery][Required] Guid jobId)
         {
             return ResponseFilter.OkOrNoContent(await jobService.GetJobById(jobId), this);
         }

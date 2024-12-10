@@ -253,13 +253,10 @@ namespace verbum_service_infrastructure.Impl.Service
             {
                 throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Order"));
             }
-            if(price > 0 && ObjectUtils.IsNotEmpty(order))
-            {
-                if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price - (price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100));
-                order.OrderPrice = price;
-                int records = await context.SaveChangesAsync();
-                if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
-            }
+            if (ObjectUtils.IsNotEmpty(order.DiscountId)) price = price - (price * (order.Discount.DiscountPercent.GetValueOrDefault() / 100));
+            order.OrderPrice = price;
+            int records = await context.SaveChangesAsync();
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
         public async Task UpdateOrderTargetLanguage(OrderUpdate request)
@@ -297,14 +294,6 @@ namespace verbum_service_infrastructure.Impl.Service
             int records = await context.Orders
                 .Where(x => x.OrderId == orderId)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, orderStatus));
-            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
-        }
-
-        public async Task RecoverDeletedFiles(Guid orderId, string url)
-        {
-            int records = await context.OrderReferences
-                .Where(x => x.OrderId == orderId && x.ReferenceFileUrl == url)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.IsDeleted, false));
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 

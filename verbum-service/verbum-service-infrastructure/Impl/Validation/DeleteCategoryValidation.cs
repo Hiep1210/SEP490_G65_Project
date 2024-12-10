@@ -20,12 +20,13 @@ namespace verbum_service_infrastructure.Impl.Validation
             List<string> alerts = new List<string>();
             ValidateEmpty(request, alerts);
             await ValidateExist(request, alerts);
+            await ValidateWorkExist(request, alerts);
             return alerts;
         }
 
         private void ValidateEmpty(CategoryDelete request, List<string> alerts)
         {
-            if (ObjectUtils.IsEmpty(request.Id))
+            if (ObjectUtils.IsEmpty(request.Id) || request.Id == 0)
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.REQUIRED, "CategoryId"));
             }
@@ -44,14 +45,6 @@ namespace verbum_service_infrastructure.Impl.Validation
             if (await context.Categories.Include(c => c.Works).AnyAsync(x => x.CategoryId == request.Id && x.Works.Any()))
             {
                 alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Exist associated works"));
-            }
-        }
-
-        private async Task ValidationRevelancyExist(CategoryDelete request, List<string> alerts)
-        {
-            if (await context.Revelancies.AnyAsync(x => x.CategoryId == request.Id))
-            {
-                alerts.Add(AlertMessage.Alert(ValidationAlertCode.INVALID, "Exist associated revelancy"));
             }
         }
     }

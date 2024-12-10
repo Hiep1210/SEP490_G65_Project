@@ -115,14 +115,6 @@ namespace verbum_service_infrastructure.Impl.Service
             return mapper.Map<List<UploadIssueAttachmentFiles>>(await context.IssueAttachments.Where(x => !x.IsDeleted).ToListAsync());
         }
 
-        public async Task RecoverDeletedFiles(Guid issueId, string attachmentUrl)
-        {
-            int records = await context.IssueAttachments
-                .Where(x => x.IssueId == issueId && x.AttachmentUrl == attachmentUrl)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.IsDeleted, false));
-            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
-        }
-
         public async Task UpdateIssue(UpdateIssueRequest request)
         {
             Issue? updateIssue = await context.Issues.Include(x => x.IssueAttachments).FirstOrDefaultAsync(x => x.IssueId == request.IssueId);
