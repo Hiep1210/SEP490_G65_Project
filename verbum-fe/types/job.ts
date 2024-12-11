@@ -16,7 +16,7 @@ export interface Job {
     orderId: string;
 }
 
-interface assigneeNames {
+export interface assigneeNames {
     id: string;
     name: string;
     email: string;

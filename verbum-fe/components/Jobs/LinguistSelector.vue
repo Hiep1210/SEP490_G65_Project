@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import type { Linguist } from '@/types/user'
 import { Check } from 'lucide-vue-next'
+import type { assigneeNames } from '~/types/job';
 interface LinguistSelectorProps {
   linguists: Linguist[]
-  assignedLinguists?: string[]
+  assignedLinguists?: assigneeNames[]
   modelValue?: string[]
   error?: boolean
 }
@@ -13,8 +14,6 @@ const emit = defineEmits(['update:selected-linguists', 'update:modelValue'])
 const isOpen = ref(false)
 const searchQuery = ref('')
 const dropdownRef = ref<HTMLElement | null>(null)
-
-const selectedLinguistsIdsArray = ref<string[]>(props.modelValue || [])
 
 onMounted(() => {
   document.addEventListener('mousedown', handleClickOutside)
@@ -33,6 +32,13 @@ const handleClickOutside = (event: MouseEvent) => {
 function toggleDropdown() {
   isOpen.value = !isOpen.value
 }
+const selectedLinguistsIdsArray = ref<string[]>(props.modelValue || [])
+
+onMounted(() => {
+  if (props.assignedLinguists) {
+    selectedLinguistsIdsArray.value = [...props.assignedLinguists.map(linguist => linguist.id)]
+  }
+})
 
 const handleLinguistSelect = (linguistId: string) => {
   const index = selectedLinguistsIdsArray.value.indexOf(linguistId)
@@ -44,9 +50,7 @@ const handleLinguistSelect = (linguistId: string) => {
   emit('update:selected-linguists', [...selectedLinguistsIdsArray.value])
   emit('update:modelValue', [...selectedLinguistsIdsArray.value])
 }
-
-const isSelected = (linguistId: string) =>
-  selectedLinguistsIdsArray.value.includes(linguistId)
+const isSelected = (linguistId: string) => selectedLinguistsIdsArray.value.includes(linguistId)
 
 const filteredLinguists = computed(() =>
   props.linguists.filter(linguist =>
@@ -55,17 +59,12 @@ const filteredLinguists = computed(() =>
 )
 
 const selectedLinguistsDisplay = computed(() => {
-  if (selectedLinguistsIdsArray.value.length === 0 && !props.assignedLinguists) {
+  if (selectedLinguistsIdsArray.value.length === 0) {
     return 'Select linguist'
   }
-  if (selectedLinguistsIdsArray.value.length === 0 && props.assignedLinguists) {
-    return props.assignedLinguists.join(', ')
-  }
-  
   const selectedLinguists = props.linguists
     .filter(linguist => selectedLinguistsIdsArray.value.includes(linguist.id))
     .map(linguist => linguist.name)
-  
   return selectedLinguists.join(', ')
 })
 
@@ -106,7 +105,7 @@ const selectedLinguistsDisplay = computed(() => {
           role="option"
           :aria-selected="isSelected(linguist.id) ? 'true' : 'false'"
           @click="() => {
-            handleLinguistSelect(linguist.id);
+            handleLinguistSelect(linguist.id)
           }"
         >
           <Check v-if="isSelected(linguist.id)" />

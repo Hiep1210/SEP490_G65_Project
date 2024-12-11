@@ -67,7 +67,7 @@ const { approve, reject } = useJobs()
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
-      <JobsEditDialog v-if="canEdit" @edit="assignLinguists">
+      <JobsEditDialog v-if="canEdit" :work-due-date="props.job?.workDueDate ?? '' " :assigned-linguists="props.job?.assigneeNames ?? []" :old-due-date="props.job?.dueDate ?? ''"  @edit="assignLinguists">
         <Button variant="outline">Edit</Button>
       </JobsEditDialog>
     </header>
