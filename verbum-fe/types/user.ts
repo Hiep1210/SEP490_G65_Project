@@ -9,6 +9,7 @@ export interface User {
 export interface Linguist {
   id: string
   name: string
-  relavancies: string[]
+  email: string
+  revelancies: string[]
   roleCode: string
 }

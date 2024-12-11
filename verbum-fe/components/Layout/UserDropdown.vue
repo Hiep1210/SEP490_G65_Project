@@ -8,17 +8,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { CircleUser } from 'lucide-vue-next'
-const authStore = useCookie('AuthStore')
-const access_token = useCookie('access_token')
-const refresh_token = useCookie('refresh_token')
 const { user } = useAuthStore()
-
-const handleLogout = () => {
-  authStore.value = ''
-  access_token.value = ''
-  refresh_token.value = ''
-  window.location.reload()
-}
+const {logout} = useAuth()
 </script>
 
 <template>
@@ -34,7 +25,7 @@ const handleLogout = () => {
         <DropdownMenuLabel>{{user?.name }} - <span class="text-primary">{{user?.role}}</span></DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
-        <DropdownMenuItem @click="handleLogout">Logout</DropdownMenuItem>
+        <DropdownMenuItem @click="logout">Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>

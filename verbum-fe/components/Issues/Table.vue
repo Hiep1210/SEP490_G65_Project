@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDistanceToNow } from 'date-fns';
 import { ref, computed, watch } from 'vue';
 import type { Issue } from '~/types/issues';
 
@@ -127,12 +126,12 @@ watch(
           </TableCell>
           <TableCell>
             {{
-              formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })
+              formatDistanceToNowUserTimezone(new Date(issue.createdAt))
             }}
           </TableCell>
           <TableCell>
             {{
-              formatDistanceToNow(new Date(issue.updatedAt), { addSuffix: true })
+              formatDistanceToNowUserTimezone(new Date(issue.updatedAt))
             }}
           </TableCell>
           <TableCell>

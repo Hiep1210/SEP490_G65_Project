@@ -13,6 +13,15 @@ onMounted(() => {
   }
 })
 provide('assignList', assignList)
+
+const jobTitle = computed(() => {
+  if (!job.value) return 'Job Details'
+  return getJobName(job.value.name)
+})
+
+useHead({
+  title: jobTitle,
+})
 </script>
 <template>
     <LoadingSpinner v-if="isLoading"/>

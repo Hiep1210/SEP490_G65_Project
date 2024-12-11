@@ -21,6 +21,7 @@
                 <FormLabel>Linguist</FormLabel>
                 <JobsLinguistSelector v-bind="componentField" v-model:selected-linguists="selectedLinguists"
                   :error="!!errorMessage" :linguists="assignList"
+                  :assigned-linguists="props.assignedLinguists"
                   @update:selected-linguists="updateSelectedLinguists" />
                 <FormMessage />
               </FormItem>
@@ -35,7 +36,7 @@
                       !value && 'text-muted-foreground',
                     )">
                       <CalendarIcon class="mr-2 h-4 w-4" />
-                      {{ value ? value.toLocaleDateString() : "Pick a date" }}
+                      {{ value ? value.toLocaleDateString() : format(new Date(oldDueDate), 'dd/MM/yyyy') }}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
@@ -64,20 +65,27 @@ import { cn } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-vue-next'
 import { CalendarDate } from "@internationalized/date"
 import { format } from 'date-fns'
+import type { assigneeNames } from '~/types/job'
+
+const props = defineProps<{
+  assignedLinguists: assigneeNames[]
+  oldDueDate: string
+  workDueDate: string
+}>()
 
 const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
 const selectedLinguists = ref<string[]>([])
 
 const schema = toTypedSchema(z.object({
   assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(), 'Due date is required')
+  dueDate: z.coerce.date().min(new Date(1900,1 ,1), 'Due date is required').max(new Date(props.workDueDate), 'Due date must be before work due date')
 }))
 
 const form = useForm({
   validationSchema: schema,
   initialValues: {
-    assignee_id: [],
-    dueDate: new Date()
+    assignee_id: props.assignedLinguists ? props.assignedLinguists.map(linguist => linguist.id) : [],
+    dueDate: props.oldDueDate ? new Date(props.oldDueDate) : new Date()
   }
 })
 

@@ -6,7 +6,7 @@ useSeoMeta({
   title: 'Issues'
 })
 
-const { issues, getIssues, updateIssue } = useIssues()
+const { isLoading, issues, getIssues, updateIssue } = useIssues()
 const { user } = useAuthStore()
 const currentUserRole = user?.role
 
