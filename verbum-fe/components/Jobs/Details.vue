@@ -103,7 +103,7 @@ const { approve, reject } = useJobs()
         <JobsRejectDialog
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           @reject="reject(job?.id, $event)" >
-          <Button variant="outline" :disable="props.job?.status !== 'SUBMITTED'">Reject</Button> 
+          <Button variant="outline" :disabled="(props.job?.status !== 'SUBMITTED' )">Reject</Button> 
         </JobsRejectDialog>
       </template>
       <template v-else>
