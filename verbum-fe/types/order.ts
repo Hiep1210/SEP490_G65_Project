@@ -15,6 +15,7 @@ export interface Order {
   hasEditService?: boolean
   hasEvaluateService?: boolean
   orderNote?: string
+  rejectReason?: string
   translationFileUrls?: string[]
   referenceFileUrls?: string[]
   jobDeliverables?: JobDeliverables[]
