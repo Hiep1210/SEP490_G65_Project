@@ -6,7 +6,7 @@ useSeoMeta({
   title: 'Issues'
 })
 
-const { issues, getIssues, updateIssue } = useIssues()
+const { isLoading, issues, getIssues, updateIssue } = useIssues()
 const { user } = useAuthStore()
 const currentUserRole = user?.role
 
@@ -22,7 +22,7 @@ const handleUpdate = async (updateIssues: Issue) => {
 </script>
 
 <template>
-  <LoadingSpinner v-if="!issues.length" />
+  <LoadingSpinner v-if="isLoading" />
   <div v-else class="flex flex-col space-y-4">
     <IssuesCarousel :issues="issues" :role="currentUserRole"/>
     <h1 class="text-2xl font-semibold">All issues</h1>

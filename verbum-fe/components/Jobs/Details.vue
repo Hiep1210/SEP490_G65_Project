@@ -67,7 +67,7 @@ const { approve, reject } = useJobs()
         </h1>
         <Badge :class="getJobBadgeClass(props.job?.status ?? '')">{{ props.job?.status }}</Badge>
       </div>
-      <JobsEditDialog v-if="canEdit" @edit="assignLinguists">
+      <JobsEditDialog v-if="canEdit" :work-due-date="props.job?.workDueDate ?? '' " :assigned-linguists="props.job?.assigneeNames ?? []" :old-due-date="props.job?.dueDate ?? ''"  @edit="assignLinguists">
         <Button variant="outline">Edit</Button>
       </JobsEditDialog>
     </header>
@@ -96,14 +96,13 @@ const { approve, reject } = useJobs()
         <Button 
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           variant="outline" 
-          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
-          @click="approve(props.job)">
+          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job">
           Approve
         </Button>
         <JobsRejectDialog
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           @reject="reject(job?.id, $event)" >
-          <Button variant="outline" :disable="props.job?.status !== 'SUBMITTED'">Reject</Button> 
+          <Button variant="outline" :disabled="(props.job?.status !== 'SUBMITTED' )">Reject</Button> 
         </JobsRejectDialog>
       </template>
       <template v-else>

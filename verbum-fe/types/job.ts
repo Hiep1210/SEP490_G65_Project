@@ -6,6 +6,7 @@ export interface Job {
     workDueDate: string;
     createdAt: string;
     updatedAt: string;
+    rejectReason: string;
     documentUrl: string;
     referenceUrls: string[];
     deliverableUrl: string;
@@ -16,7 +17,7 @@ export interface Job {
     orderId: string;
 }
 
-interface assigneeNames {
+export interface assigneeNames {
     id: string;
     name: string;
     email: string;

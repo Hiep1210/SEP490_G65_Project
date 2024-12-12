@@ -8,10 +8,15 @@ export const getFirebaseFileName = (downloadURL: string) => {
 
 }
 
-export const getJobName = (name: string) => {
-  const parts = name.split('_');
-  if (parts.length < 4) return name; // Return the whole string if less than 3 underscores
-  const prefix = parts.slice(0, 3).join('_')
-  const jobName = getFirebaseFileName(parts.slice(3).join('_'));
-  return prefix.concat('_',jobName);
-}
+export const getJobName = (name: string): string => {
+  const sanitizedString = name.replace(/VERBUM/gi, "").replace(/__+/g, "_");
+
+  const parts = sanitizedString.split('_');
+
+  if (parts.length < 3) return sanitizedString;
+  
+  const prefix = parts.slice(0, 2).join('_');
+
+  const jobName = getFirebaseFileName(parts.slice(2).join('_'));
+  return `${prefix}_${jobName}`;
+};

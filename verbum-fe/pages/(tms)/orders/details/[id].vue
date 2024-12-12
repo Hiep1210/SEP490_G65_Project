@@ -262,6 +262,10 @@ provide('role', role)
                 Client Note:
                 <span class="font-normal">{{ order?.orderNote }}</span>
               </h1>
+              <h1 v-if="order.rejectReason" class="font-semibold text-red-600">
+                Reject Reason:
+                <span class="font-normal text-black">{{ order?.rejectReason}}</span>
+              </h1>
               <h1 class="font-semibold">
                 Status:
                 <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{

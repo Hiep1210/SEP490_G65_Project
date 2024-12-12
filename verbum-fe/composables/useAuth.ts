@@ -51,9 +51,7 @@ export const useAuth = () => {
         title: 'Logged in',
         description: 'You have been logged in successfully'
       })
-      setTimeout(() => {
         router.push('/orders')
-      }, 2000)
     } catch (error) {
       console.error('Login error:', error)
     }
@@ -87,11 +85,11 @@ export const useAuth = () => {
     }
   }
 
-  const logout = async () => {
+  const logout = () => {
     accessToken.value = null
     refreshToken.value = null
     authStore.clearUser()
-    useRouter().push('/login')
+    navigateTo('/login')
   }
 
   const googleAuth = async () => {
