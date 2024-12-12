@@ -40,5 +40,6 @@ namespace verbum_service_domain.DTO.Response
         public ICollection<UserInfo> AssigneeNames { get; set; }
         public Dictionary<string, string> PreviousJobDeliverables { get; set; }
         public List<string> ReferenceUrls { get; set; }
+        public string? RejectReason { get; set; }
     }
 }
