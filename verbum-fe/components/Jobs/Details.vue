@@ -96,7 +96,8 @@ const { approve, reject } = useJobs()
         <Button 
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           variant="outline" 
-          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job">
+          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
+          @click="approve(props.job)">
           Approve
         </Button>
         <JobsRejectDialog

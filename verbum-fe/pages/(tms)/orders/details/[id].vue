@@ -418,7 +418,8 @@ provide('role', role)
                 role === 'CLIENT' &&
                 order.orderStatus !== 'COMPLETED' &&
                 order.orderStatus !== 'CANCELLED' &&
-                order.orderStatus !== 'DELIVERED'
+                order.orderStatus !== 'DELIVERED' &&
+                order.orderStatus !== 'IN_PROGRESS'
               "
               :order-id="order.orderId"
             >

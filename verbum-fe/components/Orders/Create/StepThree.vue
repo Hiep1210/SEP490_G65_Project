@@ -74,7 +74,6 @@ watch(files, () => {
       <FormControl>
         <Textarea
           placeholder="Tell us further details, notes, references, instructions or any special requests"
-          class="resize-none"
           v-bind="componentField"
         />
       </FormControl>
