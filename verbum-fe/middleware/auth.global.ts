@@ -3,9 +3,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   let access_token = useCookie('access_token').value
   const user = access_token ? decodeToken(access_token) : null
-  const unprotectedRoutes = ['/', '/login', '/signup', '/resend', '/confirm-email']
-
-  if (unprotectedRoutes.some(route => to.path.startsWith(route))) {
+  const unprotectedRoutes = ['/login', '/signup', '/resend', '/confirm-email']
+  const landingPage = '/'
+  if (unprotectedRoutes.some(route => to.path.startsWith(route)) || to.path === landingPage) {
     return
   }
 
