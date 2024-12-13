@@ -63,7 +63,7 @@ const isSupported = (language: string) => {
 <template>
   <Dialog :open="isOpen" @click-outside="closeDialog">
     <DialogContent>
-      <DialogTitle>Set Prices for {{ order.orderName }}</DialogTitle>
+      <DialogTitle class="text-cyan-600 font-bold">Set Prices for {{ order.orderName }}</DialogTitle>
       <!-- <DialogDescription v-if="order.dueDate">Due date: {{order.dueDate}}</DialogDescription> -->
       <hr>
       <div class="flex w-full gap-3">
@@ -112,6 +112,19 @@ const isSupported = (language: string) => {
         Supported languages will be in
         <span class="text-green-700">green color</span>.
       </p>
+      <hr>
+      <p class="font-bold text-cyan-600">Pricing Matrix</p>
+      <div class="flex w-full gap-3">
+        <div class="flex-none w-1/3">
+          <p class="font-semibold">Price/hour:</p>
+          <p class="font-semibold">Price/word/service:</p>
+
+        </div>
+        <div class="flex-none ">
+          <p class="text-cyan-600 font-semibold" > 10 USD</p>
+          <p class="text-cyan-600 font-semibold" > 0.05 USD</p>
+        </div>
+      </div>
       <hr>
       <div>
         

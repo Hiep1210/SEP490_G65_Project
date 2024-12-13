@@ -21,4 +21,6 @@ export interface Order {
   jobDeliverables?: JobDeliverables[]
   deleteddFileUrls?: string[]
   paymentStatus?: string
+  discountName?: string
+  discountAmount?: number
 }
