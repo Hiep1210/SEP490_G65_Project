@@ -13,5 +13,6 @@ namespace verbum_service_domain.DTO.Response
         public List<string> TranslationFileUrls { get; set; }
         public List<string> ReferenceFileUrls { get; set; }
         public string OrderStatus { get; set; }
+        public string? ServiceCode { get; set; }
     }
 }

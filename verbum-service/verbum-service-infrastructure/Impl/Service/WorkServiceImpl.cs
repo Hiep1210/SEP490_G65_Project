@@ -131,7 +131,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 {
                     WorkId = Guid.NewGuid(),
                     OrderId = request.OrderId,
-                    WorkName = request.OrderName,
+                    WorkName = request.OrderName+"_"+serviceCode,
                     ServiceCode = serviceCode,
                     CreatedDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified),
                     DueDate = request.DueDate,
