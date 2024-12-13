@@ -20,6 +20,12 @@ export const columns: ColumnDef<Work>[] = [
       h('div', { class: 'capitalize' }, row.getValue('workName'))
   },
   {
+    accessorKey: 'serviceCode',
+    header: 'Services',
+    cell: ({ row }) =>
+      h('div', { class: 'capitalize' }, row.getValue('serviceCode'))
+  },
+  {
     accessorKey: 'dueDate',
     header: 'Due Date',
     cell: ({ row }) => {

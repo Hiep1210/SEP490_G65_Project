@@ -225,7 +225,13 @@ provide('role', role)
                   Order Price:
                   <span class="font-bold hyper-link"
                     >{{ order?.orderPrice }} USD</span
-                  >
+                  ><br>
+                  <span 
+                  v-if="
+                  order.orderStatus === 'IN_PROGRESS' &&
+                  role === 'CLIENT' &&
+                  order.orderPrice" 
+                  style="font-size: small; color: red;"><i>You have deposited 50% for your order.</i></span>
                 </h1>
                 <div
                   v-if="
@@ -317,8 +323,8 @@ provide('role', role)
               </h1>
 
               <h1 v-if="order.discountId" class="font-semibold">
-                Discount Code:
-                <span class="font-normal">{{ order.discountId }}</span>
+                Discount:
+                <span class="font-normal">{{ order.discountName }} - {{ order.discountAmount}}%</span>
               </h1>
 
               <!-- Services Section -->
