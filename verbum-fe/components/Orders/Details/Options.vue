@@ -2,7 +2,6 @@
   <div class="flex gap-3">
     <Button @click="onClick('Download')">Download</Button>
     <Button variant="destructive" v-if="beDisplayed" @click="onClick('Delete')">Delete</Button>
-    <Button v-if="isDeleted && role === 'CLIENT'" @click="onClick('Recover')" class="bg-green-500 text-white">Recover</Button>
   </div>
 </template>
 
