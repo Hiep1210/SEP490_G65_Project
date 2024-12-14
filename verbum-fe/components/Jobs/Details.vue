@@ -75,8 +75,8 @@ const { approve, reject } = useJobs()
     <section class="mb-6 border rounded p-4">
       <div class="flex flex-col gap-2">
         <div class="space-y-2">
-          <h1 v-if="props.job && props.job?.rejectReason?.length > 0" class="font-semibold text-red-500">
-            Reject reason: <span class="font-normal">{{ props.job?.rejectReason }}</span>
+          <h1 v-if="props.job && props.job?.rejectReason" class="font-semibold text-red-500">
+            Reject reason: <span class="font-normal text-black">{{ props.job?.rejectReason }}</span>
           </h1>
           <h1 v-if="props.job && props.job?.assigneeNames?.length > 0" class="font-semibold">
             Assigned to: <span class="font-normal">{{ props.job?.assigneeNames.map((assignee) => assignee.name).join(', ') }}</span>
