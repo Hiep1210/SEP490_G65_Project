@@ -68,13 +68,12 @@ watch(files, () => {
 </script>
 
 <template>
-  <FormField v-slot="{ componentField }" name="reference">
+  <FormField v-slot="{ componentField }" name="orderNote">
     <FormItem>
       <FormLabel>Note</FormLabel>
       <FormControl>
         <Textarea
           placeholder="Tell us further details, notes, references, instructions or any special requests"
-          class="resize-none"
           v-bind="componentField"
         />
       </FormControl>

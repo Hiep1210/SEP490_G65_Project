@@ -51,7 +51,7 @@ interface FormValues {
   hasTranslateService?: boolean
   hasEditService?: boolean
   hasEvaluateService?: boolean
-  reference?: string
+  orderNote?: string
   referenceFileURLs: string
   discountId?: string
 }
@@ -90,7 +90,7 @@ async function onSubmit(values: FormValues) {
     hasTranslateService: values.hasTranslateService ?? false,
     hasEditService: values.hasEditService ?? false,
     hasEvaluateService: values.hasEvaluateService ?? false,
-    reference: values.reference,
+    orderNote: values.orderNote,
     referenceFileURLs: values.referenceFileURLs
       .split(',')
       .map((url: string) => url.trim()),
