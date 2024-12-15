@@ -59,7 +59,8 @@ namespace verbum_service_application.Mapper
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Order.OrderStatus))
                 .ForMember(dest => dest.TargetLanguageId, opt => opt.MapFrom(src => src.Order.TargetLanguages.Select(t => t.LanguageId).ToList()))
                 .ForMember(dest => dest.ReferenceFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.REFERENCES.ToString()).Select(t => t.ReferenceFileUrl).ToList()))
-                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.TRANSLATION.ToString()).Select(t => t.ReferenceFileUrl).ToList()));
+                .ForMember(dest => dest.TranslationFileUrls, opt => opt.MapFrom(src => src.Order.OrderReferences.Where(t => t.Tag == OrderFileTag.TRANSLATION.ToString()).Select(t => t.ReferenceFileUrl).ToList()))
+                .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => src.Jobs.All(job => job.Status.Equals(JobStatus.APPROVED))));
             CreateMap<Work, WorkCreate>().ReverseMap();
             CreateMap<Work, WorkUpdate>().ReverseMap();
             CreateMap<Discount, DiscountDTO>().ReverseMap();
