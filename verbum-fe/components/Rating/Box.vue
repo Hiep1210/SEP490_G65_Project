@@ -7,6 +7,7 @@ const { getRatingByOrderId, filteredRating, deleteRating, updateRating } = useRa
 
 const props = defineProps<{ orderId: string }>()
 
+
 // States for editing and storing the current rating
 const isEditing = ref(false)
 const editedRating = ref<Rating>({
@@ -16,6 +17,10 @@ const editedRating = ref<Rating>({
   issueResolved: 0,
   moreThought: '',
 })
+
+async function refreshPage() {
+  window.location.reload()
+}
 
 // Watch for changes in filteredRating and update editedRating accordingly
 watch(
@@ -56,6 +61,7 @@ const saveEdit = async () => {
 
     // Exit editing mode
     isEditing.value = false
+    refreshPage()
   } catch (error) {
     console.error('Error saving edited rating:', error)
   }
@@ -69,6 +75,7 @@ const confirmAndDeleteRating = async () => {
         await deleteRating(filteredRating.value.ratingId)
         // Clear the rating after deletion
         await getRatingByOrderId(props.orderId)
+        refreshPage()
       }
     } catch (error) {
       console.error('Failed to delete rating:', error)

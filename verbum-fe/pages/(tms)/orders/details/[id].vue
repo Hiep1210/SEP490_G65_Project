@@ -1,13 +1,13 @@
-<script setup lang="ts">
+ <script setup lang="ts">
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
+import { ORDER_COMPLETED } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
-import { format, toDate } from 'date-fns'
+import { format } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
-import {getLocalTimeZone, parseDate, today, DateFormatter, toLocalTimeZone} from '@internationalized/date'
+import {getLocalTimeZone, today, DateFormatter} from '@internationalized/date'
 import { cn } from '@/lib/utils'
 const { getRatingByOrderId, filteredRating } = useRating()
 
@@ -424,7 +424,8 @@ provide('role', role)
                 role === 'CLIENT' &&
                 order.orderStatus !== 'COMPLETED' &&
                 order.orderStatus !== 'CANCELLED' &&
-                order.orderStatus !== 'DELIVERED'
+                order.orderStatus !== 'DELIVERED' &&
+                order.orderStatus !== 'IN_PROGRESS'
               "
               :order-id="order.orderId"
             >
@@ -463,9 +464,7 @@ provide('role', role)
         <!-- Smaller Issues List Section -->
         <div
           v-if="
-            order.orderStatus === ORDER_COMPLETED ||
-            order.orderStatus === ORDER_IN_PROGRESS
-          "
+            order.orderStatus === ORDER_COMPLETED"
           class="flex-1 space-y-4 border rounded-md"
         >
           <OrdersIssues
