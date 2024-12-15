@@ -39,7 +39,7 @@ const toggleSelection = (value: string) => {
 
 const storage = useFirebaseStorage()
 const downloadUrls = ref<string[]>([])
-const uploadProgress = ref<number[]>([]) // Track progress of each file
+const uploadProgress = ref<number[]>([])
 
 const downloadUrlsString = computed(() => downloadUrls.value.join(','))
 

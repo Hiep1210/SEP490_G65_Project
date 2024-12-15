@@ -154,7 +154,7 @@ export const useOrders = () => {
     }
   }
 
-  const addOrderFile = async (payload: FilePayload) => {
+  const addOrderFile = async (payload: FilePayload[]) => {
     try {
       const {data, error} = await useAPI('/order/file', {
         method: 'POST',

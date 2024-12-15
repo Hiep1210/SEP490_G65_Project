@@ -33,7 +33,7 @@
                 </TableCell>
               </TableRow>
             </TableBody>
-            <Card v-if="isEdit && files?.length" :class="cn($attrs.class ?? '')">
+            <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
               <CardHeader>
               <CardDescription>Uploaded files</CardDescription>
             </CardHeader>
@@ -56,6 +56,7 @@
                   </div>
                 </div>
               </div>
+              <Button @click="handleUploadTranslteFile">Save</Button>
             </CardContent>
           </Card>
           </Table>
@@ -69,7 +70,7 @@
             !order.referenceFileUrls.length
           " class="p-2 text-center flex justify-center gap-2">
             <span>There are no reference files</span>
-            <span class="hyper-link">Upload</span>
+            <span class="hyper-link cursor-pointer" @click="open({ accept: '*', multiple: true })">Upload</span>
           </div>
           <Table v-else>
             <TableHeader>
@@ -88,6 +89,32 @@
                 </TableCell>
               </TableRow>
             </TableBody>
+            <Card v-if="files?.length" :class="cn($attrs.class ?? '')">
+              <CardHeader>
+              <CardDescription>Uploaded files</CardDescription>
+            </CardHeader>
+            <CardContent class="grid gap-3">
+              <div
+                v-for="(file, index) in files"
+                :key="file.name"
+                class="mb-4 grid grid-cols-[25px_minmax(0,1fr)] items-start pb-4 last:mb-0 last:pb-0"
+              >
+                <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                <div class="flex flex-col gap-1">
+                  <p class="text-sm font-medium leading-none">
+                    {{ file.name }}
+                  </p>
+                  <div class="flex gap-5 max-w-sm">
+                    <Progress v-model="uploadProgress[index]" />
+                    <p class="text-sm font-medium leading-none">
+                      {{ uploadProgress[index] || 0 }}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Button @click="handleUploadReferenceFile">Save</Button>
+            </CardContent>
+          </Card>
           </Table>
         </div>
       </TabsContent>
@@ -177,6 +204,7 @@ const {
   files,
   open,
   uploadProgress,
+  downloadUrlsString,
 } = useFileUploader(storage)
 
 const haveDeletedFiles = computed(() =>
@@ -203,5 +231,25 @@ const getElementsWithHighestServiceOrder = (
 }
 
 const isNewOrRejected = computed(() => props.order.orderStatus === 'NEW' || props.order.orderStatus === 'REJECTED')
+
+const handleUploadTranslteFile = async () => {
+  const urlsArray = downloadUrlsString.value.split(',').map((url) => ({
+  orderId: props.order.orderId,
+  referenceFileUrl: url,
+  tag: 'TRANSLATION'
+}));
+await addOrderFile(urlsArray);
+refreshPage()
+}
+
+const handleUploadReferenceFile = async () => {
+  const urlsArray = downloadUrlsString.value.split(',').map((url) => ({
+  orderId: props.order.orderId,
+  referenceFileUrl: url,
+  tag: 'REFERENCES'
+}));
+addOrderFile(urlsArray);
+refreshPage()
+}
 
 </script>
