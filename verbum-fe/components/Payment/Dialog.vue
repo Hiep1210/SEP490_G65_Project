@@ -144,11 +144,11 @@ const closeDialog = () => {
               </p>
             </div>
             <div class="flex-auto">
-              <p class="my-1 font-semibold">{{ order.orderPrice }} USD</p>
+              <p class="mt-3 font-semibold">{{ order.orderPrice }} USD</p>
               <p
-                class="my-1"
+                class="mt-3"
                 :class="
-                  status === 'IN_PROGRESS' ? ' my-3 font-bold text-2xl  text-cyan-600' : ''
+                  status === 'IN_PROGRESS' ? 'mt-2 mb-3 font-bold text-2xl  text-cyan-600' : ''
                 "
               >
                 {{ priceDeposit }} USD
@@ -156,7 +156,7 @@ const closeDialog = () => {
               <p
                 class="my-1"
                 :class="
-                  status !== 'IN_PROGRESS' ? ' my-3 font-bold text-2xl  text-cyan-600' : ''
+                  status !== 'IN_PROGRESS' ? ' mt-2 font-bold text-2xl  text-cyan-600' : ''
                 "
               >
                 {{ payRemaining }} USD
