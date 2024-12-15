@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ <script setup lang="ts">
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
@@ -225,7 +225,13 @@ provide('role', role)
                   Order Price:
                   <span class="font-bold hyper-link"
                     >{{ order?.orderPrice }} USD</span
-                  >
+                  ><br>
+                  <span 
+                  v-if="
+                  order.orderStatus === 'IN_PROGRESS' &&
+                  role === 'CLIENT' &&
+                  order.orderPrice" 
+                  style="font-size: small; color: red;"><i>You have deposited 50% for your order.</i></span>
                 </h1>
                 <div
                   v-if="
@@ -299,7 +305,7 @@ provide('role', role)
                           )"
                         >
                           <CalendarIcon class="mr-2 h-4 w-4" />
-                          {{ df.format(new Date(editedOrder.dueDate)) || "Pick a date" }}
+                          {{ df.format(new Date(editedOrder.dueDate as string)) || "Pick a date" }}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent class="w-auto p-0">
@@ -317,8 +323,8 @@ provide('role', role)
               </h1>
 
               <h1 v-if="order.discountId" class="font-semibold">
-                Discount Code:
-                <span class="hyper-link">{{ order.discountName }}</span>
+                Discount:
+                <span class="font-normal">{{ order.discountName }} - {{ order.discountAmount}}%</span>
               </h1>
 
               <!-- Services Section -->

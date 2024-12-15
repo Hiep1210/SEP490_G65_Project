@@ -51,7 +51,7 @@ export const useAuth = () => {
         title: 'Logged in',
         description: 'You have been logged in successfully'
       })
-        router.push('/orders')
+        navigateTo('/orders')
     } catch (error) {
       console.error('Login error:', error)
     }
