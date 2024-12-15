@@ -3,9 +3,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { isAuthenticated } = storeToRefs(useAuthStore())
   let access_token = useCookie('access_token').value
   const user = access_token ? decodeToken(access_token) : null
-  const unprotectedRoutes = ['/', '/login', '/signup', '/resend', '/confirm-email']
-
-  if (unprotectedRoutes.some(route => to.path.startsWith(route))) {
+  const unprotectedRoutes = ['/login', '/signup', '/resend', '/confirm-email']
+  const landingPage = '/'
+  if (unprotectedRoutes.some(route => to.path.startsWith(route)) || to.path === landingPage) {
     return
   }
 
@@ -37,8 +37,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
           CLIENT: { routes: ['/orders', '/issues', '/receipts'], default: '/orders' },
           MANAGER: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
           LINGUIST: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
-          ADMIN: { routes: ['/users', '/languages', '/categories'], default: '/languages' },
-          DIRECTOR: { routes: ['/orders', '/discounts'], default: '/orders' },
+          ADMIN: { routes: ['/users', '/languages', '/categories', '/discounts'], default: '/languages' },
+          DIRECTOR: { routes: ['/orders',], default: '/orders' },
           STAFF: { routes: ['/orders'], default: '/orders' }
         }
 

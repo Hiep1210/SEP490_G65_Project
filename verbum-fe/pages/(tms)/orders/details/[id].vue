@@ -1,13 +1,13 @@
-<script setup lang="ts">
+ <script setup lang="ts">
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
+import { ORDER_COMPLETED } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
-import { format, toDate } from 'date-fns'
+import { format } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
-import {getLocalTimeZone, parseDate, today, DateFormatter, toLocalTimeZone} from '@internationalized/date'
+import {getLocalTimeZone, today, DateFormatter} from '@internationalized/date'
 import { cn } from '@/lib/utils'
 const { getRatingByOrderId, filteredRating } = useRating()
 
@@ -225,7 +225,13 @@ provide('role', role)
                   Order Price:
                   <span class="font-bold hyper-link"
                     >{{ order?.orderPrice }} USD</span
-                  >
+                  ><br>
+                  <span 
+                  v-if="
+                  order.orderStatus === 'IN_PROGRESS' &&
+                  role === 'CLIENT' &&
+                  order.orderPrice" 
+                  style="font-size: small; color: red;"><i>You have deposited 50% for your order.</i></span>
                 </h1>
                 <div
                   v-if="
@@ -262,6 +268,10 @@ provide('role', role)
                 Client Note:
                 <span class="font-normal">{{ order?.orderNote }}</span>
               </h1>
+              <h1 v-if="order.rejectReason" class="font-semibold text-red-600">
+                Reject Reason:
+                <span class="font-normal text-black">{{ order?.rejectReason}}</span>
+              </h1>
               <h1 class="font-semibold">
                 Status:
                 <Badge :class="getOrderBadgeClass(order?.orderStatus)">{{
@@ -295,7 +305,7 @@ provide('role', role)
                           )"
                         >
                           <CalendarIcon class="mr-2 h-4 w-4" />
-                          {{ df.format(new Date(editedOrder.dueDate)) || "Pick a date" }}
+                          {{ df.format(new Date(editedOrder.dueDate as string)) || "Pick a date" }}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent class="w-auto p-0">
@@ -313,8 +323,8 @@ provide('role', role)
               </h1>
 
               <h1 v-if="order.discountId" class="font-semibold">
-                Discount Code:
-                <span class="font-normal">{{ order.discountId }}</span>
+                Discount:
+                <span class="font-normal">{{ order.discountName }} - {{ order.discountAmount}}%</span>
               </h1>
 
               <!-- Services Section -->
@@ -414,7 +424,8 @@ provide('role', role)
                 role === 'CLIENT' &&
                 order.orderStatus !== 'COMPLETED' &&
                 order.orderStatus !== 'CANCELLED' &&
-                order.orderStatus !== 'DELIVERED'
+                order.orderStatus !== 'DELIVERED' &&
+                order.orderStatus !== 'IN_PROGRESS'
               "
               :order-id="order.orderId"
             >
@@ -453,9 +464,7 @@ provide('role', role)
         <!-- Smaller Issues List Section -->
         <div
           v-if="
-            order.orderStatus === ORDER_COMPLETED ||
-            order.orderStatus === ORDER_IN_PROGRESS
-          "
+            order.orderStatus === ORDER_COMPLETED"
           class="flex-1 space-y-4 border rounded-md"
         >
           <OrdersIssues

@@ -2,9 +2,9 @@
   <div>
     <Tabs default-value="document" class="w-full">
       <TabsList class="grid w-full" :class="grids" >
-        <TabsTrigger value="document">Document</TabsTrigger>
+        <TabsTrigger value="document">Original Documents</TabsTrigger>
         <TabsTrigger value="references">References</TabsTrigger>
-        <TabsTrigger value="deliverable">Deliverable</TabsTrigger>
+        <TabsTrigger value="deliverable">Deliverables</TabsTrigger>
         <TabsTrigger v-if="Object.keys(job.previousJobDeliverables).length > 0" value="relatedJob">Related Jobs</TabsTrigger>
       </TabsList>
       <TabsContent value="document">

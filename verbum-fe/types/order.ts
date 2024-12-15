@@ -11,13 +11,17 @@ export interface Order {
   orderStatus?: string
   orderPrice?: string
   discountId?: string
+  discountName?: string
   hasTranslateService?: boolean
   hasEditService?: boolean
   hasEvaluateService?: boolean
   orderNote?: string
+  rejectReason?: string
   translationFileUrls?: string[]
   referenceFileUrls?: string[]
   jobDeliverables?: JobDeliverables[]
   deleteddFileUrls?: string[]
   paymentStatus?: string
+  discountName?: string
+  discountAmount?: number
 }
