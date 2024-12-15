@@ -22,7 +22,7 @@ namespace verbum_service.Controllers
 
         [HttpGet("get-all")]
         [EnableQuery]
-        //[Roles(UserRole.TRANSLATE_MANAGER,UserRole.EVALUATE_MANAGER,UserRole.EDIT_MANAGER,UserRole.MANAGER)]
+        [Roles(UserRole.MANAGER, UserRole.LINGUIST)]
         [ProducesResponseType(typeof(List<WorkResponse>), 200)]
         [ProducesResponseType(typeof(ErrorObject), 400)]
         [ProducesResponseType(500)]
