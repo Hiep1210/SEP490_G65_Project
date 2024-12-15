@@ -1,6 +1,7 @@
 import type { Order } from '~/types/order'
 import { ref } from 'vue'
 import { useToast } from '~/components/ui/toast'
+import type { FilePayload } from '~/types/payload/filePayload'
 
 const { toast } = useToast()
 
@@ -153,6 +154,33 @@ export const useOrders = () => {
     }
   }
 
+  const addOrderFile = async (payload: FilePayload) => {
+    try {
+      const {data, error} = await useAPI('/order/file', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (error.value) {
+        toast({
+          title: 'Error upload order files',
+          description: `Failed to upload files`,
+        })
+        return
+      }
+      toast({
+        title: 'File uploaded !!',
+        description: `Your files has been uploaded!!`
+      })
+      return data
+    } catch {
+      toast({
+        title: 'Error uploading files',
+        description: 'An error occurred while uploading files!!'
+      })
+    }
+  }
+
   return {
     isLoading,
     orders,
@@ -162,6 +190,7 @@ export const useOrders = () => {
     changeOrderStatus,
     sendRejectOrder,
     setOrderPrice,
-    successPayment
+    successPayment,
+    addOrderFile,
   }
 }
