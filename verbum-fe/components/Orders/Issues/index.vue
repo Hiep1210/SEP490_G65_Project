@@ -61,7 +61,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Your styles */
-</style>
