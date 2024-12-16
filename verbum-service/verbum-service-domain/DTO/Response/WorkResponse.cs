@@ -14,5 +14,6 @@ namespace verbum_service_domain.DTO.Response
         public List<string> ReferenceFileUrls { get; set; }
         public string OrderStatus { get; set; }
         public string? ServiceCode { get; set; }
+        public bool IsCompleted { get; set; }
     }
 }

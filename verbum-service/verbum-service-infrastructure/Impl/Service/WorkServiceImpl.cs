@@ -32,7 +32,7 @@ namespace verbum_service_infrastructure.Impl.Service
                 DueDate = dueDate
             });
 
-            context.Works.AddRangeAsync(works);
+            context.Works.AddRange(works);
             await context.SaveChangesAsync();
         }
 
@@ -54,35 +54,29 @@ namespace verbum_service_infrastructure.Impl.Service
 
         public async Task<List<WorkResponse>> GetAllWork()
         {
-            List<Work> orders = new List<Work>();
+            List<Work> orders = await context.Works
+                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
+                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences).Include(x => x.Jobs).ThenInclude(x => x.Assignees).ToListAsync();
             Guid clientId = currentUser.Id;
             switch (currentUser.Role)
             {
                 case UserRole.TRANSLATE_MANAGER:
-                    orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
+                    orders = orders
                         .Where(w => w.ServiceCode == "TL")
-                        .ToListAsync();
+                        .ToList();
                     break;
                 case UserRole.EDIT_MANAGER:
-                    orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
-                        .Where(w => w.ServiceCode == "ED").ToListAsync();
+                    orders = orders
+                        .Where(w => w.ServiceCode == "ED").ToList();
                     break;
                 case UserRole.EVALUATE_MANAGER:
-                    orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences)
-                        .Where(w => w.ServiceCode == "EV").ToListAsync();
+                    orders = orders
+                        .Where(w => w.ServiceCode == "EV").ToList();
                     break;
                 case UserRole.LINGUIST:
-                    orders = await context.Works
-                        .Include(w => w.Order).ThenInclude(w => w.TargetLanguages)
-                        .Include(w => w.Order).ThenInclude(w => w.OrderReferences).Include(x => x.Jobs).ThenInclude(x => x.Assignees)
+                    orders = orders
                         .Where(w => w.Jobs.Any(j => j.Assignees.Any(a => a.Id == currentUser.Id)))
-                        .ToListAsync();
+                        .ToList();
                     break;
                 default:
                     throw new BusinessException(AlertMessage.Alert(ValidationAlertCode.NOT_FOUND, "Role"));
