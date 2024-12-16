@@ -78,7 +78,7 @@ export const useOrders = () => {
         title: 'Success',
         description: `Status changed successfully`
       })
-      router.push('/orders')
+      window.location.reload()
     } catch (error) {
       console.error(`Failed to change status:`, error)
       toast({
