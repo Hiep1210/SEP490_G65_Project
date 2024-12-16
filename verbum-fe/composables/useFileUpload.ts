@@ -3,23 +3,31 @@ import { useFileDialog } from '@vueuse/core'
 import {
   ref as storageRef,
   getDownloadURL,
-  uploadBytesResumable
+  uploadBytesResumable,
+  UploadTask
 } from 'firebase/storage'
 
-export function useFileUploader(storage: ReturnType<typeof useFirebaseStorage>) {
+export function useFileUploader(
+  storage: ReturnType<typeof useFirebaseStorage>
+) {
   const downloadUrls = ref<string[]>([])
   const uploadProgress = ref<number[]>([])
+  const activeTasks = ref<UploadTask[]>([]) // Track active upload tasks
 
   const downloadUrlsString = computed(() => downloadUrls.value.join(','))
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return
 
+    activeTasks.value = []
+
     const promises = Array.from(files).map(
       (file, index) =>
         new Promise<string>((resolve, reject) => {
           const fileRef = storageRef(storage, `uploads/${file.name}`)
           const uploadTask = uploadBytesResumable(fileRef, file)
+
+          activeTasks.value.push(uploadTask)
 
           uploadTask.on(
             'state_changed',
@@ -39,8 +47,23 @@ export function useFileUploader(storage: ReturnType<typeof useFirebaseStorage>) 
         })
     )
 
-    const urls = await Promise.all(promises)
-    downloadUrls.value = [...downloadUrls.value, ...urls]
+    try {
+      const urls = await Promise.all(promises)
+      downloadUrls.value = [...downloadUrls.value, ...urls]
+    } catch (error) {
+      console.error('Error uploading files:', error)
+    } finally {
+      activeTasks.value = []
+    }
+  }
+
+  function cancelUpload() {
+    activeTasks.value.forEach((task) => task.cancel())
+    activeTasks.value = []
+
+    downloadUrls.value = []
+    uploadProgress.value = []
+    if (files.value) files.value = null
   }
 
   const { files, open } = useFileDialog()
@@ -58,6 +81,7 @@ export function useFileUploader(storage: ReturnType<typeof useFirebaseStorage>) 
     uploadFiles,
     downloadUrls,
     uploadProgress,
-    downloadUrlsString
+    downloadUrlsString,
+    cancelUpload
   }
 }
