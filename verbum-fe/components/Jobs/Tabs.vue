@@ -31,7 +31,7 @@
             There are no reference files
           </div>
           <div v-else class="p-2">
-            <a v-for="file in job.referenceUrls" :key="file" class="hyper-link">
+            <a v-for="file in job.referenceUrls" :key="file" class="hyper-link" :href="file">
               {{ getFirebaseFileName(file) }}
             </a>
           </div>

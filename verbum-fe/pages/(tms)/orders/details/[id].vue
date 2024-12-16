@@ -432,11 +432,9 @@ provide('role', role)
               <Button variant="destructive">Cancel Order</Button>
             </OrdersDetailsCancelDialog>
             <template v-if="role === 'STAFF'">
-              <Button
-                v-if="order.orderStatus === 'NEW'"
-                @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
-                >Accept Order</Button
-              >
+              <OrdersDetailsAcceptDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId">
+                <Button>Accept Order</Button>
+              </OrdersDetailsAcceptDialog>
               <OrdersDetailsDialog
                 v-if="order.orderStatus === 'NEW'"
                 :order-id="order.orderId"

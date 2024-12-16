@@ -37,7 +37,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         const roleRoutes = {
           CLIENT: { routes: ['/orders', '/issues', '/receipts'], default: '/orders' },
           MANAGER: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
-          LINGUIST: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
+          LINGUIST: { routes: ['/works', '/jobs', '/issues'], default: '/jobs' },
           ADMIN: { routes: ['/users', '/languages', '/categories', '/discounts'], default: '/languages' },
           DIRECTOR: { routes: ['/orders',], default: '/orders' },
           STAFF: { routes: ['/orders'], default: '/orders' }
