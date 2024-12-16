@@ -102,13 +102,15 @@ const { approve, reject } = useJobs()
           v-if="props.job?.assigneeNames?.length === 0 || (props.job?.status &&  ['NEW'].includes(props.job?.status))"
           :work-due-date="props.job?.workDueDate || ''"
           @assign="assignLinguists" />
-        <Button 
-          v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
-          variant="outline" 
-          :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job"
-          @click="approve(props.job)">
-          Approve
-        </Button>
+        <JobsApproveDialog
+          @approve="approve(props.job)">
+              <Button 
+              v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
+              variant="outline" 
+              :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job">
+              Approve
+            </Button>
+        </JobsApproveDialog>
         <JobsRejectDialog
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           @reject="reject(job?.id, $event)" >

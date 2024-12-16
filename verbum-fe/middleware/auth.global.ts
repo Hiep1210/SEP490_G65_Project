@@ -44,7 +44,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
         }
 
         const userRole = Object.keys(roleRoutes).find(role => user.role.includes(role))
-        console.log('User Role:', userRole)
         if (userRole) {
           const { routes, default: defaultRoute } = roleRoutes[userRole]
           if (!routes.some(route => to.path.startsWith(route))) {

@@ -9,6 +9,10 @@ export interface Work {
   referenceFileUrls: string[]
   orderStatus: string
   dueDate: string
+  serviceCode: string
+  translateService?: boolean
+  editService?: boolean
+  evaluateService?: boolean
 }
 const { toast } = useToast()
 
