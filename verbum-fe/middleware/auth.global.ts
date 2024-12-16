@@ -11,6 +11,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // If access_token exists and user is decoded
   if (access_token && user) {
+    useAuthStore().setUser(user)
     try {
       if (isTokenExpired(access_token)) {
         const config = useRuntimeConfig()

@@ -453,7 +453,7 @@ provide('role', role)
             >
           </div>
 
-          <OrdersDetailsTabs :order="order" />
+          <OrdersDetailsTabs :order="order" :is-edit="isEditing"/>
 
           <!-- Rating -->
           <div v-if="order.orderStatus === 'DELIVERED'">
