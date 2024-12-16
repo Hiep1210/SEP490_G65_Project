@@ -40,14 +40,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
         const roleRoutes = {
           CLIENT: { routes: ['/orders', '/issues', '/receipts'], default: '/orders' },
           MANAGER: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
-          LINGUIST: { routes: ['/works', '/jobs', '/issues'], default: '/works' },
+          LINGUIST: { routes: ['/works', '/jobs', '/issues'], default: '/jobs' },
           ADMIN: { routes: ['/users', '/languages', '/categories', '/discounts'], default: '/languages' },
           DIRECTOR: { routes: ['/orders',], default: '/orders' },
           STAFF: { routes: ['/orders'], default: '/orders' }
         }
 
         const userRole = Object.keys(roleRoutes).find(role => user.role.includes(role))
-        console.log('User Role:', userRole)
         if (userRole) {
           const { routes, default: defaultRoute } = roleRoutes[userRole]
           if (!routes.some(route => to.path.startsWith(route))) {

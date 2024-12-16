@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { languages } from '~/constants/languages'
 import { getWorkBadgeClass } from '~/utils/getBadgeClass'
-
 const { isLoading, work, getWorkById } = useWorks()
 const { jobs, getJobsOfWork } = useJobs()
 const { assignList, getAssignList } = useUsers()
@@ -13,6 +12,19 @@ onMounted(async () => {
   await getWorkById(workId)
   if (role?.includes('MANAGER')) {
     await getAssignList()
+  }
+})
+
+const currentService = computed(() => {
+  switch (work.value?.serviceCode) {
+    case 'TL':
+      return 'Translate'
+    case 'ED':
+      return 'Edit'
+    case 'EV':
+      return 'Evaluate'
+    default:
+      return ''
   }
 })
 
@@ -31,6 +43,21 @@ provide('assignList', assignList)
           <Badge :class="getWorkBadgeClass(work?.orderStatus)">{{
             work?.orderStatus
           }}</Badge>
+          <h1 class="font-semibold space-x-2 mt-4">
+            Service(s): 
+            <span 
+              v-for="service in ['Translate', 'Edit', 'Evaluate']"
+              v-show="
+              work.translateService && service === 'Translate'
+              || work.editService && service === 'Edit'
+              || work.evaluateService && service === 'Evaluate'
+              "
+              :key="service"
+              class="font-semibold text-primary"
+              :class="currentService.includes(service) ? 'border-2 p-1 rounded-lg border-slate-600' : ''">
+              {{ service }}
+            </span>
+          </h1>
           <h1 class="font-semibold">
             Due Date:
             <span class="font-bold hyper-link">{{

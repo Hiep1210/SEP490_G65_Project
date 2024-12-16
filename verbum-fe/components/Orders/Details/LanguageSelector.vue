@@ -80,7 +80,6 @@ const filteredLanguages = computed(() =>
       lang.languageId.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 )
-console.log('selectedLanguagesArray', selectedLanguagesArray.value)
 </script>
 
 <template>
@@ -94,19 +93,23 @@ console.log('selectedLanguagesArray', selectedLanguagesArray.value)
     >
     <span>
       <template v-if="props.isSourceLanguage">
-        <Badge>
+        <div class="p-2 border rounded-md">
+          <Badge>
           {{ languageList.find((lang)=> lang.languageId === $props.selectedLanguages)?.languageName || 'Select Source Language' }}
-        </Badge>
+          </Badge>
+        </div>
       </template>
       <template v-else>
         <template v-if="selectedLanguagesArray.length">
-          <Badge 
+          <div class="p-2 border rounded-md space-x-2">
+            <Badge 
             v-for="(languageName, languageId) in selectedLanguagesArray" 
             :key="languageId"
             class="bg-slate-500"
           >
             {{ languageList.find((lang) => lang.languageId===languageName)?.languageName }}
-          </Badge>
+            </Badge>
+        </div>
         </template>
         <Badge v-else>Select Target Language</Badge>
       </template>
