@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseUrl: 'https://verbum-service.onrender.com'
+      baseUrl: process.env.NUXT_BASE_URL
     }
   },
   modules: [
