@@ -118,16 +118,20 @@ const isSupported = (language: string) => {
         <span class="text-green-700">green color</span>.
       </p>
       <hr>
-      <p class="font-bold text-cyan-600">Pricing Matrix</p>
-      <div class="flex w-full gap-3">
-        <div class="flex-none w-1/3">
+      <p class="font-bold text-cyan-600">General Pricing Matrix</p>
+      <div class="flex w-full">
+        <div class="w-2/3">
           <p class="font-semibold">Price/hour:</p>
           <p class="font-semibold">Price/word/service:</p>
-
+          <p class="font-semibold">Extra fee for unsupported languages:</p>
         </div>
-        <div class="flex-none ">
-          <p class="text-cyan-600 font-semibold" > 10 USD</p>
-          <p class="text-cyan-600 font-semibold" > 0.05 USD</p>
+        <div class="flex-none">
+          <p class="text-cyan-600 font-semibold" >10 USD</p>
+          <p class="text-cyan-600 font-semibold" >0.05 USD</p>
+          <p class="text-cyan-600 font-semibold flex">
+            <span><LucideArrowUp/></span>
+            <span>20% - 30%</span>
+          </p>
         </div>
       </div>
       <hr>

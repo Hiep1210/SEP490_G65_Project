@@ -77,7 +77,8 @@ export const columns: ColumnDef<Work>[] = [
         Badge,
         { class: getOrderBadgeClass(orderStatus), variant: 'default' },
         { default: () => orderStatus }
-      )
+      );
     }
   }
+  
 ]

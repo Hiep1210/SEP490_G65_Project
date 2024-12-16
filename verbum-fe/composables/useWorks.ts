@@ -9,6 +9,7 @@ export interface Work {
   referenceFileUrls: string[]
   orderStatus: string
   dueDate: string
+  isCompleted: boolean
 }
 const { toast } = useToast()
 
