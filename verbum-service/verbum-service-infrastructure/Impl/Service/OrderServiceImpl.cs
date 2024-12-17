@@ -302,6 +302,8 @@ namespace verbum_service_infrastructure.Impl.Service
             int records = await context.OrderReferences
                 .Where(x => x.OrderId == orderId && x.ReferenceFileUrl.Equals(url))
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.IsDeleted, true));
+
+            await context.Orders.Where(o => o.OrderId == orderId).ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.NEW.ToString()));
             if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
