@@ -60,7 +60,7 @@ provide('assignList', assignList)
               "
               :key="service"
               class="font-semibold text-primary"
-              :class="currentService.includes(service) ? 'border-2 p-1 rounded-lg border-slate-600' : ''">
+              :class="currentService.includes(service) ? 'underline' : ''">
               {{ service }}
             </span>
           </h1>
