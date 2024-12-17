@@ -106,7 +106,7 @@ const { approve, reject } = useJobs()
           @approve="approve(props.job)">
               <Button 
               v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
-              variant="outline" 
+              variant="default" 
               :disabled="(props.job?.status !== 'SUBMITTED' )|| !props.job">
               Approve
             </Button>
@@ -114,7 +114,7 @@ const { approve, reject } = useJobs()
         <JobsRejectDialog
           v-if="props.job?.status === 'SUBMITTED' || props.job?.status === 'APPROVED'"
           @reject="reject(job?.id, $event)" >
-          <Button variant="outline" :disabled="(props.job?.status !== 'SUBMITTED' )">Reject</Button> 
+          <Button class="bg-red-500 text-white" :disabled="(props.job?.status !== 'SUBMITTED' )">Reject</Button> 
         </JobsRejectDialog>
       </template>
       <template v-else>

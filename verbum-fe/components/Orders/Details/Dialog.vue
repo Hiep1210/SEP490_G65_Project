@@ -60,6 +60,9 @@ const onSubmit = () => {
           </span>
         </div>
         <DialogFooter>
+          <DialogClose>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
           <Button type="submit" :disabled="!reason">Reject</Button>
         </DialogFooter>
       </form>
