@@ -29,7 +29,7 @@ const formSchema = [
     sourceLanguageId: z.string(),
     targetLanguageIdList: z.string(),
     translationFileURL: z.string().min(1, { message: 'Required' }),
-    dueDate: z.coerce.date()
+    dueDate: z.coerce.date().min(new Date(), {message: 'Due date is required and must be today or greater'})
   }),
   z.object({
     hasTranslateService: z.boolean().default(false),

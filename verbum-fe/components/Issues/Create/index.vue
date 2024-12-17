@@ -82,9 +82,12 @@ async function onSubmit(values: CreateIssuePayload) {
         </form>
 
         <DialogFooter>
-          <!--          <DialogClose as-child>-->
-          <Button type="submit" form="dialogForm"> Create</Button>
-          <!--          </DialogClose>-->
+          <DialogClose as-child>
+          <Button type="button" variant="secondary">
+            Cancel
+          </Button>
+        </DialogClose>
+          <Button type="submit" form="dialogForm">Create</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
