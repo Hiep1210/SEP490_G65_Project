@@ -228,8 +228,8 @@ provide('role', role)
                   ><br>
                   <span 
                   v-if="
-                  order.orderStatus === 'IN_PROGRESS' &&
                   role === 'CLIENT' &&
+                  order.orderStatus === 'IN_PROGRESS' || order.orderStatus === 'COMPLETED'  &&
                   order.orderPrice" 
                   style="font-size: small; color: red;"><i>You have deposited 50% for your order.</i></span>
                 </h1>

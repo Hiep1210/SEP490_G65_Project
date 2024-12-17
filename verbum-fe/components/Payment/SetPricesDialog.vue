@@ -29,10 +29,12 @@ const closeDialog = () => {
 }
 
 const confirmPrice = () => {
-  if (prices.value != null) {
-    emit('confirm', prices.value)
+  const priceValue = parseFloat(prices.value); // Convert to number
+  if (isNaN(priceValue) || priceValue <= 0) {
+    return;
   }
-}
+  emit('confirm', prices.value); // Emit event if valid
+};
 
 const totalSupportedLanguages = () => {
   let count = 0
@@ -58,6 +60,17 @@ const isSupported = (language: string) => {
   }
 }
 
+const priceError = ref('');
+
+
+watch(prices, (newVal) => {
+  const priceValue = parseFloat(newVal);
+  if (isNaN(priceValue) || priceValue <= 0) {
+    priceError.value = 'Price must be a positive number.';
+  } else {
+    priceError.value = '';
+  }
+});
 
 </script>
 
@@ -141,8 +154,10 @@ const isSupported = (language: string) => {
         <input
           v-model="prices"
           class="border px-4 py-2 rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+          :class="priceError ? 'border-red-500' : 'border-gray-300'"
           type="number"
         > <span>USD</span>
+        <p v-if="priceError" class="text-red-600 italic text-sm">Please enter a valid price</p>
       </div>
       <DialogFooter>
         <Button class="bg-slate-500 hover:bg-slate-600" @click="closeDialog">Cancel</Button>
