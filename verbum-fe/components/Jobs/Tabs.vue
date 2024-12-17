@@ -53,7 +53,7 @@
           " class="p-2 text-center">
             There are no deliverables
           </div>
-          <div v-else class="p-2 justify-between items-center">
+          <div v-else class="p-2 flex justify-between items-center">
             <a class="hyper-link" :href="job.deliverableUrl"> {{
             getFirebaseFileName(job.deliverableUrl) }}</a>
             <Button variant="default" @click="download(job.deliverableUrl)">

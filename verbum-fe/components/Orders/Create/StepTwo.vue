@@ -93,4 +93,8 @@ import {
       </div>
     </FormItem>
   </FormField>
+
+  <FormField name="serviceValidate">
+    <FormMessage />
+  </FormField>
 </template>

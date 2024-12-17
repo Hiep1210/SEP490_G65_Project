@@ -60,10 +60,10 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: 'orderPrice',
-    header: 'Price',
+    header: 'Price (USD)',
     cell: ({ row }) => {
       const orderPrice = row.getValue('orderPrice') as string
-      return orderPrice ? h('div', { class: 'font-bold text-primary' }, orderPrice) : h('div', { class: 'font-bold text-red-500' }, 'Unset')
+      return orderPrice ? h('div', { class: 'font-semibold text-primary' }, `$ ${orderPrice}`) : h('div', { class: 'font-semibold text-red-500' }, 'Unset')
     }
   },
   {

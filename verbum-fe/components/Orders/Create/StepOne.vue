@@ -29,15 +29,8 @@ const languages = ref<Language[]>([])
 
 const selectedValuesString = computed(() => selectedValues.value.join(','))
 
-const selectedSourceLanguage = ref<string | null>(null)
-
-const selectedSourceLanguageName = computed(() => {
-  return languages.value.find((lang) => lang.languageId === selectedSourceLanguage.value)?.languageName || ''
-})
-
-const selectSourceLanguage = (languageId: string) => {
-  selectedSourceLanguage.value = languageId
-}
+const sourceLanguage = ref<string>('');
+const openSourceLanguagePopover = ref(false);
 
 const toggleSelection = (value: string) => {
   if (selectedValues.value.includes(value)) {
@@ -150,25 +143,37 @@ onMounted(async () => {
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="sourceLanguageId">
+    <FormField
+      v-slot="{ componentField }"
+      name="sourceLanguageId"
+      :model-value="sourceLanguage"
+    >
       <FormItem>
         <FormLabel>Source Language</FormLabel>
         <FormControl>
           <Input
             v-bind="componentField"
-            :value="selectedSourceLanguage"
+            :value="sourceLanguage"
             type="hidden"
           />
         </FormControl>
-        <Popover v-model:open-target="openTarget">
+        <Popover v-model:open-target="openSourceLanguagePopover">
           <PopoverTrigger as-child>
             <Button
               variant="outline"
               role="combobox"
+              :aria-expanded="openSourceLanguagePopover"
               class="w-full justify-between"
             >
               <span class="font-normal">
-                {{ selectedSourceLanguageName || 'Select source language...' }}
+                {{
+                  sourceLanguage
+                    ? languages.find(
+                        (language: Language) =>
+                          language.languageId === sourceLanguage
+                      )?.languageName
+                    : 'Select source language...'
+                }}
               </span>
               <ChevronDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -186,16 +191,18 @@ onMounted(async () => {
                     v-for="language in languages"
                     :key="language.languageId"
                     :value="language.languageId"
-                    @select="selectSourceLanguage(language.languageId)"
+                    @select="sourceLanguage = language.languageId"
                   >
                     {{ language.languageName }}
                     <Check
-                      :class="cn(
-                        'ml-auto h-4 w-4',
-                        selectedSourceLanguage === language.languageId
-                          ? 'opacity-100'
-                          : 'opacity-0'
-                      )"
+                      :class="
+                        cn(
+                          'ml-auto h-4 w-4',
+                          sourceLanguage === language.languageId
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                        )
+                      "
                     />
                   </CommandItem>
                 </CommandGroup>
@@ -206,6 +213,7 @@ onMounted(async () => {
         <FormMessage />
       </FormItem>
     </FormField>
+
 
     <FormField
       v-slot="{ componentField }"
