@@ -15,8 +15,8 @@ const assignList = inject<Ref<Linguist[]>>('assignList', ref([]))
 
 const schema = toTypedSchema(z.object({
   assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(1900, 1, 1), 'Due date is required').max(new Date(props.workDueDate), {
-    message: 'Due date must be before the works due date'
+  dueDate: z.coerce.date().min(new Date(), 'Due date is required and must be today or greater').max(new Date(props.workDueDate), {
+    message: 'Due date must be before the order\'s due date'
   }
   )
 }))
@@ -83,7 +83,7 @@ const onSubmit = form.handleSubmit((values) => {
                       !value && 'text-muted-foreground',
                     )">
                       <CalendarIcon class="mr-2 h-4 w-4" />
-                      {{ value ? value.toLocaleDateString() : "Pick a date" }}
+                      {{ value ? format(new Date(value), 'dd/MM/yyyy') : "Pick a date" }}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">

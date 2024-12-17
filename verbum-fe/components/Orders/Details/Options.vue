@@ -1,7 +1,7 @@
 <template>
   <div class="flex gap-3">
     <Button @click="onClick('Download')">Download</Button>
-    <Button variant="destructive" v-if="beDisplayed" @click="onClick('Delete')">Delete</Button>
+    <Button v-if="beDisplayed && isEdit" variant="destructive" @click="onClick('Delete')">Delete</Button>
   </div>
 </template>
 
@@ -14,6 +14,7 @@ const props = defineProps<{
   isDeleted?: boolean
   isDelivered?: boolean
   isNewOrRejected?: boolean
+  isEdit?: boolean
 }>()
 const role = inject('role') as string | undefined
 

@@ -321,6 +321,9 @@ namespace verbum_service_infrastructure.Impl.Service
                     context.OrderReferences.AddRange(mapper.Map<List<OrderReference>>(request));
                     int records = await context.SaveChangesAsync();
                     if (records != request.Count) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
+                    await context.Orders.Where(x => request.Select(x => x.OrderId).Contains(x.OrderId))
+                        .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.NEW.ToString()));
                     transaction.Commit();
                 }
                 catch

@@ -2,7 +2,7 @@
 import type { Order } from '~/types/order'
 import ConfirmDialog from '~/components/Issues/ConfirmDialog.vue'
 import SetPricesDialog from '~/components/Payment/SetPricesDialog.vue'
-import { ORDER_COMPLETED } from '~/constants/orderSatus'
+import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus'
 import { useToast } from '~/components/ui/toast'
 import { format } from 'date-fns'
 import { formatToVietnamTimezone } from '#imports'
@@ -432,11 +432,9 @@ provide('role', role)
               <Button variant="destructive">Cancel Order</Button>
             </OrdersDetailsCancelDialog>
             <template v-if="role === 'STAFF'">
-              <Button
-                v-if="order.orderStatus === 'NEW'"
-                @click="changeOrderStatus(order.orderId, 'ACCEPTED')"
-                >Accept Order</Button
-              >
+              <OrdersDetailsAcceptDialog v-if="order.orderStatus === 'NEW'" :order-id="order.orderId">
+                <Button>Accept Order</Button>
+              </OrdersDetailsAcceptDialog>
               <OrdersDetailsDialog
                 v-if="order.orderStatus === 'NEW'"
                 :order-id="order.orderId"
@@ -462,16 +460,15 @@ provide('role', role)
         </div>
 
         <!-- Smaller Issues List Section -->
-        <div
-          v-if="
-            order.orderStatus === ORDER_COMPLETED"
-          class="flex-1 space-y-4 border rounded-md"
-        >
+        <div class="flex-1 space-y-4 border rounded-md">
           <OrdersIssues
+            v-if="
+              order.orderStatus === ORDER_COMPLETED || order.orderStatus === ORDER_IN_PROGRESS"
             :job-deliverables="order.jobDeliverables"
             :order-id="orderId as string"
             :role="role"
             :user="user"
+            :order-status="order.orderStatus"
           />
         </div>
       </div>

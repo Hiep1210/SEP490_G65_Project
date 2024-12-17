@@ -95,11 +95,11 @@ namespace verbum_service_infrastructure.Impl.Service
             issue.SrcDocumentUrl = request.DeliverableUrl;
             context.Issues.Add(issue);
 
+            if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
             int orderRecords = await context.Orders
                             .Where(o => o.OrderId == request.OrderId)
                             .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString()));
-
-            if (await context.SaveChangesAsync() < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
         public async Task DeleteIssueAttachmentFile(Guid issueId, string attachmentUrl)
@@ -145,12 +145,12 @@ namespace verbum_service_infrastructure.Impl.Service
                         .ThenInclude(x => x.Work)
                         .ThenInclude(x => x.Order).Select(x => x.Job.Work.Order.OrderId).FirstOrDefaultAsync();
 
+            int records = await context.SaveChangesAsync();
+            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
+
             await context.Orders
                             .Where(o => o.OrderId == orderId)
                             .ExecuteUpdateAsync(x => x.SetProperty(u => u.OrderStatus, OrderStatus.IN_PROGRESS.ToString()));
-
-            int records = await context.SaveChangesAsync();
-            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
         }
 
         public async Task UpdateIssueCancelResponse(ResponseRequest request)

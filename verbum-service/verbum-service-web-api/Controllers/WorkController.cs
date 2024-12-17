@@ -18,7 +18,6 @@ namespace verbum_service.Controllers
     public partial class WorkController : ControllerBase
     {
         private readonly WorkService workService;
-        private readonly UpdateWorkWorkflow updateWorkWorkflow;
 
         [HttpGet("get-all")]
         [EnableQuery]

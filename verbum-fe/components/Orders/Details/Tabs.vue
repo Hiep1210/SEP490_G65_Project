@@ -47,6 +47,7 @@
                     :is-deleted="false"
                     :is-delivered="false"
                     :is-new-or-rejected="isNewOrRejected"
+                    :is-edit="props.isEdit"
                   />
                 </TableCell>
               </TableRow>
@@ -90,7 +91,7 @@
                   <Button
                     :disabled="downloadUrlsString.length === 0"
                     class="flex-1"
-                    @click="handleUploadReferenceFile"
+                    @click="handleUploadTranslteFile"
                     >Upload</Button
                   >
                 </div>
@@ -185,6 +186,7 @@
                     :is-deleted="false"
                     :is-delivered="false"
                     :is-new-or-rejected="isNewOrRejected"
+                    :is-edit="props.isEdit"
                   />
                 </TableCell>
               </TableRow>
@@ -271,6 +273,7 @@
                     :url="deliverable.deliverableFileUrl || ''"
                     :is-delivered="true"
                     :is-new-or-rejected="isNewOrRejected"
+                    :is-edit="props.isEdit"
                   />
                 </TableCell>
               </TableRow>

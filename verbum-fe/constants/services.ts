@@ -1,7 +1,7 @@
 export const centerServices = [
   {
     serviceCode: 'TL',
-    serviceName: 'Translte'
+    serviceName: 'Translate'
   },
   {
     serviceCode: 'ED',
