@@ -14,7 +14,7 @@ const { getRatingByOrderId, filteredRating } = useRating()
 const { toast } = useToast()
 
 const { supportedLanguages, getSupportedLanguages } = useLanguages()
-const { order, isLoading, getOrder, changeOrderStatus, setOrderPrice } =
+const { order, isLoading, getOrder, setOrderPrice } =
   useOrders()
 const route = useRoute()
 const orderId = route.params.id
@@ -460,17 +460,13 @@ provide('role', role)
         </div>
 
         <!-- Smaller Issues List Section -->
-        <div class="flex-1 space-y-4 border rounded-md">
-          <OrdersIssues
-            v-if="
-              order.orderStatus === ORDER_COMPLETED || order.orderStatus === ORDER_IN_PROGRESS"
-            :job-deliverables="order.jobDeliverables"
-            :order-id="orderId as string"
-            :role="role"
-            :user="user"
-            :order-status="order.orderStatus"
-          />
-        </div>
+        <OrdersIssues
+          :job-deliverables="order.jobDeliverables"
+          :order-id="orderId as string"
+          :role="role"
+          :user="user"
+          :order-status="order.orderStatus"
+        />
       </div>
 
       <!-- Set Prices Dialog -->

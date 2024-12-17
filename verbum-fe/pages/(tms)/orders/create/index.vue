@@ -26,8 +26,8 @@ useSeoMeta({
 
 const formSchema = [
   z.object({
-    sourceLanguageId: z.string(),
-    targetLanguageIdList: z.string(),
+    sourceLanguageId: z.string().min(1, { message: 'Required' }),
+    targetLanguageIdList: z.string().min(1, { message: 'Required' }),
     translationFileURL: z.string().min(1, { message: 'Required' }),
     dueDate: z.coerce.date().min(new Date(), {message: 'Due date is required and must be today or greater'})
   }),
@@ -37,7 +37,7 @@ const formSchema = [
     hasEvaluateService: z.boolean().default(false)
   }),
   z.object({
-    reference: z.string().optional(),
+    orderNote: z.string().max(255, {message: 'Reference must be less than 255 characters'}).optional(),
     referenceFileURLs: z.string().optional(),
     discountId: z.string().nullable().optional()
   })
