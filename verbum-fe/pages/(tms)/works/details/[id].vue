@@ -40,9 +40,15 @@ provide('assignList', assignList)
           <p class="text-[2rem] font-bold text-primary underline">
             {{ work?.workName }}
           </p>
-          <Badge :class="getWorkBadgeClass(work?.orderStatus)">{{
-            work?.orderStatus
-          }}</Badge>
+          <Badge
+            :class="getWorkBadgeClass(work?.orderStatus)"
+          >
+            {{
+              work?.orderStatus === 'IN_PROGRESS' && work.isCompleted
+                ? 'COMPLETED'
+                : work?.orderStatus
+            }}
+          </Badge>
           <h1 class="font-semibold space-x-2 mt-4">
             Service(s): 
             <span 
@@ -54,7 +60,7 @@ provide('assignList', assignList)
               "
               :key="service"
               class="font-semibold text-primary"
-              :class="currentService.includes(service) ? 'border-2 p-1 rounded-lg border-slate-600' : ''">
+              :class="currentService.includes(service) ? 'underline' : ''">
               {{ service }}
             </span>
           </h1>
