@@ -35,7 +35,15 @@ const formSchema = [
     hasTranslateService: z.boolean().default(false),
     hasEditService: z.boolean().default(false),
     hasEvaluateService: z.boolean().default(false)
-  }),
+  })
+  .refine(
+      (data) =>
+        data.hasTranslateService || data.hasEditService || data.hasEvaluateService,
+      {
+        message: 'At least one service must be selected.',
+        path: ['serviceValidate']
+      }
+    ),
   z.object({
     orderNote: z.string().max(255, {message: 'Reference must be less than 255 characters'}).optional(),
     referenceFileURLs: z.string().optional(),
@@ -210,17 +218,17 @@ async function onSubmit(values: FormValues) {
 
         <div class="flex flex-col gap-6 w-full">
           <div class="flex flex-col gap-4 mt-4">
-            <template v-if="stepIndex === 1">
+            <div v-show="stepIndex === 1">
               <OrdersCreateStepOne />
-            </template>
+            </div>
 
-            <template v-if="stepIndex === 2">
+            <div v-show="stepIndex === 2">
               <OrdersCreateStepTwo />
-            </template>
+            </div>
 
-            <template v-if="stepIndex === 3">
+            <div v-show="stepIndex === 3">
               <OrdersCreateStepThree />
-            </template>
+            </div>
           </div>
 
           <div class="flex items-center justify-between mt-4">
