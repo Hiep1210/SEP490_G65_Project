@@ -153,56 +153,24 @@ onMounted(async () => {
     <FormField v-slot="{ componentField }" name="sourceLanguageId">
       <FormItem>
         <FormLabel>Source Language</FormLabel>
-        <FormControl>
-          <Input
-            v-bind="componentField"
-            :value="selectedSourceLanguage"
-            type="hidden"
-          />
-        </FormControl>
-        <Popover v-model:open-target="openTarget">
-          <PopoverTrigger as-child>
-            <Button
-              variant="outline"
-              role="combobox"
-              class="w-full justify-between"
-            >
-              <span class="font-normal">
-                {{ selectedSourceLanguageName || 'Select source language...' }}
-              </span>
-              <ChevronDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="p-0">
-            <Command>
-              <CommandInput
-                class="h-9"
-                placeholder="Search source language..."
-              />
-              <CommandEmpty>No language found.</CommandEmpty>
-              <CommandList>
-                <CommandGroup>
-                  <CommandItem
-                    v-for="language in languages"
-                    :key="language.languageId"
-                    :value="language.languageId"
-                    @select="selectSourceLanguage(language.languageId)"
-                  >
-                    {{ language.languageName }}
-                    <Check
-                      :class="cn(
-                        'ml-auto h-4 w-4',
-                        selectedSourceLanguage === language.languageId
-                          ? 'opacity-100'
-                          : 'opacity-0'
-                      )"
-                    />
-                  </CommandItem>
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <Select v-bind="componentField">
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue placeholder="Select source language..." />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem
+                v-for="language in languages"
+                :key="language.languageId"
+                :value="language.languageId"
+              >
+                {{ language.languageName }}
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
         <FormMessage />
       </FormItem>
     </FormField>
