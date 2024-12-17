@@ -85,27 +85,6 @@ namespace verbum_service_infrastructure.Impl.Service
             return list;
         }
 
-        public async Task UpdateWork(WorkUpdate request)
-        {
-            int records = await context.Works
-                .Where(x => x.WorkId == request.WorkId)
-                .ExecuteUpdateAsync(x => x.SetProperty(u => u.WorkName, request.WorkName)
-                                        .SetProperty(u => u.ServiceCode, request.ServiceCode)
-                                        .SetProperty(u => u.DueDate, request.DueDate));
-
-            var work = context.Works
-                        .Include(o => o.Categories)
-                        .FirstOrDefault(o => o.WorkId == request.WorkId);
-
-            if (work != null)
-            {
-                work.Categories.Clear();
-                await context.SaveChangesAsync();
-            }
-
-            if (records < 1) throw new BusinessException(ValidationAlertCode.UPDATE_RECORD_FAIL);
-        }
-
         public async Task<List<Guid>> GenerateWork(GenerateWork request)
         {
             List<string> serviceCodes = new List<string>();

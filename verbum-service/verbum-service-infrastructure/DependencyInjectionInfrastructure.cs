@@ -66,7 +66,6 @@ namespace VNH.Infrastructure
             services.AddScoped<UpdateIssueWorkflow>();
             services.AddScoped<CreateOrderWorkflow>();
             services.AddScoped<UpdateOrderWorkflow>();
-            services.AddScoped<UpdateWorkWorkflow>();
             services.AddScoped<CreateRatingWorkflow>();
             services.AddScoped<UpdateRatingWorkflow>();
             services.AddScoped<ConfirmPaymentWorkflow>();
@@ -81,8 +80,6 @@ namespace VNH.Infrastructure
             services.AddScoped<UpdateIssueValidation>();
             services.AddScoped<CreateOrderValidation>();
             services.AddScoped<UpdateOrderValidation>();
-            services.AddScoped<CreateWorkValidation>();
-            services.AddScoped<UpdateWorkValidation>();
             services.AddScoped<SaveDiscountValidation>();
             services.AddScoped<CreateRatingValidation>();
             services.AddScoped<UpdateRatingValidation>();
