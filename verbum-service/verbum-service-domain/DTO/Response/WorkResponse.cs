@@ -15,5 +15,8 @@ namespace verbum_service_domain.DTO.Response
         public string OrderStatus { get; set; }
         public string? ServiceCode { get; set; }
         public bool IsCompleted { get; set; }
+        public bool TranslateService {  get; set; }
+        public bool EditService { get; set; }
+        public bool EvaluateService { get; set; }
     }
 }

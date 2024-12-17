@@ -23,6 +23,9 @@ import {
         <Checkbox :checked="value" @update:checked="handleChange" />
       </FormControl>
       <div class="space-y-1 leading-none">
+        <div class="text-primary font-bold">
+          Translate
+        </div>
         <FormLabel
           >Translate the document(s) from one to another language.</FormLabel
         >
@@ -47,6 +50,9 @@ import {
         <Checkbox :checked="value" @update:checked="handleChange" />
       </FormControl>
       <div class="space-y-1 leading-none">
+        <div class="text-primary font-bold">
+          Edit
+        </div>
         <FormLabel
           >The existing translations will be reviewed and corrected using the
           source text</FormLabel
@@ -72,6 +78,9 @@ import {
         <Checkbox :checked="value" @update:checked="handleChange" />
       </FormControl>
       <div class="space-y-1 leading-none">
+        <div class="text-primary font-bold">
+          Evaluate
+        </div>
         <FormLabel
           >The existing translations will be reviewed and corrected using the
           translation text only.</FormLabel

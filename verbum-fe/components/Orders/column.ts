@@ -59,6 +59,14 @@ export const columns: ColumnDef<Order>[] = [
     }
   },
   {
+    accessorKey: 'orderPrice',
+    header: 'Price',
+    cell: ({ row }) => {
+      const orderPrice = row.getValue('orderPrice') as string
+      return orderPrice ? h('div', { class: 'font-bold text-primary' }, orderPrice) : h('div', { class: 'font-bold text-red-500' }, 'Unset')
+    }
+  },
+  {
     accessorKey: 'orderStatus',
     header: 'Status',
     cell: ({ row }) => {

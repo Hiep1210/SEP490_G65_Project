@@ -23,7 +23,11 @@ export const columns: ColumnDef<Work>[] = [
     accessorKey: 'serviceCode',
     header: 'Services',
     cell: ({ row }) =>
-      h('div', { class: 'capitalize' }, row.getValue('serviceCode'))
+      h(
+        'div',
+        { class: 'capitalize font-bold text-primary' },
+        getServiceName(row.getValue('serviceCode'))
+      )
   },
   {
     accessorKey: 'dueDate',
@@ -64,12 +68,17 @@ export const columns: ColumnDef<Work>[] = [
     accessorKey: 'orderStatus',
     header: 'Status',
     cell: ({ row }) => {
-      const orderStatus = row.getValue('orderStatus') as string
+      let orderStatus = row.getValue('orderStatus') as string
+      const isCompleted = row.original.isCompleted as boolean
+      if (isCompleted && orderStatus === 'IN_PROGRESS') {
+        orderStatus = 'COMPLETED'
+      }
       return h(
         Badge,
         { class: getOrderBadgeClass(orderStatus), variant: 'default' },
         { default: () => orderStatus }
-      )
+      );
     }
   }
+  
 ]

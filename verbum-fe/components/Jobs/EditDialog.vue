@@ -36,7 +36,7 @@
                       !value && 'text-muted-foreground',
                     )">
                       <CalendarIcon class="mr-2 h-4 w-4" />
-                      {{ value ? value.toLocaleDateString() : format(new Date(oldDueDate), 'dd/MM/yyyy') }}
+                      {{ value ? format(new Date(value), 'dd/MM/yyyy') : format(new Date(oldDueDate), 'dd/MM/yyyy') }}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent class="w-auto p-0">
@@ -78,7 +78,7 @@ const selectedLinguists = ref<string[]>([])
 
 const schema = toTypedSchema(z.object({
   assignee_id: z.array(z.string()).min(1, 'Please select at least one linguist'),
-  dueDate: z.coerce.date().min(new Date(1900,1 ,1), 'Due date is required').max(new Date(props.workDueDate), 'Due date must be before work due date')
+  dueDate: z.coerce.date().min(new Date(1900,1 ,1), 'Due date is required').max(new Date(props.workDueDate), 'Due date must be before order\'s due date')
 }))
 
 const form = useForm({
@@ -102,7 +102,7 @@ const onSubmit = form.handleSubmit((values) => {
     assigneesId: values.assignee_id,
     dueDate: format(values.dueDate, "yyyy-MM-dd'T'HH:mm:ss")
   }
-  console.log(JSON.stringify(payload, null, 2))
+  console.log(payload)
   emit('edit', payload)
 })
 </script>

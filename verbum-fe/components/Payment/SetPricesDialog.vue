@@ -3,6 +3,7 @@ import { ref, watch, defineEmits } from 'vue'
 import { Button } from '@/components/ui/button'
 import type { Order } from '~/types/order'
 import type { Language } from '~/types/language'
+import { languages } from '~/constants/languages'
 
 const props = defineProps<{
   order: Order
@@ -97,11 +98,15 @@ const isSupported = (language: string) => {
               order.sourceLanguageId ? isSupported(order.sourceLanguageId) : ''
             "
           >
-            {{ order.sourceLanguageId }}
+            {{ languages.find(
+              (language) => language.languageId === order.sourceLanguageId
+            )?.languageName }}
           </p>
           
           <ul v-for="item in order.targetLanguageId" :key="item">
-            <li :class="isSupported(item)">{{ item }}</li>
+            <li :class="isSupported(item)">{{ languages.find(
+              (language) => language.languageId === item
+            )?.languageName }}</li>
           </ul>
           <p class="text-xs italic text-gray-600">
             Order have <span class="text-green-700 font-bold">{{ total }}</span> supported languages for target languages.
@@ -113,16 +118,20 @@ const isSupported = (language: string) => {
         <span class="text-green-700">green color</span>.
       </p>
       <hr>
-      <p class="font-bold text-cyan-600">Pricing Matrix</p>
-      <div class="flex w-full gap-3">
-        <div class="flex-none w-1/3">
+      <p class="font-bold text-cyan-600">General Pricing Matrix</p>
+      <div class="flex w-full">
+        <div class="w-2/3">
           <p class="font-semibold">Price/hour:</p>
           <p class="font-semibold">Price/word/service:</p>
-
+          <p class="font-semibold">Extra fee for unsupported languages:</p>
         </div>
-        <div class="flex-none ">
-          <p class="text-cyan-600 font-semibold" > 10 USD</p>
-          <p class="text-cyan-600 font-semibold" > 0.05 USD</p>
+        <div class="flex-none">
+          <p class="text-cyan-600 font-semibold" >10 USD</p>
+          <p class="text-cyan-600 font-semibold" >0.05 USD</p>
+          <p class="text-cyan-600 font-semibold flex">
+            <span><LucideArrowUp/></span>
+            <span>20% - 30%</span>
+          </p>
         </div>
       </div>
       <hr>
@@ -136,7 +145,7 @@ const isSupported = (language: string) => {
         > <span>USD</span>
       </div>
       <DialogFooter>
-        <Button @click="closeDialog">Cancel</Button>
+        <Button class="bg-slate-500 hover:bg-slate-600" @click="closeDialog">Cancel</Button>
         <Button @click="confirmPrice">Update</Button>
       </DialogFooter>
     </DialogContent>
