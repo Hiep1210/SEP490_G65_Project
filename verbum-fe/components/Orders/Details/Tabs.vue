@@ -91,7 +91,7 @@
                   <Button
                     :disabled="downloadUrlsString.length === 0"
                     class="flex-1"
-                    @click="handleUploadReferenceFile"
+                    @click="handleUploadTranslteFile"
                     >Upload</Button
                   >
                 </div>

@@ -8,6 +8,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (unprotectedRoutes.some(route => to.path.startsWith(route)) || to.path === landingPage) {
     return
   }
+  if (to.path === '/redirect') {
+    return navigateTo('/orders')
+  }
 
   // If access_token exists and user is decoded
   if (access_token && user) {

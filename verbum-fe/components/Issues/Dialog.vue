@@ -343,6 +343,7 @@ const solutionlist = issue.value.issueAttachments.filter(
             <p>{{ issue.rejectResponse }}</p>
           </div>
 
+          <!-- Description -->
           <div class="p-3 rounded-xl border-2 border-stone-300">
             <div class="font-semibold">Description:</div>
             <p>
@@ -357,10 +358,40 @@ const solutionlist = issue.value.issueAttachments.filter(
           </div>
 
           <div class="p-3 rounded-xl border-2 border-stone-300">
+            <div class="font-semibold">File Having Issue:</div>
+            <div v-if="issue.documentUrl !== 0" class="flex gap-3">
+              <div>
+                <a
+                  :href="issue.documentUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="border rounded-xl flex flex-col gap-3 w-[150px] justify-center items-center p-2 hover:bg-stone-200"
+                  :title="getFirebaseFileName(issue.documentUrl)"
+                >
+                  <img
+                    src="~/assets/img/file_icon.png"
+                    loading="eager"
+                    format="avif"
+                    width="50"
+                    height="50"
+                    alt="file icon"
+                  />
+                  <h1
+                    class="whitespace-nowrap overflow-hidden text-ellipsis w-full text-center px-2"
+                  >
+                    {{ getFirebaseFileName(issue.documentUrl) }}
+                  </h1>
+                </a>
+              </div>
+            </div>
+            <div v-else>
+              <p class="text-primary font-semibold">No attachments found</p>
+            </div>
+          </div>
+
+          <!-- Issue Attachment -->
+          <div class="p-3 rounded-xl border-2 border-stone-300">
             <div class="font-semibold">Issue Attachment Files:</div>
-            <Button v-if="isEditing" @click="handleUploadIssueAttachment"
-              >Upload Issue Attachment</Button
-            >
             <div v-if="issue.issueAttachments.length !== 0" class="flex gap-3">
               <div
                 v-for="attachment in issue.issueAttachments"
@@ -393,8 +424,12 @@ const solutionlist = issue.value.issueAttachments.filter(
             <div v-else>
               <p class="text-primary font-semibold">No attachments found</p>
             </div>
+            <Button v-if="isEditing && role === 'CLIENT'" @click="handleUploadIssueAttachment"
+              >Upload Issue Attachment</Button
+            >
           </div>
-
+          
+          <!-- Solution file list -->
           <div class="p-3 rounded-xl border-2 border-stone-300">
             <div class="flex justify-between">
               <div class="font-semibold">Solution Files:</div>

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useToast } from '~/components/ui/toast'
-import { ref, h } from 'vue'
+import { ref} from 'vue'
 import { decodeToken } from '~/lib/auth/auth'
 import type { User } from '~/types/user'
-import { Button } from '~/components/ui/button'
 const { toast } = useToast()
 
 export const useAuth = () => {
@@ -12,7 +11,6 @@ export const useAuth = () => {
   const refreshToken = ref<string | null>(null)
   const authStore = useAuthStore()
 
-  const router = useRouter()
   const config = useRuntimeConfig()
   const login = async (credentials: any) => {
     try {

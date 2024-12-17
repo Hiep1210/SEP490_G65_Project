@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
+import { ORDER_COMPLETED, ORDER_IN_PROGRESS } from '~/constants/orderSatus';
 
 const { issues, getIssuesByOrders, updateIssue } = useIssues()
 
@@ -19,12 +20,15 @@ const props = defineProps({
   user: {
     type: Object,
     default: () => ({})
+  },
+  orderStatus: {
+    type: String,
+    default: ''
   }
 })
 
 const fetchIssues = async () => {
   issues.value = await getIssuesByOrders(props.orderId)
-  console.log('Fetched Issues:', issues.value)
 }
 
 const handleUpdate = async (updateIssues) => {
@@ -38,7 +42,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-full">
+  <div 
+    v-if="(issues.length !== 0 && props.orderStatus === ORDER_IN_PROGRESS) || props.orderStatus === ORDER_COMPLETED" 
+    class="h-full">
     <div class="flex justify-between items-center p-3 border-b">
       <span class="text-lg font-semibold text-primary">Issues</span>
       <IssuesCreate
@@ -47,7 +53,7 @@ onMounted(() => {
         :job-deliverables="jobDeliverables"
       />
     </div>
-    <div v-if="issues" class="h-[15rem] overflow-auto p-2">
+    <div v-if="issues.length !== 0" class="h-[15rem] overflow-auto p-2">
       <IssuesTable :issues="issues" :role="props.role" @update="handleUpdate" />
     </div>
     <div v-else class="w-full h-full flex justify-center items-center">
