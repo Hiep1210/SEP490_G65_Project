@@ -65,7 +65,7 @@ const priceError = ref('');
 
 watch(prices, (newVal) => {
   const priceValue = parseFloat(newVal);
-  if (isNaN(priceValue) || priceValue <= 0) {
+  if (isNaN(priceValue) || priceValue <= 0 || priceValue >= 999999999) {
     priceError.value = 'Price must be a positive number.';
   } else {
     priceError.value = '';
