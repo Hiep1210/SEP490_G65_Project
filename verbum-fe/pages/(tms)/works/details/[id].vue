@@ -41,7 +41,9 @@ provide('assignList', assignList)
             {{ work?.workName }}
           </p>
           <Badge
-            :class="getWorkBadgeClass(work?.orderStatus)"
+            :class="work?.orderStatus === 'IN_PROGRESS' && work.isCompleted
+                ? getWorkBadgeClass('COMPLETED')
+                : getWorkBadgeClass(work?.orderStatus)"
           >
             {{
               work?.orderStatus === 'IN_PROGRESS' && work.isCompleted
