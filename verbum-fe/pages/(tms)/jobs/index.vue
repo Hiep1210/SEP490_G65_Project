@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { getColumns } from '~/components/Jobs/column';
+import { getColumns } from '~/components/Jobs/column'
 useSeoMeta({
-    title: 'Jobs'
+  title: 'Jobs'
 })
 
 const { jobs, isLoading, getJobs } = useJobs()
@@ -11,19 +11,17 @@ const role = useAuthStore().user?.role
 const columns = getColumns(role)
 
 onMounted(() => {
-    if (!jobs.value.length) {
-        getJobs()
-    }
-    if (role?.includes('MANAGER')) {
-        getAssignList()
-    }
+  getJobs()
+  if (role?.includes('MANAGER')) {
+    getAssignList()
+  }
 })
 provide('assignList', assignList)
 </script>
 
 <template>
-    <LoadingSpinner v-if="isLoading" />
-    <JobsTable v-else :columns="columns" :data="jobs" />
+  <LoadingSpinner v-if="isLoading" />
+  <JobsTable v-else :columns="columns" :data="jobs" />
 </template>
 
 <style scoped></style>

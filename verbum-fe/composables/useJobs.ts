@@ -10,8 +10,13 @@ export const useJobs = () => {
   const getJobs = async () => {
     isLoading.value = true
     try {
-        const { data } = await useAPI('/job/get-all')
-        jobs.value = data.value as Job[]
+        const { data: jobsData } = await useAPI<Job[]>('/job/get-all')
+        if (!jobsData.value || jobsData.value.length === 0) {
+          jobs.value = []
+        }
+        else {
+          jobs.value = jobsData.value as Job[]
+        }
     } catch (error) {
       toast({
         title: 'Failed to fetch jobs',
