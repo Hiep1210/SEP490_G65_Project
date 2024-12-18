@@ -103,7 +103,7 @@ export const useOrders = () => {
         title: 'Success',
         description: `Order rejected successfully`
       })
-      router.push('/orders')
+      window.location.reload()
     } catch (error) {
       console.error('Failed to send reject order:', error)
       toast({
